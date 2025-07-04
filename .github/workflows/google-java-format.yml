@@ -1,0 +1,19 @@
+name: Auto Google Java Format on PR
+
+on:
+  pull_request:
+    branches: [ dev ]
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: axel-op/googlejavaformat-action@v4
+        with:
+          args: "--replace"
+          commit-message: "style: Google Java 컨벤션에 맞게 코드 스타일 자동 수정"
