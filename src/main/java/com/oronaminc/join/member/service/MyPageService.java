@@ -1,6 +1,9 @@
 package com.oronaminc.join.member.service;
 
+import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.dto.MyProfileGetResponse;
+import com.oronaminc.join.member.dto.MyProfileUpdateRequest;
+import com.oronaminc.join.member.dto.MyProfileUpdateResponse;
 import com.oronaminc.join.member.dto.ParticipantCountDto;
 import com.oronaminc.join.participant.dao.ParticipantRepository;
 import java.util.List;
@@ -37,5 +40,12 @@ public class MyPageService {
             joinedRoomCount
         );
     }
+
+    public MyProfileUpdateResponse updateMyProfile(MyProfileUpdateRequest request, Long memberId) {
+        Member member = memberService.getMember(memberId);
+        member.updateNickname(request.nickname());
+        return new MyProfileUpdateResponse(memberId);
+    }
+
 
 }
