@@ -3,6 +3,7 @@ package com.oronaminc.join.member.domain;
 import com.oronaminc.join.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,4 +24,11 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private MemberType memberType;
 
+    @Builder
+    public Member(String email, String nickname, String profileImage, MemberType memberType) {
+        this.email = email;
+        this.nickname = nickname;
+        this.profileImage = profileImage;
+        this.memberType = memberType;
+    }
 }
