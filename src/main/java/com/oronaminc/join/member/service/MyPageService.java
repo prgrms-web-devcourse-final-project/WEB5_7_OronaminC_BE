@@ -41,6 +41,7 @@ public class MyPageService {
         );
     }
 
+    @Transactional
     public MyProfileUpdateResponse updateMyProfile(MyProfileUpdateRequest request, Long memberId) {
         Member member = memberService.getMember(memberId);
         member.updateNickname(request.nickname());
