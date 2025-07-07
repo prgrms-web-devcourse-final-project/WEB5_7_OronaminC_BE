@@ -1,5 +1,7 @@
 package com.oronaminc.join.member.service;
 
+import com.oronaminc.join.global.exception.ErrorCode;
+import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.member.dao.MemberRepository;
 import com.oronaminc.join.member.domain.Member;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +16,8 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     public Member getMember(Long memberId) {
-        return memberRepository.findById(memberId).orElse(null);
+        return memberRepository.findById(memberId)
+            .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_MEMBER));
     }
 
 }
