@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -27,4 +28,10 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private MemberType memberType;
 
+    @Builder
+    public Member(String email, String nickname, MemberType memberType) {
+        this.email = email;
+        this.nickname = nickname;
+        this.memberType = memberType;
+    }
 }
