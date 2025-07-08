@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.oronaminc.join.member.dto.GuestLoginRequest;
+import com.oronaminc.join.member.dto.GuestLoginResponse;
 import com.oronaminc.join.member.dto.SessionInfoResponse;
 
 import jakarta.servlet.http.Cookie;
@@ -34,7 +35,7 @@ public class AuthController {
 
     @PostMapping("/guest")
     @ResponseStatus(HttpStatus.CREATED)
-    public Long guestLogin(@RequestBody GuestLoginRequest guestLoginRequest, HttpServletRequest request) {
+    public GuestLoginResponse guestLogin(@RequestBody GuestLoginRequest guestLoginRequest, HttpServletRequest request) {
         MemberDetails guest = authService.loadGuest(guestLoginRequest);
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
@@ -47,7 +48,7 @@ public class AuthController {
 
         request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
 
-        return guest.getId();
+        return new GuestLoginResponse(guest.getId());
     }
 
 
