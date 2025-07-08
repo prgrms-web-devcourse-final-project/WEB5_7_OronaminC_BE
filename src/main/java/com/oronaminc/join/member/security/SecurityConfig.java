@@ -23,6 +23,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/api/auth/guest"
+                        )
+                        .anonymous()
+                        .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-resources/**",
                                 "/v3/api-docs/**",
@@ -32,7 +36,7 @@ public class SecurityConfig {
                                 "/dev/**",
                                 "/login",
                                 "/login/oauth2/code/kakao",
-                                "/api/auth/guest"
+                                "/api/auth/logout"
                         )
                         .permitAll()
                         .anyRequest().authenticated()
