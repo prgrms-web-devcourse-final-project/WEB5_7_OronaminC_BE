@@ -1,9 +1,12 @@
 package com.oronaminc.join.question.service;
 
+import static com.oronaminc.join.global.exception.ErrorCode.NOT_FOUND_PARTICIPANT;
+
 import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.repository.MemberRepository;
+import com.oronaminc.join.participant.repository.ParticipantRepository;
 import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.dto.QuestionCreateRequest;
 import com.oronaminc.join.question.mapper.QuestionMapper;
@@ -20,6 +23,7 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
     private final RoomRepository roomRepository;
     private final MemberRepository memberRepository;
+    private final ParticipantRepository participantRepository;
 
     public Question create(Long roomId, Long memberId, QuestionCreateRequest requestDto) {
 
@@ -28,6 +32,10 @@ public class QuestionService {
 
         Room room = roomRepository.findById(roomId)
             .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_ROOM));
+
+        if (!participantRepository.existsByRoomIdAndMemberId(room.getId(), member.getId())) {
+            throw new ErrorException(NOT_FOUND_PARTICIPANT);
+        }
 
         Question question = QuestionMapper.toQuestion(room, member, requestDto);
 
