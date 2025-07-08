@@ -2,14 +2,19 @@ package com.oronaminc.join.question.domain;
 
 import com.oronaminc.join.global.entity.BaseEntity;
 import com.oronaminc.join.member.domain.Member;
+import com.oronaminc.join.question.dto.QuestionRequestDto;
 import com.oronaminc.join.room.domain.Room;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Question extends BaseEntity {
 
@@ -32,4 +37,12 @@ public class Question extends BaseEntity {
     @Version
     private Integer version;
 
+    public static Question create(Room room, Member member, QuestionRequestDto requestDto) {
+        return Question.builder()
+            .room(room)
+            .member(member)
+            .content(requestDto.content())
+            .emojiCount(0L)
+            .build();
+    }
 }
