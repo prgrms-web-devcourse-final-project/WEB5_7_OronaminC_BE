@@ -1,4 +1,4 @@
-package com.oronaminc.join.member.repository;
+package com.oronaminc.join.member.dao;
 
 import java.util.Optional;
 
@@ -8,4 +8,5 @@ import com.oronaminc.join.member.domain.Member;
 
 public interface MemberJpaRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByEmail(String email);
+    boolean existsMemberByEmail(String email);
 }

@@ -2,7 +2,7 @@ package com.oronaminc.join.member.service;
 
 import org.springframework.stereotype.Service;
 
-import com.oronaminc.join.member.repository.MemberJpaRepository;
+import com.oronaminc.join.member.dao.MemberJpaRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -10,5 +10,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberJpaRepository memberJpaRepository;
+
+    public boolean existsMemberByEmail(String email) {
+        return memberJpaRepository.existsMemberByEmail(email);
+    }
+
 
 }
