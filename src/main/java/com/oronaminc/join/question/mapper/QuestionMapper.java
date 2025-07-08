@@ -14,7 +14,7 @@ public class QuestionMapper {
         return Question.create(room, member, request);
     }
 
-    public static QuestionCreateResponse toQuestionResponseDto (Question question) {
+    public static QuestionCreateResponse toQuestionCreateResponse (Question question) {
         return new QuestionCreateResponse(
             "CREATE",
             question.getId(),

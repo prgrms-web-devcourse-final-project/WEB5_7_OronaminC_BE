@@ -21,7 +21,7 @@ public class QuestionService {
     private final RoomRepository roomRepository;
     private final MemberRepository memberRepository;
 
-    public Long create(Long roomId, Long memberId, QuestionCreateRequest requestDto) {
+    public Question create(Long roomId, Long memberId, QuestionCreateRequest requestDto) {
 
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_MEMBER));
@@ -33,7 +33,7 @@ public class QuestionService {
 
         questionRepository.save(question);
 
-        return question.getId();
+        return question;
     }
 
 }
