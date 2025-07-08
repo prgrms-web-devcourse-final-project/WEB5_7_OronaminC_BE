@@ -32,10 +32,7 @@ jobs:
         with:
           payload: |
             {
-              payload: |
-                {
-                  "text": "🔴 *CI 테스트 실패 알림*\n리포지토리: `${{ github.repository }}`\n브랜치: `${{ github.ref_name }}`\nPR 번호: `${{ github.event.pull_request.number }}`\nPR 제목: `${{ github.event.pull_request.title }}`\n워크플로우: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>\n실패 커밋: `${{ github.event.pull_request.head.sha }}`"
-                }
+              "text": "🔴 *CI 테스트 실패 알림*\n리포지토리: `${{ github.repository }}`\n브랜치: `${{ github.ref_name }}`\nPR 번호: `${{ github.event.pull_request.number }}`\nPR 제목: `${{ github.event.pull_request.title }}`\n워크플로우: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>\n실패 커밋: `${{ github.event.pull_request.head.sha }}`"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
