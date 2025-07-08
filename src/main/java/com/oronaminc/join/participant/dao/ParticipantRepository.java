@@ -31,7 +31,7 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
         select p
         from Participant p
         join fetch p.room
-        where p.member.id = :memberId and p.participantType == :pType
+        where p.member.id = :memberId and p.participantType = :pType
         """)
     Page<Participant> findByMemberIdAndParticipantType(Long memberId, ParticipantType pType,
         Pageable pageable);
