@@ -25,6 +25,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -35,7 +36,7 @@ public class AuthController {
 
     @PostMapping("/guest")
     @ResponseStatus(HttpStatus.CREATED)
-    public GuestLoginResponse guestLogin(@RequestBody GuestLoginRequest guestLoginRequest, HttpServletRequest request) {
+    public GuestLoginResponse guestLogin(@RequestBody @Valid GuestLoginRequest guestLoginRequest, HttpServletRequest request) {
         MemberDetails guest = authService.loadGuest(guestLoginRequest);
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
