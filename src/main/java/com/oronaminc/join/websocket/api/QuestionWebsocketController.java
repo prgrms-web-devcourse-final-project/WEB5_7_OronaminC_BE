@@ -1,4 +1,4 @@
-package com.oronaminc.join.question.controller.websocket;
+package com.oronaminc.join.websocket.api;
 
 import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.dto.QuestionCreateRequest;

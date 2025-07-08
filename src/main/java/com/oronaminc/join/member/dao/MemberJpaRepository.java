@@ -1,4 +1,4 @@
-package com.oronaminc.join.member.repository;
+package com.oronaminc.join.member.dao;
 
 import java.util.Optional;
 

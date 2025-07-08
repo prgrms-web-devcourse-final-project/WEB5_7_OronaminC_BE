@@ -1,4 +1,4 @@
-package com.oronaminc.join.member.controller;
+package com.oronaminc.join.member.api;
 
 import org.springframework.web.bind.annotation.RestController;
 

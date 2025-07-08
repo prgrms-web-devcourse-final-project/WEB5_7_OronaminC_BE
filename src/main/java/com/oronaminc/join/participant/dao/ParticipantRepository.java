@@ -1,4 +1,4 @@
-package com.oronaminc.join.participant.repository;
+package com.oronaminc.join.participant.dao;
 
 import com.oronaminc.join.participant.domain.Participant;
 import org.springframework.data.jpa.repository.JpaRepository;
