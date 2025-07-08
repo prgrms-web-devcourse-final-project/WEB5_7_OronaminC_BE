@@ -1,6 +1,6 @@
 package com.oronaminc.join.question.dto;
 
-public record QuestionRequestDto(
+public record QuestionCreateRequest(
     String content
 ) {
 

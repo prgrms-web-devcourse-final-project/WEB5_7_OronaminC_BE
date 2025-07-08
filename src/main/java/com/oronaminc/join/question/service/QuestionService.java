@@ -5,7 +5,7 @@ import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.repository.MemberRepository;
 import com.oronaminc.join.question.domain.Question;
-import com.oronaminc.join.question.dto.QuestionRequestDto;
+import com.oronaminc.join.question.dto.QuestionCreateRequest;
 import com.oronaminc.join.question.mapper.QuestionMapper;
 import com.oronaminc.join.question.repository.QuestionRepository;
 import com.oronaminc.join.room.domain.Room;
@@ -21,7 +21,7 @@ public class QuestionService {
     private final RoomRepository roomRepository;
     private final MemberRepository memberRepository;
 
-    public Long create(Long roomId, Long memberId, QuestionRequestDto requestDto) {
+    public Long create(Long roomId, Long memberId, QuestionCreateRequest requestDto) {
 
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_MEMBER));

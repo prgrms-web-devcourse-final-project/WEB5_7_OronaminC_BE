@@ -4,7 +4,7 @@ package com.oronaminc.join.question.dto;
 import com.oronaminc.join.global.dto.WriterDto;
 import java.time.LocalDateTime;
 
-public record QuestionResponseDto(
+public record QuestionCreateResponse(
     String event,
     Long questionId,
     String content,
