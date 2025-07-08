@@ -32,7 +32,7 @@ jobs:
         with:
           payload: |
             {
-              "text": ":red_circle: *CI 테스트 실패 알림*\n"
+              "text": "🔴 *CI 테스트 실패 알림*\n"
                         + "리포지토리: `${{ github.repository }}`\n"
                         + "브랜치: `${{ github.ref_name }}`\n"
                         + "PR 번호: ${{ github.event.pull_request.number }}\n"

@@ -13,7 +13,7 @@ jobs:
         with:
           payload: |
             {
-              "text": "${{ github.event.action == 'submitted' && ':돋보기: PR 리뷰가 등록되었습니다' || github.event.action == 'closed' && github.event.pull_request.merged && ':흰색_확인_표시: PR이 머지되었습니다' || github.event.action == 'opened' && ':로켓: 새 PR이 생성되었습니다' || ':시계_반대_방향_화살표: PR 이벤트가 발생했습니다' }}: *${{ github.event.pull_request.title }}* by `${{ github.event.pull_request.user.login }}`\n<${{ github.event.pull_request.html_url }}|PR 보러가기>"
+              "text": "${{ github.event.action == 'submitted' && '🔎 PR 리뷰가 등록되었습니다' || github.event.action == 'closed' && github.event.pull_request.merged && '✅ PR이 머지되었습니다' || github.event.action == 'opened' && '🚀 새 PR이 생성되었습니다' || '🔄 PR 이벤트가 발생했습니다' }}: *${{ github.event.pull_request.title }}* by `${{ github.event.pull_request.user.login }}`\n<${{ github.event.pull_request.html_url }}|PR 보러가기>"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
