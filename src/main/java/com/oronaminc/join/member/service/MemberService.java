@@ -10,4 +10,5 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberJpaRepository memberJpaRepository;
+
 }

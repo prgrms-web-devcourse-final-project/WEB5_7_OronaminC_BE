@@ -34,8 +34,6 @@ public class AuthService extends DefaultOAuth2UserService {
 
         log.info("attributes :: " + attributes);
 
-        httpSession.setAttribute("login_info", attributes);
-
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
         Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
 
@@ -78,10 +76,10 @@ public class AuthService extends DefaultOAuth2UserService {
 
         // 1. 비회원 MemberDetails 생성
         MemberDetails memberDetails = MemberDetails.builder()
-                .id(guest.getId()) // DB ID 없음
+                .id(guest.getId())
                 .name("GUEST" + guest.getId())
                 .nickname(guest.getNickname())
-                .role(MemberType.GUEST) // enum: GUEST 추가
+                .role(MemberType.GUEST)
                 .attributes(Map.of("nickname", guest.getNickname()))
                 .build();
 
