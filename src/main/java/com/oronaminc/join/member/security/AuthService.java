@@ -51,16 +51,13 @@ public class AuthService extends DefaultOAuth2UserService {
                 )
         );
 
-        MemberDetails memberDetails = MemberDetails.builder()
+        return MemberDetails.builder()
                 .id(member.getId())
                 .name(member.getEmail())
                 .nickname(member.getNickname())
                 .attributes(attributes)
                 .role(member.getMemberType())
                 .build();
-
-
-        return memberDetails;
     }
 
     @Transactional

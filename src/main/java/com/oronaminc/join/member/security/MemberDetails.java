@@ -19,7 +19,7 @@ public class MemberDetails implements OAuth2User {
     private final String name;
     private final String nickname;
     private final Map<String, Object> attributes;
-    private String role;
+    private final String role;
 
     @Builder
     public MemberDetails(Long id, String name, String nickname, Map<String, Object> attributes, MemberType role) {
