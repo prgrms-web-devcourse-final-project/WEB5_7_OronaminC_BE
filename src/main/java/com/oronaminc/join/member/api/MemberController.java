@@ -1,6 +1,8 @@
 package com.oronaminc.join.member.api;
 
+import com.oronaminc.join.member.security.MemberDetails;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -40,26 +42,28 @@ public class MemberController {
 
     @GetMapping("/me")
     @ResponseStatus(HttpStatus.OK)
-    public MyProfileGetResponse getMyProfile() {
-        // todo : 세션로그인 도입 후 memberID 세션에서 받아오는 걸로 변경
-        Long memberId = 1L;
+    public MyProfileGetResponse getMyProfile(@AuthenticationPrincipal MemberDetails memberDetails) {
+        Long memberId = memberDetails.getId();
         return myPageService.getMyProfile(memberId);
     }
 
     @PatchMapping("/me")
     @ResponseStatus(HttpStatus.OK)
-    public MyProfileUpdateResponse updateMyProfile(@RequestBody @Valid MyProfileUpdateRequest request) {
+    public MyProfileUpdateResponse updateMyProfile(
+        @RequestBody @Valid MyProfileUpdateRequest request,
+        @AuthenticationPrincipal MemberDetails memberDetails) {
         // todo : 세션로그인 도입 후 memberID 세션에서 받아오는 걸로 변경
-        Long memberId = 1L;
+        Long memberId = memberDetails.getId();
         return myPageService.updateMyProfile(request, memberId);
     }
 
     @GetMapping("/rooms")
     @ResponseStatus(HttpStatus.OK)
-    public MyRoomsGetResponse getMyProfile(@RequestParam(defaultValue = "ALL") MyPageType type,
+    public MyRoomsGetResponse getMyProfile(
+        @RequestParam(defaultValue = "ALL") MyPageType type,
+        @AuthenticationPrincipal MemberDetails memberDetails,
         Pageable pageable) {
-        // todo : 세션로그인 도입 후 memberID 세션에서 받아오는 걸로 변경
-        Long memberId = 1L;
+        Long memberId = memberDetails.getId();
         return myPageService.getMyRooms(memberId, type, pageable);
     }
 

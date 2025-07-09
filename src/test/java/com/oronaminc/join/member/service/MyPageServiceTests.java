@@ -140,9 +140,23 @@ class MyPageServiceTests {
         ReflectionTestUtils.setField(room2, "createdAt", LocalDateTime.now());
         ReflectionTestUtils.setField(room3, "createdAt", LocalDateTime.now());
 
-        Participant participant1 = new Participant(room1, member, ParticipantType.PRESENTER);
-        Participant participant2 = new Participant(room2, member, ParticipantType.TEAM);
-        Participant participant3 = new Participant(room3, member, ParticipantType.GUEST);
+
+        Participant participant1 = Participant.builder()
+            .room(room1)
+            .member(member)
+            .participantType(ParticipantType.PRESENTER)
+            .build();
+        Participant participant2 = Participant.builder()
+            .room(room2)
+            .member(member)
+            .participantType(ParticipantType.TEAM)
+            .build();
+        Participant participant3 = Participant.builder()
+            .room(room3)
+            .member(member)
+            .participantType(ParticipantType.GUEST)
+            .build();
+
 
         List<Participant> pc = List.of(participant1, participant2, participant3);
         Page<Participant> participantPage = new PageImpl<>(pc, pageable, 1);

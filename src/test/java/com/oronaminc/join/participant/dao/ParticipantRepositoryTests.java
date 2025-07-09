@@ -45,10 +45,30 @@ class ParticipantRepositoryTests {
         Room room2 = roomRepository.save(Room.builder().build());
         Room room3 = roomRepository.save(Room.builder().build());
 
-        participantRepository.save(new Participant(room1, member, ParticipantType.PRESENTER));
-        participantRepository.save(new Participant(room2, member, ParticipantType.TEAM));
-        participantRepository.save(new Participant(room3, member, ParticipantType.GUEST));
-        participantRepository.save(new Participant(room3, otherMember, ParticipantType.GUEST));
+        participantRepository.save(Participant.builder()
+            .room(room1)
+            .member(member)
+            .participantType(ParticipantType.PRESENTER)
+            .build()
+        );
+        participantRepository.save(Participant.builder()
+            .room(room2)
+            .member(member)
+            .participantType(ParticipantType.TEAM)
+            .build()
+        );
+        participantRepository.save(Participant.builder()
+            .room(room3)
+            .member(member)
+            .participantType(ParticipantType.GUEST)
+            .build()
+        );
+        participantRepository.save(Participant.builder()
+            .room(room3)
+            .member(otherMember)
+            .participantType(ParticipantType.GUEST)
+            .build()
+        );
     }
     
     @Test
