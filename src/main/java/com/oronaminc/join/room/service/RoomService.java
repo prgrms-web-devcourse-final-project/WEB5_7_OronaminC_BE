@@ -23,10 +23,19 @@ public class RoomService {
     private static final int CODE_LENGTH = 6;
 
     public CreateRoomResponse createRoom(CreateRoomRequest createRoomRequest, String presenterEmail) {
-        String code = CodeGenerator.generateCode(CODE_LENGTH);
+        String code = this.generateCode();
         Room room = RoomMapper.toRoom(createRoomRequest, code);
         roomJpaRepository.save(room);
         participantService.savePresenterAndTeam(presenterEmail, createRoomRequest.teamEmail(), room);
         return RoomMapper.toCreateRoomResponse(room);
+    }
+
+    private String generateCode() {
+        while(true){
+            String code = CodeGenerator.generateCode(CODE_LENGTH);
+            if (!roomJpaRepository.existsBySecretCode(code)) {
+                return code;
+            }
+        }
     }
 }
