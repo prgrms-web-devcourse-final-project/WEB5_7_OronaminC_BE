@@ -10,10 +10,10 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.oronaminc.join.member.dao.MemberRepository;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.domain.MemberType;
 import com.oronaminc.join.member.dto.GuestLoginRequest;
-import com.oronaminc.join.member.dao.MemberJpaRepository;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class AuthService extends DefaultOAuth2UserService {
-    private final MemberJpaRepository memberJpaRepository;
+    private final MemberRepository memberRepository;
 
     private final HttpSession httpSession;
 
@@ -38,10 +38,10 @@ public class AuthService extends DefaultOAuth2UserService {
         Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
 
 
-        Optional<Member> optionalMember = memberJpaRepository.findByEmail(kakaoAccount.get("email").toString());
+        Optional<Member> optionalMember = memberRepository.findByEmail(kakaoAccount.get("email").toString());
 
         Member member = optionalMember.orElseGet(
-                () -> memberJpaRepository.save(
+                () -> memberRepository.save(
                         Member.builder()
                                 .email(kakaoAccount.get("email").toString())
                                 .nickname(profile.get("nickname").toString())
@@ -55,7 +55,6 @@ public class AuthService extends DefaultOAuth2UserService {
                 .id(member.getId())
                 .name(member.getEmail())
                 .nickname(member.getNickname())
-                .attributes(attributes)
                 .role(member.getMemberType())
                 .build();
     }
@@ -69,15 +68,14 @@ public class AuthService extends DefaultOAuth2UserService {
                 .memberType(MemberType.GUEST)
                 .build();
 
-        memberJpaRepository.save(guest);
+        memberRepository.save(guest);
 
         // 1. 비회원 MemberDetails 생성
         MemberDetails memberDetails = MemberDetails.builder()
                 .id(guest.getId())
-                .name("GUEST" + guest.getId())
+                .name("GUEST_" + guest.getId())
                 .nickname(guest.getNickname())
                 .role(MemberType.GUEST)
-                .attributes(Map.of("nickname", guest.getNickname()))
                 .build();
 
         return memberDetails;
