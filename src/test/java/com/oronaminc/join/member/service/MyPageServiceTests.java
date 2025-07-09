@@ -148,11 +148,11 @@ class MyPageServiceTests {
         Page<Participant> participantPage = new PageImpl<>(pc, pageable, 1);
 
         List<Long> roomIds = List.of(room1.getId(), room2.getId(), room3.getId());
-        Map<Long, Long> questions = new HashMap<>(Map.of(
-            room1.getId(), 1L,
-            room2.getId(), 2L,
-            room3.getId(), 3L
-        ));
+        List<Object[]> questions = List.of(
+            new Object[]{ room1.getId(), 1L },
+            new Object[]{ room2.getId(), 2L },
+            new Object[]{ room3.getId(), 3L }
+        );
 
         when(participantRepository.findByMemberId(memberId, pageable))
             .thenReturn(participantPage);

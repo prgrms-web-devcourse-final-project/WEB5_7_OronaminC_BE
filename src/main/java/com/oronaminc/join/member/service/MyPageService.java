@@ -16,6 +16,8 @@ import com.oronaminc.join.question.dao.QuestionRepository;
 import com.oronaminc.join.room.domain.Room;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -76,7 +78,13 @@ public class MyPageService {
         List<Long> roomIds = participants.stream()
             .map(p -> p.getRoom().getId())
             .toList();
-        Map<Long, Long> questionCounts = questionRepository.countByRoomIds(roomIds);
+        List<Object[]> questionCounts = questionRepository.countByRoomIds(roomIds);
+        Map<Long, Long> countMap = questionCounts.stream()
+            .collect(Collectors.toMap(
+                row -> (Long) row[0],
+                row -> (Long) row[1]
+            ));
+
 
         Page<MyRoomsDto> response = participants.map(p -> {
             Room room = p.getRoom();
@@ -87,7 +95,7 @@ public class MyPageService {
                 .status(room.getRoomStatus())
                 .startedAt(room.getCreatedAt().toLocalDate())
                 .participationType(ParticipationType.from(p.getParticipantType()))
-                .questions(questionCounts.getOrDefault(room.getId(), 0L))
+                .questions(countMap.getOrDefault(room.getId(), 0L))
                 .build();
         });
 
