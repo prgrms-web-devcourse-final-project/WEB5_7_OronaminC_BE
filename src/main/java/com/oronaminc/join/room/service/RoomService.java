@@ -2,10 +2,16 @@ package com.oronaminc.join.room.service;
 
 import static com.oronaminc.join.global.exception.ErrorCode.*;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.oronaminc.join.document.domain.Document;
+import com.oronaminc.join.document.service.DocumentService;
+import com.oronaminc.join.emoji.service.EmojiService;
 import com.oronaminc.join.global.exception.ErrorException;
+import com.oronaminc.join.participant.domain.Participant;
 import com.oronaminc.join.participant.domain.ParticipantType;
 import com.oronaminc.join.participant.service.ParticipantService;
 import com.oronaminc.join.room.dao.RoomRepository;
@@ -14,6 +20,7 @@ import com.oronaminc.join.room.dto.CreateRoomRequest;
 import com.oronaminc.join.room.dto.CreateRoomResponse;
 import com.oronaminc.join.room.dto.JoinRoomRequest;
 import com.oronaminc.join.room.dto.JoinRoomResponse;
+import com.oronaminc.join.room.dto.RoomDetailResponse;
 import com.oronaminc.join.room.util.CodeGenerator;
 import com.oronaminc.join.room.util.RoomMapper;
 
@@ -25,6 +32,8 @@ import lombok.RequiredArgsConstructor;
 public class RoomService {
     private final RoomRepository roomRepository;
     private final ParticipantService participantService;
+    private final EmojiService emojiService;
+    private final DocumentService documentService;
 
     private static final int CODE_LENGTH = 6;
 
@@ -42,6 +51,20 @@ public class RoomService {
 
         participantService.saveParticipantById(memberId, room, ParticipantType.GUEST);
         return new JoinRoomResponse(room.getId());
+    }
+
+    public RoomDetailResponse getRoomDetail(Long memberId, Long roomId) {
+        participantService.validateParticipant(memberId, roomId);
+
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new ErrorException(NOT_FOUND_ROOM));
+
+        Participant presenter = participantService.getPresenter(roomId);
+        List<Participant> team = participantService.getTeam(roomId);
+        Integer emojiCount = emojiService.countRoomEmoji(roomId);
+        Document document = documentService.getDocumentByRoomId(roomId);
+
+        return RoomMapper.toRoomDetailResponse(room, presenter, team, document, emojiCount, memberId);
     }
 
     private String generateCode() {

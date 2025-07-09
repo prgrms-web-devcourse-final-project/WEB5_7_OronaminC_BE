@@ -50,4 +50,19 @@ public class ParticipantService {
         Participant participant = ParticipantMapper.toParticipant(participantMember, room, participantType);
         participantRepository.save(participant);
     }
+
+    public void validateParticipant(Long memberId, Long roomId) {
+        if (!participantRepository.existsByRoomIdAndMemberId(roomId, memberId)) {
+            throw new ErrorException(NOT_FOUND_PARTICIPANT);
+        }
+    }
+
+    public Participant getPresenter(Long roomId) {
+        return participantRepository.findByRoomIdAndParticipantType(roomId, ParticipantType.PRESENTER)
+                .orElseThrow(() -> new ErrorException(NOT_FOUND_PARTICIPANT));
+    }
+
+    public List<Participant> getTeam(Long roomId) {
+        return participantRepository.findAllByRoomIdAndParticipantType(roomId, ParticipantType.TEAM);
+    }
 }
