@@ -8,6 +8,10 @@ import com.oronaminc.join.room.domain.RoomType;
 import com.oronaminc.join.room.dto.CreateRoomRequest;
 import com.oronaminc.join.room.dto.CreateRoomResponse;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RoomMapper {
 
     public static Room toRoom(CreateRoomRequest createRoomRequest, String code) {
