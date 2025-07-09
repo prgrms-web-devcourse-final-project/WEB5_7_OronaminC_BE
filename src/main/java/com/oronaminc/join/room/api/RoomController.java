@@ -2,6 +2,7 @@ package com.oronaminc.join.room.api;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.oronaminc.join.member.security.MemberDetails;
 import com.oronaminc.join.room.dto.CreateRoomRequest;
 import com.oronaminc.join.room.dto.CreateRoomResponse;
+import com.oronaminc.join.room.dto.JoinRoomRequest;
+import com.oronaminc.join.room.dto.JoinRoomResponse;
 import com.oronaminc.join.room.service.RoomService;
 
 import jakarta.validation.Valid;
@@ -30,5 +33,14 @@ public class RoomController {
     ) {
         String presenterEmail = memberDetails.getName();
         return roomService.createRoom(createRoomRequest, presenterEmail);
+    }
+
+    @GetMapping("/code")
+    @ResponseStatus(HttpStatus.OK)
+    public JoinRoomResponse joinRoom(
+            @RequestBody JoinRoomRequest joinRoomRequest,
+            @AuthenticationPrincipal MemberDetails memberDetails
+    ) {
+        return roomService.joinRoom(memberDetails.getId(), joinRoomRequest);
     }
 }
