@@ -1,5 +1,6 @@
 package com.oronaminc.join.participant.domain;
 
+import java.time.LocalDateTime;
 
 import com.oronaminc.join.global.entity.BaseEntity;
 import com.oronaminc.join.member.domain.Member;
@@ -14,14 +15,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Participant extends BaseEntity {
 
@@ -41,11 +43,4 @@ public class Participant extends BaseEntity {
     private ParticipantType participantType;
 
     private LocalDateTime exitedAt;
-
-    @Builder
-    public Participant(Room room, Member member, ParticipantType participantType) {
-        this.room = room;
-        this.member = member;
-        this.participantType = participantType;
-    }
 }
