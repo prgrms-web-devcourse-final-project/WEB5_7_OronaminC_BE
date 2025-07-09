@@ -34,9 +34,6 @@ class ParticipantRepositoryTests {
     @Autowired
     private RoomRepository roomRepository;
 
-    @Autowired
-    private QuestionRepository questionRepository;
-
     private Member member;
 
     @BeforeEach
