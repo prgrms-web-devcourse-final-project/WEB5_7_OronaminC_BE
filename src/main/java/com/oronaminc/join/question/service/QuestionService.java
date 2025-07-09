@@ -9,6 +9,7 @@ import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.dao.MemberRepository;
 import com.oronaminc.join.participant.dao.ParticipantRepository;
 import com.oronaminc.join.question.domain.Question;
+import com.oronaminc.join.question.domain.QuestionSort;
 import com.oronaminc.join.question.dto.QuestionCreateRequest;
 import com.oronaminc.join.question.dto.QuestionListResponse;
 import com.oronaminc.join.question.util.QuestionMapper;
@@ -20,9 +21,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +33,7 @@ public class QuestionService {
     private final MemberRepository memberRepository;
     private final ParticipantRepository participantRepository;
 
+    @Transactional
     public Question create(Long roomId, Long memberId, QuestionCreateRequest requestDto) {
 
         Member member = getMember(memberId);
@@ -50,6 +51,29 @@ public class QuestionService {
         return question;
     }
 
+    @Transactional(readOnly = true)
+    public Slice<QuestionListResponse> getQuestions(
+        QuestionSort sort,
+        Long lastId,
+        Long lastEmojiCount,
+        int size,
+        Long memberId
+    ) {
+        getMember(memberId);
+        Pageable pageable = PageRequest.of(0, size + 1);
+
+        List<QuestionListResponse> questions = switch (sort) {
+            case CREATEDAT -> questionRepository.findByCreatedAt(lastId,
+                    memberId, pageable);
+            case EMOJI -> questionRepository.findByEmojiCount(lastId,
+                    lastEmojiCount, memberId, pageable);
+            case MYQUESTION -> questionRepository.findByMyQuestion(lastId,
+                    memberId, pageable);
+        };
+
+        return SliceUtil.toSlice(questions, PageRequest.of(0, size));
+    }
+
     private Room getRoom(Long roomId) {
         Room room = roomRepository.findById(roomId)
             .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_ROOM));
@@ -61,18 +85,4 @@ public class QuestionService {
             .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_MEMBER));
         return member;
     }
-
-    public Slice<QuestionListResponse> getQuestions(Long cursor, int size, Long memberId) {
-        getMember(memberId);
-
-        Sort sort = Sort.by(Direction.ASC, "id");
-        Pageable pageable = PageRequest.of(0, size + 1, sort);
-        List<QuestionListResponse> questions = questionRepository.findNextPage(cursor, memberId,
-            pageable);
-
-        return SliceUtil.toSlice(questions, PageRequest.of(0, size, sort));
-    }
-
-
-
 }
