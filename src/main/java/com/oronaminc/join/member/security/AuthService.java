@@ -55,7 +55,6 @@ public class AuthService extends DefaultOAuth2UserService {
                 .id(member.getId())
                 .name(member.getEmail())
                 .nickname(member.getNickname())
-                .attributes(attributes)
                 .role(member.getMemberType())
                 .build();
     }
@@ -74,10 +73,9 @@ public class AuthService extends DefaultOAuth2UserService {
         // 1. 비회원 MemberDetails 생성
         MemberDetails memberDetails = MemberDetails.builder()
                 .id(guest.getId())
-                .name("GUEST" + guest.getId())
+                .name("GUEST_" + guest.getId())
                 .nickname(guest.getNickname())
                 .role(MemberType.GUEST)
-                .attributes(Map.of("nickname", guest.getNickname()))
                 .build();
 
         return memberDetails;
