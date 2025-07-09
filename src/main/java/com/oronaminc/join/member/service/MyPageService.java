@@ -65,16 +65,14 @@ public class MyPageService {
 
     public MyRoomsGetResponse getMyRooms(Long memberId, MyPageType type, Pageable pageable) {
 
-        Page<Participant> participants;
-        if (type == MyPageType.CREATED) {
-            participants = participantRepository.findByMemberIdAndParticipantType(memberId,
+        Page<Participant> participants = switch (type) {
+            case ALL -> participantRepository.findByMemberId(memberId, pageable);
+            case CREATED -> participantRepository.findByMemberIdAndParticipantType(memberId,
                 ParticipantType.PRESENTER, pageable);
-        } else if (type == MyPageType.JOINED) {
-            participants = participantRepository.findByMemberIdAndParticipantTypeNot(memberId,
+            case JOINED -> participantRepository.findByMemberIdAndParticipantTypeNot(memberId,
                 ParticipantType.PRESENTER, pageable);
-        } else {
-            participants = participantRepository.findByMemberId(memberId, pageable);
-        }
+        };
+
 
         List<Long> roomIds = participants.stream()
             .map(p -> p.getRoom().getId())

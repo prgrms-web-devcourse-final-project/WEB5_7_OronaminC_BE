@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
+    private final MyPageService myPageService;
 
     @GetMapping("/exists")
     @ResponseStatus(HttpStatus.OK)
@@ -37,8 +38,6 @@ public class MemberController {
         boolean exists = memberService.existsMemberByEmail(existsMemberRequest.email());
         return new ExistsMemberResponse(exists);
     }
-
-    private final MyPageService myPageService;
 
     @GetMapping("/me")
     @ResponseStatus(HttpStatus.OK)
