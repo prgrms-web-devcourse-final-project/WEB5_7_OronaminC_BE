@@ -37,7 +37,7 @@ class ParticipantRepositoryTests {
     @Autowired
     private QuestionRepository questionRepository;
 
-    Member member;
+    private Member member;
 
     @BeforeEach
     void setUp() {
