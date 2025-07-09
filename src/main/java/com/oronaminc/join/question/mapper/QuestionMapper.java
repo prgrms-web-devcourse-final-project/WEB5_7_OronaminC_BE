@@ -7,7 +7,10 @@ import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.dto.QuestionCreateRequest;
 import com.oronaminc.join.question.dto.QuestionCreateResponse;
 import com.oronaminc.join.room.domain.Room;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class QuestionMapper {
 
     public static Question toQuestion(Room room, Member member, QuestionCreateRequest request) {
