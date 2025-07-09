@@ -15,18 +15,18 @@ public class QuestionMapper {
     }
 
     public static QuestionCreateResponse toQuestionCreateResponse (Question question) {
-        return new QuestionCreateResponse(
-            "CREATE",
-            question.getId(),
-            question.getContent(),
-            0,
-            false,
-            false,
-            new WriterDto(
+        return QuestionCreateResponse.builder()
+            .event("CREATE")
+            .questionId(question.getId())
+            .content(question.getContent())
+            .emojiCount(0)
+            .isEmojied(false)
+            .hasAnswer(false)
+            .writer(new WriterDto(
                 question.getMember().getId(),
                 question.getMember().getNickname()
-            ),
-            question.getCreatedAt()
-        );
+            ))
+            .createdAt(question.getCreatedAt())
+            .build();
     }
 }
