@@ -1,5 +1,6 @@
 package com.oronaminc.join.participant.dao;
 
+import com.oronaminc.join.member.dto.ParticipantCountDto;
 import com.oronaminc.join.participant.domain.Participant;
 import com.oronaminc.join.participant.domain.ParticipantType;
 import java.util.List;
