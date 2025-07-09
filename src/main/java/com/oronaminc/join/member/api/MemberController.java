@@ -1,5 +1,6 @@
 package com.oronaminc.join.member.api;
 
+import com.oronaminc.join.member.security.MemberDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.http.HttpStatus;
