@@ -2,21 +2,19 @@ package com.oronaminc.join.room.domain;
 
 
 import com.oronaminc.join.global.entity.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Version;
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Room extends BaseEntity {
 
@@ -44,14 +42,4 @@ public class Room extends BaseEntity {
     @Version
     private Integer version;
 
-    @Builder
-    public Room(String title, String description, String secretCode, Integer participantLimit) {
-        this.title = title;
-        this.description = description;
-        this.secretCode = secretCode;
-        this.roomStatus = RoomStatus.BEFORE_START;
-        this.roomType = RoomType.PUBLIC; // todo: private이였나요..?
-        this.emojiCount = 0L;
-        this.participantLimit = participantLimit;
-    }
 }
