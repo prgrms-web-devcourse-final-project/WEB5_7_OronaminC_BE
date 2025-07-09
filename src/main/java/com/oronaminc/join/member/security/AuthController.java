@@ -1,5 +1,10 @@
 package com.oronaminc.join.member.security;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -30,10 +35,19 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Auth", description = "로그인 관련 API")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
 
+    @Operation(
+        summary = "비회원 로그인",
+        description = "닉네임을 입력하면 비회원 세션이 생성되고 인증이 설정됩니다. 이후 모든 요청에 세션 인증이 적용됩니다.",
+        responses = {
+            @ApiResponse(responseCode = "201", description = "비회원 로그인 성공"),
+            @ApiResponse(responseCode = "400", description = "닉네임 누락 또는 유효성 검증 실패")
+        }
+    )
     @PostMapping("/guest")
     @ResponseStatus(HttpStatus.CREATED)
     public GuestLoginResponse guestLogin(@RequestBody @Valid GuestLoginRequest guestLoginRequest, HttpServletRequest request) {
@@ -52,7 +66,15 @@ public class AuthController {
         return new GuestLoginResponse(guest.getId());
     }
 
-
+    @Operation(
+        summary = "현재 세션 사용자 정보 조회",
+        description = "로그인한 사용자의 세션 정보를 반환합니다. 로그인하지 않은 경우 403 또는 401이 발생합니다.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "세션 사용자 정보 조회 성공"),
+            @ApiResponse(responseCode = "401", description = "로그인되지 않은 사용자"),
+            @ApiResponse(responseCode = "403", description = "인증된 사용자 아님")
+        }
+    )
     @GetMapping("/session")
     @ResponseStatus(HttpStatus.OK)
     public SessionInfoResponse getSessionInfo(@AuthenticationPrincipal MemberDetails memberDetails) {
@@ -65,6 +87,14 @@ public class AuthController {
         );
     }
 
+    @Operation(
+        summary = "로그아웃",
+        description = "현재 로그인한 사용자의 세션을 만료시키고 인증 정보를 삭제합니다. JSESSIONID 쿠키도 제거됩니다.",
+        responses = {
+            @ApiResponse(responseCode = "204", description = "로그아웃 성공"),
+            @ApiResponse(responseCode = "401", description = "로그인되지 않은 사용자")
+        }
+    )
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void logout(HttpServletRequest request, HttpServletResponse response) {
