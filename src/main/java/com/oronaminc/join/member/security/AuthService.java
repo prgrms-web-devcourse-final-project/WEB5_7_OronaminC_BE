@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.domain.MemberType;
 import com.oronaminc.join.member.dto.GuestLoginRequest;
-import com.oronaminc.join.member.repository.MemberJpaRepository;
+import com.oronaminc.join.member.dao.MemberJpaRepository;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
