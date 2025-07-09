@@ -31,11 +31,12 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
         )
         FROM Question q
         JOIN q.member m
-        WHERE (:lastId IS NULL OR q.id < :lastId)
+        WHERE :roomId = q.room.id
+        AND (:lastId IS NULL OR q.id < :lastId)
         ORDER BY q.id ASC
     """)
     List<QuestionListResponse> findByCreatedAt(@Param("cursor") Long lastId,
-        @Param("memberId") Long memberId, Pageable pageable);
+        @Param("memberId") Long memberId, @Param("roomId") Long roomId, Pageable pageable);
 
     @Query("""
         SELECT new com.oronaminc.join.question.dto.QuestionListResponse(
@@ -58,14 +59,15 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
         )
         FROM Question q
         JOIN q.member m
-        WHERE (:lastEmojiCount IS NULL OR (
+        WHERE :roomId = q.room.id
+        AND (:lastEmojiCount IS NULL OR (
             q.emojiCount < :lastEmojiCount OR (q.emojiCount = :lastEmojiCount AND q.id < :lastId)
         ))
         ORDER BY q.emojiCount DESC, q.id DESC 
     """)
     List<QuestionListResponse> findByEmojiCount(@Param("cursor") Long lastId,
         @Param("lastEmojiCount") Long lastEmojiCount,
-        @Param("memberId") Long memberId, Pageable pageable);
+        @Param("memberId") Long memberId, @Param("roomId") Long roomId, Pageable pageable);
 
     @Query("""
         SELECT new com.oronaminc.join.question.dto.QuestionListResponse(
@@ -88,11 +90,12 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
         )
         FROM Question q
         JOIN q.member m
-        WHERE q.member.id = :memberId
+        WHERE :roomId = q.room.id
+        AND  q.member.id = :memberId
         AND (:lastId IS NULL OR  q.id < :lastId)
         ORDER BY q.id DESC 
     """)
     List<QuestionListResponse> findByMyQuestion(@Param("cursor") Long lastId,
-        @Param("memberId") Long memberId, Pageable pageable);
+        @Param("memberId") Long memberId, @Param("roomId") Long roomId, Pageable pageable);
 
 }

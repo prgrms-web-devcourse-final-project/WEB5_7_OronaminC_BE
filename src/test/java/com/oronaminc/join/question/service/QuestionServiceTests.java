@@ -159,4 +159,5 @@ class QuestionServiceTests {
             .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_PARTICIPANT);
 
     }
+
 }

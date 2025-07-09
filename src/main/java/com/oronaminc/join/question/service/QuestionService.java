@@ -57,32 +57,33 @@ public class QuestionService {
         Long lastId,
         Long lastEmojiCount,
         int size,
-        Long memberId
+        Long memberId,
+        Long roomId
     ) {
         getMember(memberId);
+        getRoom(roomId);
+
         Pageable pageable = PageRequest.of(0, size + 1);
 
         List<QuestionListResponse> questions = switch (sort) {
             case CREATEDAT -> questionRepository.findByCreatedAt(lastId,
-                    memberId, pageable);
+                    memberId, roomId, pageable);
             case EMOJI -> questionRepository.findByEmojiCount(lastId,
-                    lastEmojiCount, memberId, pageable);
+                    lastEmojiCount, memberId, roomId, pageable);
             case MYQUESTION -> questionRepository.findByMyQuestion(lastId,
-                    memberId, pageable);
+                    memberId, roomId, pageable);
         };
 
         return SliceUtil.toSlice(questions, PageRequest.of(0, size));
     }
 
     private Room getRoom(Long roomId) {
-        Room room = roomRepository.findById(roomId)
+        return roomRepository.findById(roomId)
             .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_ROOM));
-        return room;
     }
 
     private Member getMember(Long memberId) {
-        Member member = memberRepository.findById(memberId)
+        return memberRepository.findById(memberId)
             .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_MEMBER));
-        return member;
     }
 }
