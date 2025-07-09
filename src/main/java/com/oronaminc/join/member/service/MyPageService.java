@@ -9,6 +9,7 @@ import com.oronaminc.join.member.dto.MyRoomsDto;
 import com.oronaminc.join.member.dto.MyRoomsGetResponse;
 import com.oronaminc.join.member.dto.ParticipantCountDto;
 import com.oronaminc.join.member.dto.ParticipationType;
+import com.oronaminc.join.member.mapper.MyPageMapper;
 import com.oronaminc.join.participant.dao.ParticipantRepository;
 import com.oronaminc.join.participant.domain.Participant;
 import com.oronaminc.join.participant.domain.ParticipantType;
@@ -85,27 +86,11 @@ public class MyPageService {
                 row -> (Long) row[1]
             ));
 
+        Page<MyRoomsDto> response = participants.map(p ->
+            MyPageMapper.toMyRoomsDto(p, countMap)
+        );
 
-        Page<MyRoomsDto> response = participants.map(p -> {
-            Room room = p.getRoom();
-            return MyRoomsDto.builder()
-                .roomId(room.getId())
-                .title(room.getTitle())
-                .emojiCount(room.getEmojiCount())
-                .status(room.getRoomStatus())
-                .startedAt(room.getCreatedAt().toLocalDate())
-                .participationType(ParticipationType.from(p.getParticipantType()))
-                .questions(countMap.getOrDefault(room.getId(), 0L))
-                .build();
-        });
-
-        return MyRoomsGetResponse.builder()
-            .content(response.getContent())
-            .currentPage(response.getNumber())
-            .size(response.getSize())
-            .totalElements(response.getTotalElements())
-            .totalPages(response.getTotalPages())
-            .build();
+        return MyPageMapper.toMyRoomsGetResponse(response);
     }
 
 }
