@@ -11,7 +11,7 @@ import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.domain.MemberType;
 import com.oronaminc.join.member.service.MemberService;
-import com.oronaminc.join.participant.dao.ParticipantJpaRepository;
+import com.oronaminc.join.participant.dao.ParticipantRepository;
 import com.oronaminc.join.participant.domain.Participant;
 import com.oronaminc.join.participant.domain.ParticipantType;
 import com.oronaminc.join.participant.util.ParticipantMapper;
@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 @RequiredArgsConstructor
 public class ParticipantService {
-    private final ParticipantJpaRepository participantJpaRepository;
+    private final ParticipantRepository participantRepository;
     private final MemberService memberService;
 
     public void savePresenterAndTeam(String presenterEmail, List<String> teamEmail, Room room) {
@@ -39,7 +39,7 @@ public class ParticipantService {
             throw new ErrorException(UNAUTHORIZED_TEAM_GUEST);
         }
         Participant participant = ParticipantMapper.toParticipant(participantMember, room, participantType);
-        participantJpaRepository.save(participant);
+        participantRepository.save(participant);
     }
 
 }

@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.oronaminc.join.participant.service.ParticipantService;
-import com.oronaminc.join.room.dao.RoomJpaRepository;
+import com.oronaminc.join.room.dao.RoomRepository;
 import com.oronaminc.join.room.domain.Room;
 import com.oronaminc.join.room.dto.CreateRoomRequest;
 import com.oronaminc.join.room.dto.CreateRoomResponse;
@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 @RequiredArgsConstructor
 public class RoomService {
-    private final RoomJpaRepository roomJpaRepository;
+    private final RoomRepository roomRepository;
     private final ParticipantService participantService;
 
     private static final int CODE_LENGTH = 6;
@@ -25,7 +25,7 @@ public class RoomService {
     public CreateRoomResponse createRoom(CreateRoomRequest createRoomRequest, String presenterEmail) {
         String code = this.generateCode();
         Room room = RoomMapper.toRoom(createRoomRequest, code);
-        roomJpaRepository.save(room);
+        roomRepository.save(room);
         participantService.savePresenterAndTeam(presenterEmail, createRoomRequest.teamEmail(), room);
         return RoomMapper.toCreateRoomResponse(room);
     }
@@ -33,7 +33,7 @@ public class RoomService {
     private String generateCode() {
         while(true){
             String code = CodeGenerator.generateCode(CODE_LENGTH);
-            if (!roomJpaRepository.existsBySecretCode(code)) {
+            if (!roomRepository.existsBySecretCode(code)) {
                 return code;
             }
         }
