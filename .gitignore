@@ -5,6 +5,9 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+*.yml
+*.env
+
 ### STS ###
 .apt_generated
 .classpath
@@ -35,6 +38,3 @@ out/
 
 ### VS Code ###
 .vscode/
-
-*.yml
-.env
