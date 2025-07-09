@@ -1,4 +1,4 @@
-package com.oronaminc.join.question.mapper;
+package com.oronaminc.join.question.util;
 
 
 import com.oronaminc.join.global.dto.WriterDto;
@@ -22,7 +22,7 @@ public class QuestionMapper {
             .event("CREATE")
             .questionId(question.getId())
             .content(question.getContent())
-            .emojiCount(0)
+            .emojiCount(0L)
             .isEmojied(false)
             .hasAnswer(false)
             .writer(new WriterDto(

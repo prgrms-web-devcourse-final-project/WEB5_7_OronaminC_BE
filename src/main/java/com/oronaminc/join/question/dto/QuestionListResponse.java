@@ -6,14 +6,14 @@ import java.time.LocalDateTime;
 import lombok.Builder;
 
 @Builder
-public record QuestionCreateResponse(
-    String event,
+public record QuestionListResponse(
     Long questionId,
     String content,
     Long emojiCount,
     boolean hasAnswer,
     boolean isEmojied,
-    WriterDto writer,
+    Long memberId,
+    String nickname,
     LocalDateTime createdAt
 
 ) {
