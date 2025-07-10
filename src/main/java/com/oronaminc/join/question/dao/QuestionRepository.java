@@ -35,7 +35,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
         AND (:lastId IS NULL OR q.id < :lastId)
         ORDER BY q.id DESC 
     """)
-    List<QuestionListResponse> findByCreatedAt(@Param("cursor") Long lastId,
+    List<QuestionListResponse> findByCreatedAt(@Param("lastId") Long lastId,
         @Param("memberId") Long memberId, @Param("roomId") Long roomId, Pageable pageable);
 
     @Query("""
@@ -44,7 +44,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
             q.content,
             q.emojiCount,
             (CASE WHEN EXISTS (
-                SELECT a FROM Answer a 
+                SELECT a FROM Answer a  
                 WHERE a.question = q
             ) THEN true ELSE false END),
             (CASE WHEN EXISTS (
@@ -65,7 +65,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
         ))
         ORDER BY q.emojiCount DESC, q.id DESC 
     """)
-    List<QuestionListResponse> findByEmojiCount(@Param("cursor") Long lastId,
+    List<QuestionListResponse> findByEmojiCount(@Param("lastId") Long lastId,
         @Param("lastEmojiCount") Long lastEmojiCount,
         @Param("memberId") Long memberId, @Param("roomId") Long roomId, Pageable pageable);
 
@@ -95,7 +95,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
         AND (:lastId IS NULL OR  q.id > :lastId)
         ORDER BY q.id DESC 
     """)
-    List<QuestionListResponse> findByMyQuestion(@Param("cursor") Long lastId,
+    List<QuestionListResponse> findByMyQuestion(@Param("lastId") Long lastId,
         @Param("memberId") Long memberId, @Param("roomId") Long roomId, Pageable pageable);
 
 }
