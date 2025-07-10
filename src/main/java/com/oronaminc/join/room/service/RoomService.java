@@ -105,7 +105,7 @@ public class RoomService {
         RoomStatus updateStatus = roomUpdateStatusRequest.roomStatus();
         List<RoomStatus> canUpdateStatus = List.of(RoomStatus.STARTED, RoomStatus.ENDED);
         if (!canUpdateStatus.contains(roomUpdateStatusRequest.roomStatus())) {
-            updateStatus = RoomStatus.ENDED;
+            throw new ErrorException(BAD_REQUEST_UPDATE_STATUS);
         }
         room.updateStatus(updateStatus);
     }

@@ -14,6 +14,7 @@ public enum ErrorCode {
 
     NOT_FOUND_ROOM("ROOM-001", "존재하지 않는 발표방입니다.", NOT_FOUND),
     BAD_REQUEST_ROOM_STARTED("ROOM-002", "시작 상태의 발표방은 수정 및 삭제할 수 없습니다.", BAD_REQUEST),
+    BAD_REQUEST_UPDATE_STATUS("ROOM-003", "변경할 수 없는 상태입니다.", BAD_REQUEST),
 
     NOT_FOUND_PARTICIPANT("PARTICIPANT-001", "발표방에 존재하지 않는 회원입니다.", NOT_FOUND),
     UNAUTHORIZED_TEAM_GUEST("PARTICIPANT-002", "게스트는 팀이 될 수 없습니다.", UNAUTHORIZED),
