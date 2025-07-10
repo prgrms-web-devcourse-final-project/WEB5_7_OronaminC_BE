@@ -45,7 +45,7 @@ public class AnswerService {
             throw new ErrorException(NOT_FOUND_PARTICIPANT);
         }
 
-        if(!answerRepository.existsByQuestionIdAndMemberId(question.getId(), member.getId())){
+        if(answerRepository.existsByQuestionIdAndMemberId(question.getId(), member.getId())){
             throw new ErrorException(BADREQUEST_DUPLICATION_ANSWER);
         }
 

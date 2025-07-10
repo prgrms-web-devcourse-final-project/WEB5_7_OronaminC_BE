@@ -109,7 +109,7 @@ public class AnswerServiceTests {
         given(memberRepository.findById(1L)).willReturn(Optional.of(mockMember));
         given(roomRepository.findById(1L)).willReturn(Optional.of(mockRoom));
         given(participantRepository.existsByRoomIdAndMemberId(1L, 1L)).willReturn(true);
-        given(answerRepository.existsByQuestionIdAndMemberId(1L, 1L)).willReturn(true);
+        given(answerRepository.existsByQuestionIdAndMemberId(1L, 1L)).willReturn(false);
         given(answerRepository.save(any(Answer.class))).willReturn(answer);
 
         // when
@@ -187,7 +187,7 @@ public class AnswerServiceTests {
         given(roomRepository.findById(1L)).willReturn(Optional.of(mockRoom));
         given(questionRepository.findByIdAndRoomId(1L, 1L)).willReturn(Optional.of(mockQuestion));
         given(participantRepository.existsByRoomIdAndMemberId(1L, 1L)).willReturn(true);
-        given(answerRepository.existsByQuestionIdAndMemberId(1L, 1L)).willReturn(false);
+        given(answerRepository.existsByQuestionIdAndMemberId(1L, 1L)).willReturn(true);
 
         // when & then
         assertThatThrownBy(() -> answerService.create(1L, 1L, 1L, request))
