@@ -4,7 +4,7 @@ import com.oronaminc.join.emoji.domain.TargetType;
 
 public record EmojiResponse(
     String event,
-    TargetType target,
+    TargetType targetType,
     Long targetId,
     Long emojiCount
 ) {

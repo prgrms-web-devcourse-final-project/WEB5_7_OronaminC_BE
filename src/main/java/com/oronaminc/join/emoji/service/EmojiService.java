@@ -25,17 +25,6 @@ public class EmojiService {
     private final AnswerService answerService;
     private final MemberService memberService;
 
-    /*
-        memberId, TargetId, TargetType으로 공감테이블에 있는지 확인
-        있다?
-        - 공감테이블에서 삭제
-        - 해당 count - 1
-
-        없다?
-        - 공감테이블에 추가
-        - 해당 count + 1
-
-     */
     @Transactional
     public EmojiResponse toggleEmoji(Long memberId, EmojiRequest emojiRequest) {
         Long emojiCount;
