@@ -66,11 +66,11 @@ public class QuestionService {
         Pageable pageable = PageRequest.of(0, size + 1);
 
         List<QuestionListResponse> questions = switch (sort) {
-            case CREATEDAT -> questionRepository.findByCreatedAt(lastId,
+            case QuestionSort.CREATEDAT -> questionRepository.findByCreatedAt(lastId,
                     memberId, roomId, pageable);
-            case EMOJI -> questionRepository.findByEmojiCount(lastId,
+            case QuestionSort.EMOJI -> questionRepository.findByEmojiCount(lastId,
                     lastEmojiCount, memberId, roomId, pageable);
-            case MYQUESTION -> questionRepository.findByMyQuestion(lastId,
+            case QuestionSort.MYQUESTION -> questionRepository.findByMyQuestion(lastId,
                     memberId, roomId, pageable);
         };
 

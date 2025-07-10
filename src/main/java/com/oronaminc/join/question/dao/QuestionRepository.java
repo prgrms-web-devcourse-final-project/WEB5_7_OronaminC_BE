@@ -33,7 +33,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
         JOIN q.member m
         WHERE :roomId = q.room.id
         AND (:lastId IS NULL OR q.id < :lastId)
-        ORDER BY q.id ASC
+        ORDER BY q.id DESC 
     """)
     List<QuestionListResponse> findByCreatedAt(@Param("cursor") Long lastId,
         @Param("memberId") Long memberId, @Param("roomId") Long roomId, Pageable pageable);
@@ -92,7 +92,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
         JOIN q.member m
         WHERE :roomId = q.room.id
         AND  q.member.id = :memberId
-        AND (:lastId IS NULL OR  q.id < :lastId)
+        AND (:lastId IS NULL OR  q.id > :lastId)
         ORDER BY q.id DESC 
     """)
     List<QuestionListResponse> findByMyQuestion(@Param("cursor") Long lastId,
