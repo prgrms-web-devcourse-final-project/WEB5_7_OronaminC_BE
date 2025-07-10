@@ -36,6 +36,7 @@ public class SecurityConfig {
                                 "/api/auth/logout"
                         )
                         .permitAll()
+                        .requestMatchers("/ws/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable)

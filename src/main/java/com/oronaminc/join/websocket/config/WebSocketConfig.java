@@ -22,6 +22,7 @@ import org.springframework.web.socket.server.support.HttpSessionHandshakeInterce
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final CustomHandshakeHandler handshakeHandler;
+    private final StompErrorHandler stompErrorHandler;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -36,5 +37,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             .addInterceptors(new HttpSessionHandshakeInterceptor())
             .setHandshakeHandler(handshakeHandler)
             .withSockJS();
+
+        registry.setErrorHandler(stompErrorHandler);
     }
 }

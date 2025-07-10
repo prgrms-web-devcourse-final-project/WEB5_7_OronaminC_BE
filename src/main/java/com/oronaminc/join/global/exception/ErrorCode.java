@@ -18,7 +18,11 @@ public enum ErrorCode {
     UNAUTHORIZED_TEAM_GUEST("PARTICIPANT-002", "게스트는 팀이 될 수 없습니다.", UNAUTHORIZED),
 
     FILE_UPLOAD_FAILED("FILE-001", "파일 업로드에 실패하였습니다.", INTERNAL_SERVER_ERROR),
-    NOT_FOUND_FILE("FILE-002", "존재하지 않는 파일입니다.",  NOT_FOUND);
+    NOT_FOUND_FILE("FILE-002", "존재하지 않는 파일입니다.",  NOT_FOUND),
+
+    ACCESS_DENIED_SESSION("SESSION-1201", "접근 권한이 없습니다.", FORBIDDEN),
+    NOT_FOUND_SESSION("SESSION-1202", "세션이 유효하지 않습니다.", UNAUTHORIZED),
+    EXPIRED_SESSION("SESSION-1203", "세션이 만료되었습니다.", UNAUTHORIZED);
 
     private final String code;
     private final String message;
