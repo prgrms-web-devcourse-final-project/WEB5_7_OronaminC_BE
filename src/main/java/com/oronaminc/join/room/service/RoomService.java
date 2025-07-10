@@ -9,8 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.oronaminc.join.document.domain.Document;
 import com.oronaminc.join.document.service.DocumentService;
-import com.oronaminc.join.emoji.service.EmojiService;
 import com.oronaminc.join.global.exception.ErrorException;
+import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.participant.domain.Participant;
 import com.oronaminc.join.participant.domain.ParticipantType;
 import com.oronaminc.join.participant.service.ParticipantService;
@@ -21,6 +21,7 @@ import com.oronaminc.join.room.dto.CreateRoomResponse;
 import com.oronaminc.join.room.dto.JoinRoomRequest;
 import com.oronaminc.join.room.dto.JoinRoomResponse;
 import com.oronaminc.join.room.dto.RoomDetailResponse;
+import com.oronaminc.join.room.dto.RoomUpdateRequest;
 import com.oronaminc.join.room.util.CodeGenerator;
 import com.oronaminc.join.room.util.RoomMapper;
 
@@ -32,7 +33,6 @@ import lombok.RequiredArgsConstructor;
 public class RoomService {
     private final RoomRepository roomRepository;
     private final ParticipantService participantService;
-    private final EmojiService emojiService;
     private final DocumentService documentService;
 
     private static final int CODE_LENGTH = 6;
@@ -64,6 +64,18 @@ public class RoomService {
         Document document = documentService.getDocumentByRoomId(roomId);
 
         return RoomMapper.toRoomDetailResponse(room, presenter, team, document, memberId);
+    }
+
+    public void updateRoom(Long memberId, Long roomId, RoomUpdateRequest updateRoomRequest) {
+        Member presenter = participantService.getPresenter(roomId).getMember();
+        if (!presenter.getId().equals(memberId)) {
+            throw new ErrorException(UNAUTHORIZED_UPDATE);
+        }
+
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new ErrorException(NOT_FOUND_ROOM));
+        room.update(updateRoomRequest);
+        participantService.updateTeam(room, updateRoomRequest.teamEmail());
     }
 
     private String generateCode() {

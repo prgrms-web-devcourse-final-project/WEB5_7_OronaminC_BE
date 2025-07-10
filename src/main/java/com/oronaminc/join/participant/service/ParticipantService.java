@@ -65,4 +65,17 @@ public class ParticipantService {
     public List<Participant> getTeam(Long roomId) {
         return participantRepository.findAllByRoomIdAndParticipantType(roomId, ParticipantType.TEAM);
     }
+
+    public void updateTeam(Room room, List<String> emails) {
+        List<Participant> team = this.getTeam(room.getId());
+        for (Participant participant : team) {
+            if (!emails.contains(participant.getMember().getEmail())) {
+                participantRepository.delete(participant);
+            }
+        }
+
+        for (String email : emails) {
+            this.saveMemberParticipantByEmail(email, room, ParticipantType.TEAM);
+        }
+    }
 }

@@ -1,8 +1,10 @@
 package com.oronaminc.join.room.domain;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import com.oronaminc.join.global.entity.BaseEntity;
+import com.oronaminc.join.room.dto.RoomUpdateRequest;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -47,4 +49,11 @@ public class Room extends BaseEntity {
 
     @Version
     private Integer version;
+
+    public void update(RoomUpdateRequest roomUpdateRequest) {
+        this.title = roomUpdateRequest.title();
+        this.description = roomUpdateRequest.description();
+        this.endedAt = roomUpdateRequest.endDate().atTime(LocalTime.MAX);
+        this.participantLimit = roomUpdateRequest.participantLimit();
+    }
 }

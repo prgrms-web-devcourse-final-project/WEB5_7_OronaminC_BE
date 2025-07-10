@@ -16,6 +16,7 @@ public enum ErrorCode {
 
     NOT_FOUND_PARTICIPANT("PARTICIPANT-001", "발표방에 존재하지 않는 회원입니다.", NOT_FOUND),
     UNAUTHORIZED_TEAM_GUEST("PARTICIPANT-002", "게스트는 팀이 될 수 없습니다.", UNAUTHORIZED),
+    UNAUTHORIZED_UPDATE("PARTICIPANT-003", "발표방 수정 권한이 없습니다.", UNAUTHORIZED),
 
     FILE_UPLOAD_FAILED("FILE-001", "파일 업로드에 실패하였습니다.", INTERNAL_SERVER_ERROR),
     NOT_FOUND_FILE("FILE-002", "존재하지 않는 파일입니다.",  NOT_FOUND);
