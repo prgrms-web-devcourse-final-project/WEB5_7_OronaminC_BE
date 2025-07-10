@@ -61,10 +61,9 @@ public class RoomService {
 
         Participant presenter = participantService.getPresenter(roomId);
         List<Participant> team = participantService.getTeam(roomId);
-        Integer emojiCount = emojiService.countRoomEmoji(roomId);
         Document document = documentService.getDocumentByRoomId(roomId);
 
-        return RoomMapper.toRoomDetailResponse(room, presenter, team, document, emojiCount, memberId);
+        return RoomMapper.toRoomDetailResponse(room, presenter, team, document, memberId);
     }
 
     private String generateCode() {

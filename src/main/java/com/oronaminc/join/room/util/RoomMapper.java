@@ -35,7 +35,7 @@ public class RoomMapper {
         return new CreateRoomResponse(room.getId(), room.getSecretCode());
     }
 
-    public static RoomDetailResponse toRoomDetailResponse(Room room, Participant presenter, List<Participant> team, Document document, Integer emojiCount, Long memberId) {
+    public static RoomDetailResponse toRoomDetailResponse(Room room, Participant presenter, List<Participant> team, Document document, Long memberId) {
         return RoomDetailResponse.builder()
                 .title(room.getTitle())
                 .description(room.getDescription())
@@ -45,7 +45,7 @@ public class RoomMapper {
                 .documentUrl(document.getFileUrl())
                 .participantCount(0)
                 .participantLimit(room.getParticipantLimit())
-                .emojiCount(emojiCount)
+                .emojiCount(room.getEmojiCount())
                 .isHost(presenter.getMember().getId().equals(memberId))
                 .isTeamMember(team.stream()
                         .map(Participant::getMember)

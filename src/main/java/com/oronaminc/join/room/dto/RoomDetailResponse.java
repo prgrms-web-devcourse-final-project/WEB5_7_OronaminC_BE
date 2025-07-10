@@ -17,7 +17,7 @@ public record RoomDetailResponse(
         String documentUrl,
         Integer participantCount,
         Integer participantLimit,
-        Integer emojiCount,
+        Long emojiCount,
         boolean isHost,
         boolean isTeamMember,
         RoomStatus roomStatus,
