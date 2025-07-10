@@ -98,4 +98,11 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     List<QuestionFlatResponse> findByMyQuestion(@Param("lastId") Long lastId,
         @Param("memberId") Long memberId, @Param("roomId") Long roomId, Pageable pageable);
 
+    @Query("""
+        select q.room.id, count(q)
+        from Question q
+        where q.room.id  in (:roomIds)
+        group by q.room.id
+    """)
+    List<Object[]> countByRoomIds(List<Long> roomIds);
 }
