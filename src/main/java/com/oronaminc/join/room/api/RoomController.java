@@ -1,5 +1,8 @@
 package com.oronaminc.join.room.api;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +30,16 @@ import lombok.RequiredArgsConstructor;
 public class RoomController {
     private final RoomService roomService;
 
+    @Operation(
+        summary = "발표방 생성",
+        description = "발표 제목, 소개, 팀원 목록 등을 포함해 새로운 발표방을 생성합니다. 로그인한 발표자만 생성할 수 있으며, 응답으로 방 ID와 비밀코드를 반환합니다.",
+        security = @SecurityRequirement(name = "sessionAuth"),
+        responses = {
+            @ApiResponse(responseCode = "201", description = "발표방 생성 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 형식 오류"),
+            @ApiResponse(responseCode = "401", description = "로그인되지 않은 사용자")
+        }
+    )
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CreateRoomResponse createRoom(

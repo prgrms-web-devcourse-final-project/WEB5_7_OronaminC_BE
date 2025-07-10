@@ -19,7 +19,6 @@ public enum ErrorCode {
 
     FILE_UPLOAD_FAILED("FILE-001", "파일 업로드에 실패하였습니다.", INTERNAL_SERVER_ERROR),
     NOT_FOUND_FILE("FILE-002", "존재하지 않는 파일입니다.",  NOT_FOUND);
-    ;
 
     private final String code;
     private final String message;
