@@ -9,13 +9,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.oronaminc.join.document.domain.Document;
 import com.oronaminc.join.document.service.DocumentService;
+import com.oronaminc.join.emoji.service.EmojiService;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.participant.domain.Participant;
 import com.oronaminc.join.participant.domain.ParticipantType;
 import com.oronaminc.join.participant.service.ParticipantService;
+import com.oronaminc.join.question.service.QuestionService;
 import com.oronaminc.join.room.dao.RoomRepository;
 import com.oronaminc.join.room.domain.Room;
+import com.oronaminc.join.room.domain.RoomStatus;
 import com.oronaminc.join.room.dto.CreateRoomRequest;
 import com.oronaminc.join.room.dto.CreateRoomResponse;
 import com.oronaminc.join.room.dto.JoinRoomRequest;
@@ -34,6 +37,8 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final ParticipantService participantService;
     private final DocumentService documentService;
+    private final QuestionService questionService;
+    private final EmojiService emojiService;
 
     private static final int CODE_LENGTH = 6;
 
@@ -69,13 +74,33 @@ public class RoomService {
     public void updateRoom(Long memberId, Long roomId, RoomUpdateRequest updateRoomRequest) {
         Member presenter = participantService.getPresenter(roomId).getMember();
         if (!presenter.getId().equals(memberId)) {
-            throw new ErrorException(UNAUTHORIZED_UPDATE);
+            throw new ErrorException(UNAUTHORIZED_UPDATE_AND_DELETE);
         }
 
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new ErrorException(NOT_FOUND_ROOM));
+
+        if (room.getRoomStatus().equals(RoomStatus.STARTED)) {
+            throw new ErrorException(BAD_REQUEST_ROOM_STARTED);
+        }
         room.update(updateRoomRequest);
         participantService.updateTeam(room, updateRoomRequest.teamEmail());
+    }
+
+    public void deleteRoom(Long memberId, Long roomId) {
+        participantService.validatePresenter(roomId, memberId);
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new ErrorException(NOT_FOUND_ROOM));
+
+        if (room.getRoomStatus().equals(RoomStatus.STARTED)) {
+            throw new ErrorException(BAD_REQUEST_ROOM_STARTED);
+        }
+
+        participantService.deleteParticipantByRoomId(roomId);
+        questionService.deleteByRoomId(roomId);
+        emojiService.deleteByRoomEmoji(roomId);
+        documentService.deleteByRoomId(roomId);
+        roomRepository.deleteById(roomId);
     }
 
     private String generateCode() {

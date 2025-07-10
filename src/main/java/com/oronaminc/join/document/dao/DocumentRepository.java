@@ -8,4 +8,5 @@ import com.oronaminc.join.document.domain.Document;
 
 public interface DocumentRepository extends JpaRepository<Document, Long> {
     Optional<Document> findByRoomId(Long roomId);
+    void deleteByRoomId(Long roomId);
 }

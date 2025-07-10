@@ -58,4 +58,6 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
         """)
     Page<Participant> findByMemberIdAndParticipantTypeNot(Long memberId, ParticipantType pType,
         Pageable pageable);
+
+    void deleteByRoomId(Long roomId);
 }

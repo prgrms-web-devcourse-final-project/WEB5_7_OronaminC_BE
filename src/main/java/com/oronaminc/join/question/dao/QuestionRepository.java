@@ -1,11 +1,11 @@
 package com.oronaminc.join.question.dao;
 
-import com.oronaminc.join.question.domain.Question;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+
+import com.oronaminc.join.question.domain.Question;
 
 public interface QuestionRepository extends JpaRepository<Question, Long> {
 
@@ -16,4 +16,8 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
         group by q.room.id
         """)
     List<Object[]> countByRoomIds(List<Long> roomIds);
+
+    List<Question> findByRoomId(Long roomId);
+
+    void deleteByRoomId(Long roomId);
 }

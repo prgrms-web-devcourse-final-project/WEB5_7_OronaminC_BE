@@ -78,4 +78,15 @@ public class ParticipantService {
             this.saveMemberParticipantByEmail(email, room, ParticipantType.TEAM);
         }
     }
+
+    public void validatePresenter(Long roomId, Long memberId) {
+        Participant presenter = this.getPresenter(roomId);
+        if (!presenter.getMember().getId().equals(memberId)) {
+            throw new ErrorException(UNAUTHORIZED_UPDATE_AND_DELETE);
+        }
+    }
+
+    public void deleteParticipantByRoomId(Long roomId) {
+        participantRepository.deleteByRoomId(roomId);
+    }
 }
