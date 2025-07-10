@@ -11,7 +11,6 @@ import com.oronaminc.join.document.domain.Document;
 import com.oronaminc.join.document.service.DocumentService;
 import com.oronaminc.join.emoji.service.EmojiService;
 import com.oronaminc.join.global.exception.ErrorException;
-import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.participant.domain.Participant;
 import com.oronaminc.join.participant.domain.ParticipantType;
 import com.oronaminc.join.participant.service.ParticipantService;
@@ -25,6 +24,7 @@ import com.oronaminc.join.room.dto.JoinRoomRequest;
 import com.oronaminc.join.room.dto.JoinRoomResponse;
 import com.oronaminc.join.room.dto.RoomDetailResponse;
 import com.oronaminc.join.room.dto.RoomUpdateRequest;
+import com.oronaminc.join.room.dto.RoomUpdateStatusRequest;
 import com.oronaminc.join.room.util.CodeGenerator;
 import com.oronaminc.join.room.util.RoomMapper;
 
@@ -61,8 +61,7 @@ public class RoomService {
     public RoomDetailResponse getRoomDetail(Long memberId, Long roomId) {
         participantService.validateParticipant(memberId, roomId);
 
-        Room room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new ErrorException(NOT_FOUND_ROOM));
+        Room room = this.getRoomById(roomId);
 
         Participant presenter = participantService.getPresenter(roomId);
         List<Participant> team = participantService.getTeam(roomId);
@@ -72,25 +71,20 @@ public class RoomService {
     }
 
     public void updateRoom(Long memberId, Long roomId, RoomUpdateRequest updateRoomRequest) {
-        Member presenter = participantService.getPresenter(roomId).getMember();
-        if (!presenter.getId().equals(memberId)) {
-            throw new ErrorException(UNAUTHORIZED_UPDATE_AND_DELETE);
-        }
-
-        Room room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new ErrorException(NOT_FOUND_ROOM));
+        participantService.validatePresenter(roomId, memberId);
+        Room room = this.getRoomById(roomId);
 
         if (room.getRoomStatus().equals(RoomStatus.STARTED)) {
             throw new ErrorException(BAD_REQUEST_ROOM_STARTED);
         }
+
         room.update(updateRoomRequest);
         participantService.updateTeam(room, updateRoomRequest.teamEmail());
     }
 
     public void deleteRoom(Long memberId, Long roomId) {
         participantService.validatePresenter(roomId, memberId);
-        Room room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new ErrorException(NOT_FOUND_ROOM));
+        Room room = this.getRoomById(roomId);
 
         if (room.getRoomStatus().equals(RoomStatus.STARTED)) {
             throw new ErrorException(BAD_REQUEST_ROOM_STARTED);
@@ -101,6 +95,23 @@ public class RoomService {
         emojiService.deleteByRoomEmoji(roomId);
         documentService.deleteByRoomId(roomId);
         roomRepository.deleteById(roomId);
+    }
+
+    public void updateRoomStatus(Long memberId, Long roomId, RoomUpdateStatusRequest roomUpdateStatusRequest) {
+        participantService.validatePresenter(roomId, memberId);
+        Room room = this.getRoomById(roomId);
+
+        RoomStatus updateStatus = roomUpdateStatusRequest.roomStatus();
+        List<RoomStatus> canUpdateStatus = List.of(RoomStatus.STARTED, RoomStatus.ENDED);
+        if (!canUpdateStatus.contains(roomUpdateStatusRequest.roomStatus())) {
+            updateStatus = RoomStatus.ENDED;
+        }
+        room.updateStatus(updateStatus);
+    }
+
+    private Room getRoomById(Long roomId) {
+        return roomRepository.findById(roomId)
+                .orElseThrow(() -> new ErrorException(NOT_FOUND_ROOM));
     }
 
     private String generateCode() {

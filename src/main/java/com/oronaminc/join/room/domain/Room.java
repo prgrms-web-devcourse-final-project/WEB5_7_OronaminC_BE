@@ -56,4 +56,8 @@ public class Room extends BaseEntity {
         this.endedAt = roomUpdateRequest.endDate().atTime(LocalTime.MAX);
         this.participantLimit = roomUpdateRequest.participantLimit();
     }
+
+    public void updateStatus(RoomStatus roomStatus) {
+        this.roomStatus = roomStatus;
+    }
 }

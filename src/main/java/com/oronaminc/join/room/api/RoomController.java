@@ -19,6 +19,7 @@ import com.oronaminc.join.room.dto.JoinRoomRequest;
 import com.oronaminc.join.room.dto.JoinRoomResponse;
 import com.oronaminc.join.room.dto.RoomDetailResponse;
 import com.oronaminc.join.room.dto.RoomUpdateRequest;
+import com.oronaminc.join.room.dto.RoomUpdateStatusRequest;
 import com.oronaminc.join.room.service.RoomService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -82,5 +83,14 @@ public class RoomController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteRoom(@PathVariable Long roomId, @AuthenticationPrincipal MemberDetails memberDetails) {
         roomService.deleteRoom(memberDetails.getId(), roomId);
+    }
+
+    @PatchMapping("/{roomId}/status")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateRoomStatus(
+            @PathVariable Long roomId,
+            @RequestBody RoomUpdateStatusRequest roomUpdateStatusRequest,
+            @AuthenticationPrincipal MemberDetails memberDetails) {
+        roomService.updateRoomStatus(memberDetails.getId(), roomId, roomUpdateStatusRequest);
     }
 }
