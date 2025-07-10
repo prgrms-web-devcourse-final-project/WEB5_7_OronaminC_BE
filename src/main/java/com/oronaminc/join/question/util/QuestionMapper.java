@@ -7,12 +7,12 @@ import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.dto.QuestionCreateRequest;
 import com.oronaminc.join.question.dto.QuestionCreateResponse;
 import com.oronaminc.join.question.dto.QuestionFlatResponse;
+import com.oronaminc.join.question.dto.QuestionAssembleResponse;
 import com.oronaminc.join.question.dto.QuestionListResponse;
 import com.oronaminc.join.room.domain.Room;
-import java.io.IOException;
-import java.io.Writer;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Slice;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class QuestionMapper {
@@ -37,8 +37,8 @@ public class QuestionMapper {
             .build();
     }
 
-    public static QuestionListResponse toQuestionListResponse(QuestionFlatResponse flatResponse) {
-        return QuestionListResponse.builder()
+    public static QuestionAssembleResponse toQuestionListResponse(QuestionFlatResponse flatResponse) {
+        return QuestionAssembleResponse.builder()
             .questionId(flatResponse.questionId())
             .content(flatResponse.content())
             .isEmojied(flatResponse.isEmojied())
@@ -50,5 +50,10 @@ public class QuestionMapper {
             ))
             .createdAt(flatResponse.createdAt())
             .build();
+    }
+
+    public static QuestionListResponse toQuestionListResponse(
+        Slice<QuestionAssembleResponse> slice) {
+        return new QuestionListResponse(slice.getContent());
     }
 }

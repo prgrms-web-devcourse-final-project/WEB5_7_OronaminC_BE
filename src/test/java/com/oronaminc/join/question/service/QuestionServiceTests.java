@@ -19,7 +19,7 @@ import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.domain.QuestionSort;
 import com.oronaminc.join.question.dto.QuestionCreateRequest;
 import com.oronaminc.join.question.dto.QuestionFlatResponse;
-import com.oronaminc.join.question.dto.QuestionListResponse;
+import com.oronaminc.join.question.dto.QuestionAssembleResponse;
 import com.oronaminc.join.room.dao.RoomRepository;
 import com.oronaminc.join.room.domain.Room;
 import com.oronaminc.join.room.domain.RoomStatus;
@@ -132,7 +132,7 @@ class QuestionServiceTests {
             .willReturn(mockList);
 
 
-        Slice<QuestionListResponse> result = questionService.getQuestions(QuestionSort.CREATEDAT,
+        Slice<QuestionAssembleResponse> result = questionService.getQuestions(QuestionSort.CREATEDAT,
             null, null, size, memberId, roomId);
 
         assertThat(result).isNotNull();
@@ -155,7 +155,7 @@ class QuestionServiceTests {
             .willReturn(mockList);
 
 
-        Slice<QuestionListResponse> result = questionService.getQuestions(QuestionSort.EMOJI,
+        Slice<QuestionAssembleResponse> result = questionService.getQuestions(QuestionSort.EMOJI,
             null, null, size, memberId, roomId);
 
         assertThat(result).isNotNull();
@@ -178,7 +178,7 @@ class QuestionServiceTests {
             .willReturn(mockList);
 
 
-        Slice<QuestionListResponse> result = questionService.getQuestions(QuestionSort.MYQUESTION,
+        Slice<QuestionAssembleResponse> result = questionService.getQuestions(QuestionSort.MYQUESTION,
             null, null, size, memberId, roomId);
 
         assertThat(result).isNotNull();

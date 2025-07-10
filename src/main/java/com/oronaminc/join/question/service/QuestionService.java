@@ -12,7 +12,7 @@ import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.domain.QuestionSort;
 import com.oronaminc.join.question.dto.QuestionCreateRequest;
 import com.oronaminc.join.question.dto.QuestionFlatResponse;
-import com.oronaminc.join.question.dto.QuestionListResponse;
+import com.oronaminc.join.question.dto.QuestionAssembleResponse;
 import com.oronaminc.join.question.util.QuestionMapper;
 import com.oronaminc.join.question.dao.QuestionRepository;
 import com.oronaminc.join.room.domain.Room;
@@ -53,7 +53,7 @@ public class QuestionService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<QuestionListResponse> getQuestions(
+    public Slice<QuestionAssembleResponse> getQuestions(
         QuestionSort sort,
         Long lastId,
         Long lastEmojiCount,
@@ -75,7 +75,7 @@ public class QuestionService {
                     memberId, roomId, pageable);
         };
 
-        List<QuestionListResponse> assembledList  = questions.stream()
+        List<QuestionAssembleResponse> assembledList  = questions.stream()
             .map(QuestionMapper::toQuestionListResponse).toList();
 
         return SliceUtil.toSlice(assembledList , PageRequest.of(0, size));
