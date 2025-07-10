@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 // TODO: ddl-auto: create,update에만 유효 -> 추후 flyway sql 생성
 @Table(name = "question", indexes = {
-    @Index(name = "idx_question_id_room", columnList = "id, room_id")
+    @Index(name = "idx_question_id_room", columnList = "room_id")
 })
 public class Question extends BaseEntity {
 
