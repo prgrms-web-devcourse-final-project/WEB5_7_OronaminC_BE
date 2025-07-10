@@ -1,6 +1,8 @@
 package com.oronaminc.join.global.exception;
 
-import static com.oronaminc.join.global.exception.ErrorStatus.*;
+import static com.oronaminc.join.global.exception.ErrorStatus.INTERNAL_SERVER_ERROR;
+import static com.oronaminc.join.global.exception.ErrorStatus.NOT_FOUND;
+import static com.oronaminc.join.global.exception.ErrorStatus.UNAUTHORIZED;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,8 +20,9 @@ public enum ErrorCode {
     UNAUTHORIZED_TEAM_GUEST("PARTICIPANT-002", "게스트는 팀이 될 수 없습니다.", UNAUTHORIZED),
 
     FILE_UPLOAD_FAILED("FILE-001", "파일 업로드에 실패하였습니다.", INTERNAL_SERVER_ERROR),
-    NOT_FOUND_FILE("FILE-002", "존재하지 않는 파일입니다.",  NOT_FOUND);
-    ;
+    NOT_FOUND_FILE("FILE-002", "존재하지 않는 파일입니다.", NOT_FOUND),
+
+    UNAUTHORIZED_ROLE_ANSWER("ANSWER-001", "팀원 또는 발표자만 댓글을 작성할 수 있습니다.", UNAUTHORIZED);
 
     private final String code;
     private final String message;
