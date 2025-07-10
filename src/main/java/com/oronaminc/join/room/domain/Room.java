@@ -1,9 +1,6 @@
 package com.oronaminc.join.room.domain;
 
-import java.time.LocalDateTime;
-
 import com.oronaminc.join.global.entity.BaseEntity;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -11,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Version;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -47,4 +45,15 @@ public class Room extends BaseEntity {
 
     @Version
     private Integer version;
+
+    public Long incrementEmojiCount() {
+        return ++this.emojiCount;
+    }
+
+    public Long decrementEmojiCount() {
+        if (this.emojiCount > 0) {
+            this.emojiCount--;
+        }
+        return this.emojiCount;
+    }
 }

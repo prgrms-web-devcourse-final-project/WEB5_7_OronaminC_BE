@@ -1,12 +1,15 @@
 package com.oronaminc.join.emoji.service;
 
-import com.oronaminc.join.answer.dao.AnswerRepository;
+import com.oronaminc.join.answer.service.AnswerService;
 import com.oronaminc.join.emoji.dao.EmojiRepository;
+import com.oronaminc.join.emoji.domain.Emoji;
 import com.oronaminc.join.emoji.domain.TargetType;
 import com.oronaminc.join.emoji.dto.EmojiRequest;
 import com.oronaminc.join.emoji.dto.EmojiResponse;
-import com.oronaminc.join.question.dao.QuestionRepository;
-import com.oronaminc.join.room.dao.RoomRepository;
+import com.oronaminc.join.member.service.MemberService;
+import com.oronaminc.join.question.service.QuestionService;
+import com.oronaminc.join.room.service.RoomService;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,26 +20,65 @@ import org.springframework.transaction.annotation.Transactional;
 public class EmojiService {
 
     private final EmojiRepository emojiRepository;
-    private final RoomRepository roomRepository;
-    private final QuestionRepository questionRepository;
-    private final AnswerRepository answerRepository;
+    private final RoomService roomService;
+    private final QuestionService questionService;
+    private final AnswerService answerService;
+    private final MemberService memberService;
 
+    /*
+        memberId, TargetId, TargetType으로 공감테이블에 있는지 확인
+        있다?
+        - 공감테이블에서 삭제
+        - 해당 count - 1
+
+        없다?
+        - 공감테이블에 추가
+        - 해당 count + 1
+
+     */
     @Transactional
-    public EmojiResponse createEmoji(Long memberId, EmojiRequest emojiRequest) {
-        Long emojiCount = 0L;
-        switch (emojiRequest.targetType()) {
-            case ROOM -> {
-//                roomRepository.findEmojiCountById()
-            }
-            case QUESTION -> {
+    public EmojiResponse toggleEmoji(Long memberId, EmojiRequest emojiRequest) {
+        Long emojiCount;
+        TargetType targetType = emojiRequest.targetType();
+        Long targetId = emojiRequest.targetId();
 
-            }
-            case ANSWER -> {
+        Optional<Emoji> findEmoji = emojiRepository.findByMemberIdAndTargetIdAndTargetType(
+            memberId, targetId, targetType);
 
-            }
+        if (findEmoji.isPresent()) {
+            emojiRepository.delete(findEmoji.get());
+            emojiCount = decrementEmojiCount(targetType, targetId);
+
+            return new EmojiResponse("DELETE", targetType, targetId, emojiCount);
+
+        } else {
+            Emoji emoji = Emoji.builder()
+                .member(memberService.getMember(memberId))
+                .targetType(targetType)
+                .targetId(targetId)
+                .build();
+            emojiRepository.save(emoji);
+
+            emojiCount = incrementEmojiCount(targetType, targetId);
+
+            return new EmojiResponse("CREATE", targetType, targetId, emojiCount);
         }
-
     }
 
+    private Long decrementEmojiCount(TargetType targetType, Long targetId) {
+        return switch (targetType) {
+            case ROOM -> roomService.findById(targetId).decrementEmojiCount();
+            case QUESTION -> questionService.findById(targetId).decrementEmojiCount();
+            case ANSWER -> answerService.findById(targetId).decrementEmojiCount();
+        };
+    }
+
+    private Long incrementEmojiCount(TargetType targetType, Long targetId) {
+        return switch (targetType) {
+            case ROOM -> roomService.findById(targetId).incrementEmojiCount();
+            case QUESTION -> questionService.findById(targetId).incrementEmojiCount();
+            case ANSWER -> answerService.findById(targetId).incrementEmojiCount();
+        };
+    }
 
 }

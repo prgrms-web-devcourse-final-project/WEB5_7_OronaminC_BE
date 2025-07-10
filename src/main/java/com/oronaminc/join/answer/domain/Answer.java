@@ -3,7 +3,6 @@ package com.oronaminc.join.answer.domain;
 import com.oronaminc.join.global.entity.BaseEntity;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.question.domain.Question;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -42,5 +41,16 @@ public class Answer extends BaseEntity {
 
     @Version
     private Integer version;
+
+    public Long incrementEmojiCount() {
+        return ++this.emojiCount;
+    }
+
+    public Long decrementEmojiCount() {
+        if (this.emojiCount > 0) {
+            this.emojiCount--;
+        }
+        return this.emojiCount;
+    }
 
 }
