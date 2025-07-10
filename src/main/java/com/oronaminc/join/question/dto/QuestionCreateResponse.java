@@ -16,7 +16,7 @@ public record QuestionCreateResponse(
     @Schema(description = "질문 내용", example = "질문있습니다. 질문생성DTO가 맞나요?")
     String content,
     @Schema(description = "공감 수", example = "3")
-    int emojiCount,
+    Long emojiCount,
     @Schema(description = "질문에 대한 답변 여부", example = "false")
     boolean hasAnswer,
     @Schema(description = "공감 여부", example = "true")

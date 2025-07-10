@@ -16,12 +16,17 @@ import com.oronaminc.join.participant.domain.Participant;
 import com.oronaminc.join.participant.domain.ParticipantType;
 import com.oronaminc.join.question.dao.QuestionRepository;
 import com.oronaminc.join.question.domain.Question;
+import com.oronaminc.join.question.domain.QuestionSort;
 import com.oronaminc.join.question.dto.QuestionCreateRequest;
+import com.oronaminc.join.question.dto.QuestionFlatResponse;
+import com.oronaminc.join.question.dto.QuestionAssembleResponse;
 import com.oronaminc.join.room.dao.RoomRepository;
 import com.oronaminc.join.room.domain.Room;
 import com.oronaminc.join.room.domain.RoomStatus;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +34,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.test.context.ActiveProfiles;
 
+@Slf4j
+@ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 class QuestionServiceTests {
 
@@ -49,6 +59,8 @@ class QuestionServiceTests {
     private Member mockMember;
     private Participant mockParticipant;
     private QuestionCreateRequest request;
+    private QuestionFlatResponse mockQ1;
+    private QuestionFlatResponse mockQ2;
 
     @BeforeEach
     void setUp() {
@@ -82,6 +94,97 @@ class QuestionServiceTests {
 
         request = new QuestionCreateRequest("질문입니다");
 
+        mockQ1 = QuestionFlatResponse.builder()
+            .questionId(1L)
+            .content("질문1")
+            .emojiCount(100L)
+            .hasAnswer(false)
+            .isEmojied(false)
+            .memberId(1L)
+            .nickname("테스트유저")
+            .createdAt(LocalDateTime.now())
+            .build();
+        mockQ2 = QuestionFlatResponse.builder()
+            .questionId(2L)
+            .content("질문2")
+            .emojiCount(1L)
+            .hasAnswer(false)
+            .isEmojied(false)
+            .memberId(1L)
+            .nickname("테스트유저")
+            .createdAt(LocalDateTime.of(2000, 1, 1, 1, 1))
+            .build();
+
+    }
+
+    @Test
+    @DisplayName("최신순 질문 목록 조회")
+    void getQuestionByCreatedAt_success() {
+        // given
+        Long roomId = 1L;
+        Long memberId = 1L;
+        int size = 1;
+
+
+        List<QuestionFlatResponse> mockList = List.of(mockQ1, mockQ2);
+
+        given(memberRepository.findById(memberId)).willReturn(Optional.of(mockMember));
+        given(roomRepository.findById(roomId)).willReturn(Optional.of(mockRoom));
+        given(questionRepository.findByCreatedAt(null, memberId, roomId, PageRequest.of(0, size + 1)))
+            .willReturn(mockList);
+
+
+        Slice<QuestionAssembleResponse> result = questionService.getQuestions(QuestionSort.CREATEDAT,
+            null, null, size, memberId, roomId);
+
+        assertThat(result).isNotNull();
+        assertThat(result.hasNext()).isTrue();
+    }
+
+    @Test
+    @DisplayName("공감순 질문 목록 조회")
+    void getQuestionByEmoji_success() {
+        // given
+        Long roomId = 1L;
+        Long memberId = 1L;
+        int size = 1;
+
+        List<QuestionFlatResponse> mockList = List.of(mockQ1, mockQ2);
+
+        given(memberRepository.findById(memberId)).willReturn(Optional.of(mockMember));
+        given(roomRepository.findById(roomId)).willReturn(Optional.of(mockRoom));
+        given(questionRepository.findByEmojiCount(null, null, memberId, roomId, PageRequest.of(0, size + 1)))
+            .willReturn(mockList);
+
+
+        Slice<QuestionAssembleResponse> result = questionService.getQuestions(QuestionSort.EMOJI,
+            null, null, size, memberId, roomId);
+
+        assertThat(result).isNotNull();
+        assertThat(result.hasNext()).isTrue();
+    }
+
+    @Test
+    @DisplayName("내 질문 목록 조회")
+    void getQuestionByMyQuestion_success() {
+        // given
+        Long roomId = 1L;
+        Long memberId = 1L;
+        int size = 1;
+
+        List<QuestionFlatResponse> mockList = List.of(mockQ1, mockQ2);
+
+        given(memberRepository.findById(memberId)).willReturn(Optional.of(mockMember));
+        given(roomRepository.findById(roomId)).willReturn(Optional.of(mockRoom));
+        given(questionRepository.findByMyQuestion(null, memberId, roomId, PageRequest.of(0, size + 1)))
+            .willReturn(mockList);
+
+
+        Slice<QuestionAssembleResponse> result = questionService.getQuestions(QuestionSort.MYQUESTION,
+            null, null, size, memberId, roomId);
+
+        assertThat(result).isNotNull();
+        assertThat(result.hasNext()).isTrue();
     }
 
     @Test

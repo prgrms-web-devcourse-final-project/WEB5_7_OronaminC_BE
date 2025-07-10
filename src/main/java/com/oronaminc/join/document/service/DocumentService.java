@@ -1,14 +1,16 @@
 package com.oronaminc.join.document.service;
 
+
 import com.oronaminc.join.document.dto.DocumentRequest;
 import com.oronaminc.join.document.dto.DocumentResponse;
 import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.infra.service.S3Service;
 import com.oronaminc.join.member.domain.MemberType;
+import static com.oronaminc.join.global.exception.ErrorCode.*;
 import org.springframework.stereotype.Service;
-
-import com.oronaminc.join.document.dao.DocumentJpaRepository;
+import com.oronaminc.join.document.dao.DocumentRepository;
+import com.oronaminc.join.document.domain.Document;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,8 +19,14 @@ import java.net.URI;
 @Service
 @RequiredArgsConstructor
 public class DocumentService {
-    private final DocumentJpaRepository documentJpaRepository;
+
+    private final DocumentRepository documentRepository;
     private final S3Service s3Service;
+
+    public Document getDocumentByRoomId(Long roomId) {
+        return documentRepository.findByRoomId(roomId)
+                .orElseThrow(() -> new ErrorException(NOT_FOUND_FILE));
+    }
 
     public DocumentResponse generatePresignedUrl(DocumentRequest request, String memberRole) {
         if (!memberRole.equals(MemberType.MEMBER.name())) {
