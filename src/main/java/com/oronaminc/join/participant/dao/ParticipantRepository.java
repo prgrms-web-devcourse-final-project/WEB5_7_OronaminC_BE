@@ -1,9 +1,11 @@
 package com.oronaminc.join.participant.dao;
 
+import java.util.List;
+import java.util.Optional;
+
 import com.oronaminc.join.member.dto.ParticipantCountDto;
 import com.oronaminc.join.participant.domain.Participant;
 import com.oronaminc.join.participant.domain.ParticipantType;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,6 +20,9 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
         "WHERE p.room.id = :roomId AND p.member.id = :memberId"
     )
     boolean existsByRoomIdAndMemberId(@Param("roomId") Long roomId, @Param("memberId") Long memberId);
+
+    Optional<Participant> findByRoomIdAndParticipantType(Long roomId, ParticipantType participantType);
+    List<Participant> findAllByRoomIdAndParticipantType(Long roomId, ParticipantType participantType);
 
     @Query("""
         select new com.oronaminc.join.member.dto.ParticipantCountDto(p.participantType, count(p))
