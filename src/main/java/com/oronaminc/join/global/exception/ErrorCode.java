@@ -1,5 +1,6 @@
 package com.oronaminc.join.global.exception;
 
+import static com.oronaminc.join.global.exception.ErrorStatus.BAD_REQUEST;
 import static com.oronaminc.join.global.exception.ErrorStatus.INTERNAL_SERVER_ERROR;
 import static com.oronaminc.join.global.exception.ErrorStatus.NOT_FOUND;
 import static com.oronaminc.join.global.exception.ErrorStatus.UNAUTHORIZED;
@@ -22,7 +23,10 @@ public enum ErrorCode {
     FILE_UPLOAD_FAILED("FILE-001", "파일 업로드에 실패하였습니다.", INTERNAL_SERVER_ERROR),
     NOT_FOUND_FILE("FILE-002", "존재하지 않는 파일입니다.", NOT_FOUND),
 
-    UNAUTHORIZED_ROLE_ANSWER("ANSWER-001", "팀원 또는 발표자만 댓글을 작성할 수 있습니다.", UNAUTHORIZED);
+    NOT_FOUND_QUESTION("QUESTION-001", "질문을 찾을 수 없습니다.", NOT_FOUND),
+
+    UNAUTHORIZED_ROLE_ANSWER("ANSWER-001", "팀원 또는 발표자만 댓글을 작성할 수 있습니다.", UNAUTHORIZED),
+    BADREQUEST_DUPLICATION_ANSWER("ANSWER-002", "이미 답변한 질문입니다.", BAD_REQUEST);
 
     private final String code;
     private final String message;

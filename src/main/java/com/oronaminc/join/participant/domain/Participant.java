@@ -29,6 +29,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+// TODO: ddl-auto: create,update에만 유효 -> 추후 flyway sql 생성
 @Table(name = "participant", indexes = {
     @Index(name = "idx_participant_room_member", columnList = "room_id, member_id")
 })

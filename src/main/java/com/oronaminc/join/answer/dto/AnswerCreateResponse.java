@@ -6,7 +6,7 @@ import lombok.Builder;
 
 @Builder
 public record AnswerCreateResponse(
-    //TODO: QuestionCreateResponse와 유사-> 둘중 하나만 쓰기
+    //TODO: QuestionCreateResponse와 유사-> 둘중 하나만?
     String event,
     Long answerId,
     String content,
