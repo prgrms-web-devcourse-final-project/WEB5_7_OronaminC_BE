@@ -23,6 +23,7 @@ import com.oronaminc.join.room.dto.CreateRoomResponse;
 import com.oronaminc.join.room.dto.JoinRoomRequest;
 import com.oronaminc.join.room.dto.JoinRoomResponse;
 import com.oronaminc.join.room.dto.RoomDetailResponse;
+import com.oronaminc.join.room.dto.RoomUpdateInfoResponse;
 import com.oronaminc.join.room.dto.RoomUpdateRequest;
 import com.oronaminc.join.room.dto.RoomUpdateStatusRequest;
 import com.oronaminc.join.room.util.CodeGenerator;
@@ -107,6 +108,13 @@ public class RoomService {
             updateStatus = RoomStatus.ENDED;
         }
         room.updateStatus(updateStatus);
+    }
+
+    public RoomUpdateInfoResponse getRoomUpdateInfo(Long memberId, Long roomId) {
+        participantService.validatePresenter(roomId, memberId);
+        Room room = this.getRoomById(roomId);
+        List<Participant> team = participantService.getTeam(roomId);
+        return RoomMapper.toRoomUpdateInfoResponse(room, team);
     }
 
     private Room getRoomById(Long roomId) {

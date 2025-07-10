@@ -18,6 +18,7 @@ import com.oronaminc.join.room.dto.CreateRoomResponse;
 import com.oronaminc.join.room.dto.JoinRoomRequest;
 import com.oronaminc.join.room.dto.JoinRoomResponse;
 import com.oronaminc.join.room.dto.RoomDetailResponse;
+import com.oronaminc.join.room.dto.RoomUpdateInfoResponse;
 import com.oronaminc.join.room.dto.RoomUpdateRequest;
 import com.oronaminc.join.room.dto.RoomUpdateStatusRequest;
 import com.oronaminc.join.room.service.RoomService;
@@ -92,5 +93,14 @@ public class RoomController {
             @RequestBody RoomUpdateStatusRequest roomUpdateStatusRequest,
             @AuthenticationPrincipal MemberDetails memberDetails) {
         roomService.updateRoomStatus(memberDetails.getId(), roomId, roomUpdateStatusRequest);
+    }
+
+    @GetMapping("/{roomId}/update")
+    @ResponseStatus(HttpStatus.OK)
+    public RoomUpdateInfoResponse getUpdateInfo(
+            @PathVariable Long roomId,
+            @AuthenticationPrincipal MemberDetails memberDetails
+    ) {
+        return roomService.getRoomUpdateInfo(memberDetails.getId(), roomId);
     }
 }
