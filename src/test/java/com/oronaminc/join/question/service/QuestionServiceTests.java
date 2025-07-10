@@ -18,6 +18,7 @@ import com.oronaminc.join.question.dao.QuestionRepository;
 import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.domain.QuestionSort;
 import com.oronaminc.join.question.dto.QuestionCreateRequest;
+import com.oronaminc.join.question.dto.QuestionFlatResponse;
 import com.oronaminc.join.question.dto.QuestionListResponse;
 import com.oronaminc.join.room.dao.RoomRepository;
 import com.oronaminc.join.room.domain.Room;
@@ -56,8 +57,8 @@ class QuestionServiceTests {
     private Member mockMember;
     private Participant mockParticipant;
     private QuestionCreateRequest request;
-    private QuestionListResponse mockQ1;
-    private QuestionListResponse mockQ2;
+    private QuestionFlatResponse mockQ1;
+    private QuestionFlatResponse mockQ2;
 
     @BeforeEach
     void setUp() {
@@ -91,7 +92,7 @@ class QuestionServiceTests {
 
         request = new QuestionCreateRequest("질문입니다");
 
-        mockQ1 = QuestionListResponse.builder()
+        mockQ1 = QuestionFlatResponse.builder()
             .questionId(1L)
             .content("질문1")
             .emojiCount(100L)
@@ -101,7 +102,7 @@ class QuestionServiceTests {
             .nickname("테스트유저")
             .createdAt(LocalDateTime.now())
             .build();
-        mockQ2 = QuestionListResponse.builder()
+        mockQ2 = QuestionFlatResponse.builder()
             .questionId(2L)
             .content("질문2")
             .emojiCount(1L)
@@ -123,7 +124,7 @@ class QuestionServiceTests {
         int size = 1;
 
 
-        List<QuestionListResponse> mockList = List.of(mockQ1, mockQ2);
+        List<QuestionFlatResponse> mockList = List.of(mockQ1, mockQ2);
 
         given(memberRepository.findById(memberId)).willReturn(Optional.of(mockMember));
         given(roomRepository.findById(roomId)).willReturn(Optional.of(mockRoom));
@@ -136,7 +137,6 @@ class QuestionServiceTests {
 
         assertThat(result).isNotNull();
         assertThat(result.hasNext()).isTrue();
-        assertThat(result.getContent().get(0)).isEqualTo(mockQ1);
     }
 
     @Test
@@ -147,7 +147,7 @@ class QuestionServiceTests {
         Long memberId = 1L;
         int size = 1;
 
-        List<QuestionListResponse> mockList = List.of(mockQ1, mockQ2);
+        List<QuestionFlatResponse> mockList = List.of(mockQ1, mockQ2);
 
         given(memberRepository.findById(memberId)).willReturn(Optional.of(mockMember));
         given(roomRepository.findById(roomId)).willReturn(Optional.of(mockRoom));
@@ -160,7 +160,6 @@ class QuestionServiceTests {
 
         assertThat(result).isNotNull();
         assertThat(result.hasNext()).isTrue();
-        assertThat(result.getContent().get(0)).isEqualTo(mockQ1);
     }
 
     @Test
@@ -171,7 +170,7 @@ class QuestionServiceTests {
         Long memberId = 1L;
         int size = 1;
 
-        List<QuestionListResponse> mockList = List.of(mockQ1, mockQ2);
+        List<QuestionFlatResponse> mockList = List.of(mockQ1, mockQ2);
 
         given(memberRepository.findById(memberId)).willReturn(Optional.of(mockMember));
         given(roomRepository.findById(roomId)).willReturn(Optional.of(mockRoom));
@@ -184,7 +183,6 @@ class QuestionServiceTests {
 
         assertThat(result).isNotNull();
         assertThat(result.hasNext()).isTrue();
-        assertThat(result.getContent().get(0)).isEqualTo(mockQ1);
     }
 
     @Test

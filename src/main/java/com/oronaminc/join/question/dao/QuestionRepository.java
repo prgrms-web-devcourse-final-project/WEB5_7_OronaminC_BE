@@ -1,7 +1,7 @@
 package com.oronaminc.join.question.dao;
 
 import com.oronaminc.join.question.domain.Question;
-import com.oronaminc.join.question.dto.QuestionListResponse;
+import com.oronaminc.join.question.dto.QuestionFlatResponse;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     @Query("""
-        SELECT new com.oronaminc.join.question.dto.QuestionListResponse(
+        SELECT new com.oronaminc.join.question.dto.QuestionFlatResponse(
             q.id,
             q.content,
             q.emojiCount,
@@ -35,11 +35,11 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
         AND (:lastId IS NULL OR q.id < :lastId)
         ORDER BY q.id DESC 
     """)
-    List<QuestionListResponse> findByCreatedAt(@Param("lastId") Long lastId,
+    List<QuestionFlatResponse> findByCreatedAt(@Param("lastId") Long lastId,
         @Param("memberId") Long memberId, @Param("roomId") Long roomId, Pageable pageable);
 
     @Query("""
-        SELECT new com.oronaminc.join.question.dto.QuestionListResponse(
+        SELECT new com.oronaminc.join.question.dto.QuestionFlatResponse(
             q.id,
             q.content,
             q.emojiCount,
@@ -65,12 +65,12 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
         ))
         ORDER BY q.emojiCount DESC, q.id DESC 
     """)
-    List<QuestionListResponse> findByEmojiCount(@Param("lastId") Long lastId,
+    List<QuestionFlatResponse> findByEmojiCount(@Param("lastId") Long lastId,
         @Param("lastEmojiCount") Long lastEmojiCount,
         @Param("memberId") Long memberId, @Param("roomId") Long roomId, Pageable pageable);
 
     @Query("""
-        SELECT new com.oronaminc.join.question.dto.QuestionListResponse(
+        SELECT new com.oronaminc.join.question.dto.QuestionFlatResponse(
             q.id,
             q.content,
             q.emojiCount,
@@ -95,7 +95,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
         AND (:lastId IS NULL OR  q.id > :lastId)
         ORDER BY q.id DESC 
     """)
-    List<QuestionListResponse> findByMyQuestion(@Param("lastId") Long lastId,
+    List<QuestionFlatResponse> findByMyQuestion(@Param("lastId") Long lastId,
         @Param("memberId") Long memberId, @Param("roomId") Long roomId, Pageable pageable);
 
 }

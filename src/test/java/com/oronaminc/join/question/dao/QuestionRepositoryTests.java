@@ -2,7 +2,7 @@ package com.oronaminc.join.question.dao;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
-import com.oronaminc.join.question.dto.QuestionListResponse;
+import com.oronaminc.join.question.dto.QuestionFlatResponse;
 import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -29,7 +29,7 @@ class QuestionRepositoryTests {
         Long roomId = 1L;
 
         // when
-        List<QuestionListResponse> result = questionRepository.findByCreatedAt(
+        List<QuestionFlatResponse> result = questionRepository.findByCreatedAt(
             null, memberId, roomId, pageable
         );
 
@@ -48,14 +48,14 @@ class QuestionRepositoryTests {
         Long roomId = 1L;
 
         // when
-        List<QuestionListResponse> result = questionRepository.findByEmojiCount(
+        List<QuestionFlatResponse> result = questionRepository.findByEmojiCount(
             null, null, memberId, roomId, pageable
         );
 
         // then
         assertThat(result).hasSize(5);
         assertThat(result).isSortedAccordingTo(
-            Comparator.comparing(QuestionListResponse::emojiCount).reversed());
+            Comparator.comparing(QuestionFlatResponse::emojiCount).reversed());
 
     }
 
@@ -68,7 +68,7 @@ class QuestionRepositoryTests {
         Long roomId = 1L;
 
         // when
-        List<QuestionListResponse> result = questionRepository.findByMyQuestion(
+        List<QuestionFlatResponse> result = questionRepository.findByMyQuestion(
             null, memberId, roomId, pageable
         );
 

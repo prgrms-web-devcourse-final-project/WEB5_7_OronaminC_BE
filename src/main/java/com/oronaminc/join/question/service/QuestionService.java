@@ -11,6 +11,7 @@ import com.oronaminc.join.participant.dao.ParticipantRepository;
 import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.domain.QuestionSort;
 import com.oronaminc.join.question.dto.QuestionCreateRequest;
+import com.oronaminc.join.question.dto.QuestionFlatResponse;
 import com.oronaminc.join.question.dto.QuestionListResponse;
 import com.oronaminc.join.question.util.QuestionMapper;
 import com.oronaminc.join.question.dao.QuestionRepository;
@@ -65,7 +66,7 @@ public class QuestionService {
 
         Pageable pageable = PageRequest.of(0, size + 1);
 
-        List<QuestionListResponse> questions = switch (sort) {
+        List<QuestionFlatResponse> questions = switch (sort) {
             case QuestionSort.CREATEDAT -> questionRepository.findByCreatedAt(lastId,
                     memberId, roomId, pageable);
             case QuestionSort.EMOJI -> questionRepository.findByEmojiCount(lastId,
@@ -74,7 +75,10 @@ public class QuestionService {
                     memberId, roomId, pageable);
         };
 
-        return SliceUtil.toSlice(questions, PageRequest.of(0, size));
+        List<QuestionListResponse> assembledList  = questions.stream()
+            .map(QuestionMapper::toQuestionListResponse).toList();
+
+        return SliceUtil.toSlice(assembledList , PageRequest.of(0, size));
     }
 
     private Room getRoom(Long roomId) {

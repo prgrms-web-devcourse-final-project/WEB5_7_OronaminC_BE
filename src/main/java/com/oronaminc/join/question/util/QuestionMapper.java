@@ -6,7 +6,11 @@ import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.dto.QuestionCreateRequest;
 import com.oronaminc.join.question.dto.QuestionCreateResponse;
+import com.oronaminc.join.question.dto.QuestionFlatResponse;
+import com.oronaminc.join.question.dto.QuestionListResponse;
 import com.oronaminc.join.room.domain.Room;
+import java.io.IOException;
+import java.io.Writer;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -30,6 +34,21 @@ public class QuestionMapper {
                 question.getMember().getNickname()
             ))
             .createdAt(question.getCreatedAt())
+            .build();
+    }
+
+    public static QuestionListResponse toQuestionListResponse(QuestionFlatResponse flatResponse) {
+        return QuestionListResponse.builder()
+            .questionId(flatResponse.questionId())
+            .content(flatResponse.content())
+            .isEmojied(flatResponse.isEmojied())
+            .hasAnswer(flatResponse.hasAnswer())
+            .emojiCount(flatResponse.emojiCount())
+            .writer(new WriterDto(
+                flatResponse.memberId(),
+                flatResponse.nickname()
+            ))
+            .createdAt(flatResponse.createdAt())
             .build();
     }
 }
