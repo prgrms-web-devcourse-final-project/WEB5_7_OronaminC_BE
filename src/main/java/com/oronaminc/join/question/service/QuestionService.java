@@ -31,11 +31,11 @@ import lombok.RequiredArgsConstructor;
 public class QuestionService {
 
     private final QuestionRepository questionRepository;
+    private final ParticipantService participantService;
     private final AnswerService answerService;
-    private final RoomReader roomReader;
     private final QuestionReader questionReader;
     private final MemberReader memberReader;
-    private final ParticipantService participantService;
+    private final RoomReader roomReader;
 
     @Transactional
     public Question create(Long roomId, Long memberId, QuestionCreateRequest requestDto) {

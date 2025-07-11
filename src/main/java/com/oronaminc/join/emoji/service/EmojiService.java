@@ -23,11 +23,11 @@ import lombok.RequiredArgsConstructor;
 public class EmojiService {
 
     private final EmojiRepository emojiRepository;
-    private final AnswerReader answerReader;
-    private final RoomReader roomReader;
     private final QuestionReader questionReader;
+    private final AnswerReader answerReader;
     private final MemberReader memberReader;
     private final EmojiReader emojiReader;
+    private final RoomReader roomReader;
 
     @Transactional
     public void deleteByRoomEmoji(Long roomId) {

@@ -25,9 +25,9 @@ import lombok.RequiredArgsConstructor;
 public class AnswerService {
 
     private final AnswerRepository answerRepository;
+    private final ParticipantService participantService;
     private final QuestionReader questionReader;
     private final MemberReader memberReader;
-    private final ParticipantService participantService;
     private final AnswerReader answerReader;
 
     @Transactional

@@ -41,9 +41,9 @@ public class RoomService {
     private final ParticipantService participantService;
     private final DocumentService documentService;
     private final QuestionService questionService;
+    private final DocumentReader documentReader;
     private final EmojiService emojiService;
     private final RoomReader roomReader;
-    private final DocumentReader documentReader;
 
     private static final int CODE_LENGTH = 6;
 

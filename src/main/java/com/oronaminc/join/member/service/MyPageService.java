@@ -29,9 +29,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MyPageService {
 
+    private final ParticipantReader participantReader;
     private final QuestionReader questionReader;
     private final MemberReader memberReader;
-    private final ParticipantReader participantReader;
 
     public MyProfileGetResponse getMyProfile(Long memberId) {
         Long createdRoomCount = 0L;

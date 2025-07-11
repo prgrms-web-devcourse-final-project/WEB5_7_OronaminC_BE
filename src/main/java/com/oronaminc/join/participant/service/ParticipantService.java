@@ -24,8 +24,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ParticipantService {
     private final ParticipantRepository participantRepository;
-    private final MemberReader memberReader;
     private final ParticipantReader participantReader;
+    private final MemberReader memberReader;
 
     public void savePresenterAndTeam(String presenterEmail, List<String> teamEmail, Room room) {
         saveMemberParticipantByEmail(presenterEmail, room, ParticipantType.PRESENTER);
