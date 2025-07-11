@@ -16,7 +16,7 @@ import com.oronaminc.join.member.dto.MyProfileUpdateRequest;
 import com.oronaminc.join.member.dto.MyRoomsDto;
 import com.oronaminc.join.member.dto.MyRoomsGetResponse;
 import com.oronaminc.join.member.dto.ParticipantCountDto;
-import com.oronaminc.join.member.mapper.MyPageMapper;
+import com.oronaminc.join.member.util.MyPageMapper;
 import com.oronaminc.join.participant.domain.Participant;
 import com.oronaminc.join.participant.domain.ParticipantType;
 import com.oronaminc.join.participant.service.ParticipantReader;
