@@ -1,7 +1,5 @@
 package com.oronaminc.join.question.service;
 
-import static com.oronaminc.join.global.exception.ErrorCode.*;
-
 import java.util.List;
 
 import org.springframework.data.domain.PageRequest;
@@ -11,11 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.oronaminc.join.answer.service.AnswerService;
-import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.global.util.SliceUtil;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.service.MemberReader;
-import com.oronaminc.join.participant.dao.ParticipantRepository;
+import com.oronaminc.join.participant.service.ParticipantService;
 import com.oronaminc.join.question.dao.QuestionRepository;
 import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.domain.QuestionSort;
@@ -34,11 +31,11 @@ import lombok.RequiredArgsConstructor;
 public class QuestionService {
 
     private final QuestionRepository questionRepository;
-    private final ParticipantRepository participantRepository;
     private final AnswerService answerService;
     private final RoomReader roomReader;
     private final QuestionReader questionReader;
     private final MemberReader memberReader;
+    private final ParticipantService participantService;
 
     @Transactional
     public Question create(Long roomId, Long memberId, QuestionCreateRequest requestDto) {
@@ -47,9 +44,7 @@ public class QuestionService {
 
         Room room = roomReader.getById(roomId);
 
-        if (!participantRepository.existsByRoomIdAndMemberId(room.getId(), member.getId())) {
-            throw new ErrorException(NOT_FOUND_PARTICIPANT);
-        }
+        participantService.validateParticipant(memberId, roomId);
 
         Question question = QuestionMapper.toQuestion(room, member, requestDto);
 

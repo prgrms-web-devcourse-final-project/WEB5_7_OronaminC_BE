@@ -14,11 +14,9 @@ import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.service.MemberReader;
-import com.oronaminc.join.participant.dao.ParticipantRepository;
+import com.oronaminc.join.participant.service.ParticipantService;
 import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.service.QuestionReader;
-import com.oronaminc.join.room.domain.Room;
-import com.oronaminc.join.room.service.RoomReader;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,23 +26,18 @@ import lombok.RequiredArgsConstructor;
 public class AnswerService {
 
     private final AnswerRepository answerRepository;
-    private final ParticipantRepository participantRepository;
-    private final RoomReader roomReader;
     private final QuestionReader questionReader;
     private final MemberReader memberReader;
+    private final ParticipantService participantService;
 
     @Transactional
     public Answer create(Long roomId, Long memberId, Long questionId ,AnswerCreateRequest requestDto ){
 
         Member member = memberReader.getById(memberId);
 
-        Room room = roomReader.getById(roomId);
-
         Question question = questionReader.getByIdAndRoomId(questionId, roomId);
 
-        if (!participantRepository.existsByRoomIdAndMemberId(room.getId(), member.getId())) {
-            throw new ErrorException(NOT_FOUND_PARTICIPANT);
-        }
+        participantService.validateParticipant(memberId, roomId);
 
         if(answerRepository.existsByQuestionIdAndMemberId(question.getId(), member.getId())){
             throw new ErrorException(BADREQUEST_DUPLICATION_ANSWER);

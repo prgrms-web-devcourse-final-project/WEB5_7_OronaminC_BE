@@ -17,9 +17,9 @@ import com.oronaminc.join.member.dto.MyRoomsDto;
 import com.oronaminc.join.member.dto.MyRoomsGetResponse;
 import com.oronaminc.join.member.dto.ParticipantCountDto;
 import com.oronaminc.join.member.mapper.MyPageMapper;
-import com.oronaminc.join.participant.dao.ParticipantRepository;
 import com.oronaminc.join.participant.domain.Participant;
 import com.oronaminc.join.participant.domain.ParticipantType;
+import com.oronaminc.join.participant.service.ParticipantReader;
 import com.oronaminc.join.question.service.QuestionReader;
 
 import lombok.RequiredArgsConstructor;
@@ -29,16 +29,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MyPageService {
 
-    private final ParticipantRepository participantRepository;
     private final QuestionReader questionReader;
     private final MemberReader memberReader;
+    private final ParticipantReader participantReader;
 
     public MyProfileGetResponse getMyProfile(Long memberId) {
         Long createdRoomCount = 0L;
         Long joinedRoomCount = 0L;
 
         List<ParticipantCountDto> participantCounts =
-            participantRepository.countByMemberIdGroupByParticipantType(memberId);
+                participantReader.countByMemberIdGroupByParticipantType(memberId);
 
         for (ParticipantCountDto pc : participantCounts) {
             switch (pc.participantType()) {
@@ -63,10 +63,10 @@ public class MyPageService {
     public MyRoomsGetResponse getMyRooms(Long memberId, MyPageType type, Pageable pageable) {
 
         Page<Participant> participants = switch (type) {
-            case ALL -> participantRepository.findByMemberId(memberId, pageable);
-            case CREATED -> participantRepository.findByMemberIdAndParticipantType(memberId,
+            case ALL -> participantReader.findByMemberId(memberId, pageable);
+            case CREATED -> participantReader.findByMemberIdAndParticipantType(memberId,
                 ParticipantType.PRESENTER, pageable);
-            case JOINED -> participantRepository.findByMemberIdAndParticipantTypeNot(memberId,
+            case JOINED -> participantReader.findByMemberIdAndParticipantTypeNot(memberId,
                 ParticipantType.PRESENTER, pageable);
         };
 

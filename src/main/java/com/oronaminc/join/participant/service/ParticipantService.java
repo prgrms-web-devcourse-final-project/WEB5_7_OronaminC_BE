@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class ParticipantService {
     private final ParticipantRepository participantRepository;
     private final MemberReader memberReader;
+    private final ParticipantReader participantReader;
 
     public void savePresenterAndTeam(String presenterEmail, List<String> teamEmail, Room room) {
         saveMemberParticipantByEmail(presenterEmail, room, ParticipantType.PRESENTER);
@@ -44,7 +45,7 @@ public class ParticipantService {
     
     public void saveParticipantById(Long memberId, Room room, ParticipantType participantType) {
         Member participantMember = memberReader.getById(memberId);
-        if (participantRepository.existsByRoomIdAndMemberId(room.getId(), participantMember.getId())) {
+        if (participantReader.existsByRoomIdAndMemberId(room.getId(), participantMember.getId())) {
             return;
         }
         Participant participant = ParticipantMapper.toParticipant(participantMember, room, participantType);
@@ -52,18 +53,18 @@ public class ParticipantService {
     }
 
     public void validateParticipant(Long memberId, Long roomId) {
-        if (!participantRepository.existsByRoomIdAndMemberId(roomId, memberId)) {
+        if (!participantReader.existsByRoomIdAndMemberId(roomId, memberId)) {
             throw new ErrorException(NOT_FOUND_PARTICIPANT);
         }
     }
 
     public Participant getPresenter(Long roomId) {
-        return participantRepository.findByRoomIdAndParticipantType(roomId, ParticipantType.PRESENTER)
+        return participantReader.findByRoomIdAndParticipantType(roomId, ParticipantType.PRESENTER)
                 .orElseThrow(() -> new ErrorException(NOT_FOUND_PARTICIPANT));
     }
 
     public List<Participant> getTeam(Long roomId) {
-        return participantRepository.findAllByRoomIdAndParticipantType(roomId, ParticipantType.TEAM);
+        return participantReader.findAllByRoomIdAndParticipantType(roomId, ParticipantType.TEAM);
     }
 
     public void updateTeam(Room room, List<String> emails) {
