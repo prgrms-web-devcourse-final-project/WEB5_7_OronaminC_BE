@@ -11,7 +11,7 @@ import com.oronaminc.join.emoji.domain.Emoji;
 import com.oronaminc.join.emoji.domain.TargetType;
 import com.oronaminc.join.emoji.dto.EmojiRequest;
 import com.oronaminc.join.emoji.dto.EmojiResponse;
-import com.oronaminc.join.member.service.MemberService;
+import com.oronaminc.join.member.service.MemberReader;
 import com.oronaminc.join.question.service.QuestionReader;
 import com.oronaminc.join.room.service.RoomReader;
 
@@ -24,9 +24,9 @@ public class EmojiService {
 
     private final EmojiRepository emojiRepository;
     private final AnswerService answerService;
-    private final MemberService memberService;
     private final RoomReader roomReader;
     private final QuestionReader questionReader;
+    private final MemberReader memberReader;
 
     @Transactional
     public void deleteByRoomEmoji(Long roomId) {
@@ -49,7 +49,7 @@ public class EmojiService {
             return new EmojiResponse("DELETE", targetType, targetId, emojiCount);
         }
 
-        Emoji emoji = Emoji.create(memberService.findById(memberId), targetType, targetId);
+        Emoji emoji = Emoji.create(memberReader.getById(memberId), targetType, targetId);
         emojiRepository.save(emoji);
 
         emojiCount = incrementEmojiCount(targetType, targetId);

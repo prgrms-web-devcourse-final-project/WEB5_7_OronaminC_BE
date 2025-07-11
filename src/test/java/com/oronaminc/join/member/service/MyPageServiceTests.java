@@ -1,7 +1,22 @@
 package com.oronaminc.join.member.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.dto.MyPageType;
@@ -15,19 +30,6 @@ import com.oronaminc.join.participant.domain.Participant;
 import com.oronaminc.join.participant.domain.ParticipantType;
 import com.oronaminc.join.question.dao.QuestionRepository;
 import com.oronaminc.join.room.domain.Room;
-import java.time.LocalDateTime;
-import java.util.List;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class MyPageServiceTests {
@@ -40,6 +42,9 @@ class MyPageServiceTests {
 
     @Mock
     private QuestionRepository questionRepository;
+
+    @Mock
+    private MemberReader memberReader;
 
     @InjectMocks
     private MyPageService myPageService;
@@ -57,7 +62,7 @@ class MyPageServiceTests {
             new ParticipantCountDto(ParticipantType.GUEST, 1L)
         );
 
-        when(memberService.findById(member.getId())).thenReturn(member);
+        when(memberReader.getById(member.getId())).thenReturn(member);
         when(participantRepository.countByMemberIdGroupByParticipantType(member.getId()))
             .thenReturn(pc);
 
@@ -80,7 +85,7 @@ class MyPageServiceTests {
 
         List<ParticipantCountDto> pc = List.of();
 
-        when(memberService.findById(member.getId())).thenReturn(member);
+        when(memberReader.getById(member.getId())).thenReturn(member);
         when(participantRepository.countByMemberIdGroupByParticipantType(member.getId()))
             .thenReturn(pc);
 
@@ -104,7 +109,7 @@ class MyPageServiceTests {
         String newNickname = "newNickname";
         MyProfileUpdateRequest request = new MyProfileUpdateRequest(newNickname);
 
-        when(memberService.findById(member.getId())).thenReturn(member);
+        when(memberReader.getById(member.getId())).thenReturn(member);
 
         // when
         myPageService.updateMyProfile(request, member.getId());

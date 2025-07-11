@@ -1,8 +1,18 @@
 package com.oronaminc.join.emoji.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+import java.util.Optional;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.oronaminc.join.answer.domain.Answer;
 import com.oronaminc.join.answer.service.AnswerService;
@@ -12,19 +22,11 @@ import com.oronaminc.join.emoji.domain.TargetType;
 import com.oronaminc.join.emoji.dto.EmojiRequest;
 import com.oronaminc.join.emoji.dto.EmojiResponse;
 import com.oronaminc.join.member.domain.Member;
-import com.oronaminc.join.member.service.MemberService;
+import com.oronaminc.join.member.service.MemberReader;
 import com.oronaminc.join.question.domain.Question;
-import com.oronaminc.join.question.service.QuestionService;
+import com.oronaminc.join.question.service.QuestionReader;
 import com.oronaminc.join.room.dao.RoomRepository;
 import com.oronaminc.join.room.domain.Room;
-import java.util.Optional;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class EmojiServiceTests {
@@ -36,13 +38,13 @@ class EmojiServiceTests {
     private RoomRepository roomRepository;
 
     @Mock
-    private QuestionService questionService;
-
-    @Mock
     private AnswerService answerService;
 
     @Mock
-    private MemberService memberService;
+    private MemberReader memberReader;
+
+    @Mock
+    private QuestionReader questionReader;
 
     @InjectMocks
     private EmojiService emojiService;
@@ -69,7 +71,7 @@ class EmojiServiceTests {
 
         when(emojiRepository.findByMemberIdAndTargetIdAndTargetType(memberId, targetId,
             targetType)).thenReturn(Optional.empty());
-        when(memberService.findById(memberId)).thenReturn(member);
+        when(memberReader.getById(memberId)).thenReturn(member);
         when(emojiRepository.save(any(Emoji.class))).thenReturn(findEmoji);
         when(roomRepository.findById(targetId)).thenReturn(Optional.of(room));
 
@@ -107,9 +109,9 @@ class EmojiServiceTests {
 
         when(emojiRepository.findByMemberIdAndTargetIdAndTargetType(memberId, targetId,
             targetType)).thenReturn(Optional.empty());
-        when(memberService.findById(memberId)).thenReturn(member);
+        when(memberReader.getById(memberId)).thenReturn(member);
         when(emojiRepository.save(any(Emoji.class))).thenReturn(findEmoji);
-        when(questionService.findById(targetId)).thenReturn(question);
+        when(questionReader.getById(targetId)).thenReturn(question);
 
         // when
         EmojiResponse response = emojiService.toggleEmoji(memberId,
@@ -145,7 +147,7 @@ class EmojiServiceTests {
 
         when(emojiRepository.findByMemberIdAndTargetIdAndTargetType(memberId, targetId,
             targetType)).thenReturn(Optional.empty());
-        when(memberService.findById(memberId)).thenReturn(member);
+        when(memberReader.getById(memberId)).thenReturn(member);
         when(emojiRepository.save(any(Emoji.class))).thenReturn(findEmoji);
         when(answerService.findById(targetId)).thenReturn(answer);
 
@@ -219,7 +221,7 @@ class EmojiServiceTests {
 
         when(emojiRepository.findByMemberIdAndTargetIdAndTargetType(memberId, targetId,
             targetType)).thenReturn(Optional.of(findEmoji));
-        when(questionService.findById(targetId)).thenReturn(question);
+        when(questionReader.getById(targetId)).thenReturn(question);
 
         // when
         EmojiResponse response = emojiService.toggleEmoji(memberId,

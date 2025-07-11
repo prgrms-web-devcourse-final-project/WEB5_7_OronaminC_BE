@@ -11,11 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.oronaminc.join.answer.service.AnswerService;
-import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.global.util.SliceUtil;
-import com.oronaminc.join.member.dao.MemberRepository;
 import com.oronaminc.join.member.domain.Member;
+import com.oronaminc.join.member.service.MemberReader;
 import com.oronaminc.join.participant.dao.ParticipantRepository;
 import com.oronaminc.join.question.dao.QuestionRepository;
 import com.oronaminc.join.question.domain.Question;
@@ -35,16 +34,16 @@ import lombok.RequiredArgsConstructor;
 public class QuestionService {
 
     private final QuestionRepository questionRepository;
-    private final MemberRepository memberRepository;
     private final ParticipantRepository participantRepository;
     private final AnswerService answerService;
     private final RoomReader roomReader;
     private final QuestionReader questionReader;
+    private final MemberReader memberReader;
 
     @Transactional
     public Question create(Long roomId, Long memberId, QuestionCreateRequest requestDto) {
 
-        Member member = getMember(memberId);
+        Member member = memberReader.getById(memberId);
 
         Room room = roomReader.getById(roomId);
 
@@ -67,7 +66,7 @@ public class QuestionService {
         Long memberId,
         Long roomId
     ) {
-        getMember(memberId);
+        memberReader.getById(memberId);
         roomReader.getById(roomId);
 
         Pageable pageable = PageRequest.of(0, size + 1);
@@ -87,10 +86,6 @@ public class QuestionService {
         return SliceUtil.toSlice(assembledList, PageRequest.of(0, size));
     }
 
-    private Member getMember(Long memberId) {
-        return memberRepository.findById(memberId)
-            .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_MEMBER));
-    }
 
     @Transactional
     public void deleteByRoomId(Long roomId) {

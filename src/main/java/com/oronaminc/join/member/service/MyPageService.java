@@ -31,7 +31,7 @@ public class MyPageService {
 
     private final ParticipantRepository participantRepository;
     private final QuestionReader questionReader;
-    private final MemberService memberService;
+    private final MemberReader memberReader;
 
     public MyProfileGetResponse getMyProfile(Long memberId) {
         Long createdRoomCount = 0L;
@@ -48,7 +48,7 @@ public class MyPageService {
         }
 
         return new MyProfileGetResponse(
-            memberService.findById(memberId).getNickname(),
+            memberReader.getById(memberId).getNickname(),
             createdRoomCount,
             joinedRoomCount
         );
@@ -56,7 +56,7 @@ public class MyPageService {
 
     @Transactional
     public void updateMyProfile(MyProfileUpdateRequest request, Long memberId) {
-        Member member = memberService.findById(memberId);
+        Member member = memberReader.getById(memberId);
         member.updateNickname(request.nickname());
     }
 
