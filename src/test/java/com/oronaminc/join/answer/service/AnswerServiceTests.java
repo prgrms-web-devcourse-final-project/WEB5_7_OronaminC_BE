@@ -9,6 +9,10 @@ import static org.mockito.BDDMockito.given;
 import com.oronaminc.join.answer.dao.AnswerRepository;
 import com.oronaminc.join.answer.domain.Answer;
 import com.oronaminc.join.answer.dto.AnswerCreateRequest;
+import com.oronaminc.join.answer.dto.AnswerGetResponse;
+import com.oronaminc.join.emoji.domain.Emoji;
+import com.oronaminc.join.emoji.domain.TargetType;
+import com.oronaminc.join.emoji.repository.EmojiRepository;
 import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.member.dao.MemberRepository;
@@ -43,12 +47,14 @@ public class AnswerServiceTests {
     @Mock private ParticipantRepository participantRepository;
     @Mock private AnswerRepository answerRepository;
     @Mock private RoomRepository roomRepository;
+    @Mock private EmojiRepository emojiRepository;
 
     private Member mockMember;
     private Room mockRoom;
     private Question mockQuestion;
     private Participant mockParticipant;
     private AnswerCreateRequest request;
+    private Emoji mockEmoji;
 
     @BeforeEach
     void setUp() {
@@ -119,6 +125,50 @@ public class AnswerServiceTests {
         assertThat(result.getQuestion()).isEqualTo(mockQuestion);
         assertThat(result.getMember()).isEqualTo(mockMember);
         assertThat(result.getContent()).isEqualTo("답변입니다.");
+    }
+
+    @Test
+    @DisplayName("답변 조회 성공")
+    void getAnswer_success() {
+        // given
+        Long memberId = 1L;
+        Long roomId = 1L;
+        Long questionId = 1L;
+
+        Answer mockAnswer = Answer.builder()
+            .id(10L)
+            .question(mockQuestion)
+            .member(mockMember)
+            .content("답변입니다.")
+            .emojiCount(0L)
+            .version(0)
+            .build();
+
+        mockEmoji = Emoji.builder()
+            .id(1L)
+            .member(mockMember)
+            .targetType(TargetType.ANSWER)
+            .targetId(mockAnswer.getId())
+            .build();
+
+        // mocking
+        given(memberRepository.findById(memberId)).willReturn(Optional.of(mockMember));
+        given(roomRepository.findById(roomId)).willReturn(Optional.of(mockRoom));
+        given(questionRepository.findByIdAndRoomId(questionId, roomId)).willReturn(Optional.of(mockQuestion));
+        given(answerRepository.findByQuestionId(questionId)).willReturn(Optional.of(mockAnswer));
+        given(emojiRepository.countByTargetIdAndTargetType(mockAnswer.getId(), TargetType.ANSWER)).willReturn(5);
+        given(emojiRepository.findByMemberIdAndTargetIdAndTargetType(memberId, mockAnswer.getId(), TargetType.ANSWER)).willReturn(Optional.of(mockEmoji));
+
+        // when
+        AnswerGetResponse response = answerService.getAnswer(roomId, questionId, memberId);
+
+        // then
+        assertThat(response.answerId()).isEqualTo(mockAnswer.getId());
+        assertThat(response.content()).isEqualTo(mockAnswer.getContent());
+        assertThat(response.emojiCount()).isEqualTo(5);
+        assertThat(response.Emojied()).isTrue();
+        assertThat(response.writer().memberId()).isEqualTo(mockMember.getId());
+        assertThat(response.writer().nickname()).isEqualTo(mockMember.getNickname());
     }
 
     @Test

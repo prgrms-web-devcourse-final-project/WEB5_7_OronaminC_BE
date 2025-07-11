@@ -89,14 +89,8 @@ public class AnswerService {
     }
 
     private Question getRoomQuestion(Long questionId, Long roomId) {
-        getQuestion(questionId);
         return questionRepository.findByIdAndRoomId(questionId, roomId)
             .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_ROOM_QUESTION));
-    }
-
-    private Question getQuestion(Long questionId) {
-        return questionRepository.findById(questionId)
-            .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_QUESTION));
     }
 
     private Answer getExistAnswer(Long questionId) {
