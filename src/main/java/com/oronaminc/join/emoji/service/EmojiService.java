@@ -1,6 +1,9 @@
 package com.oronaminc.join.emoji.service;
 
-import static com.oronaminc.join.global.exception.ErrorCode.NOT_FOUND_ROOM;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.oronaminc.join.answer.service.AnswerService;
 import com.oronaminc.join.emoji.dao.EmojiRepository;
@@ -8,15 +11,11 @@ import com.oronaminc.join.emoji.domain.Emoji;
 import com.oronaminc.join.emoji.domain.TargetType;
 import com.oronaminc.join.emoji.dto.EmojiRequest;
 import com.oronaminc.join.emoji.dto.EmojiResponse;
-import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.member.service.MemberService;
 import com.oronaminc.join.question.service.QuestionService;
-import com.oronaminc.join.room.dao.RoomRepository;
-import com.oronaminc.join.room.domain.Room;
-import java.util.Optional;
+import com.oronaminc.join.room.service.RoomReader;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
@@ -27,11 +26,7 @@ public class EmojiService {
     private final QuestionService questionService;
     private final AnswerService answerService;
     private final MemberService memberService;
-    private final RoomRepository roomRepository;
-
-    public Integer countRoomEmoji(Long roomId) {
-        return emojiRepository.countByTargetIdAndTargetType(roomId, TargetType.ROOM);
-    }
+    private final RoomReader roomReader;
 
     @Transactional
     public void deleteByRoomEmoji(Long roomId) {
@@ -65,7 +60,7 @@ public class EmojiService {
 
     private Long decrementEmojiCount(TargetType targetType, Long targetId) {
         return switch (targetType) {
-            case ROOM -> getRoomById(targetId).decrementEmojiCount();
+            case ROOM -> roomReader.getById(targetId).decrementEmojiCount();
             case QUESTION -> questionService.findById(targetId).decrementEmojiCount();
             case ANSWER -> answerService.findById(targetId).decrementEmojiCount();
         };
@@ -73,15 +68,10 @@ public class EmojiService {
 
     private Long incrementEmojiCount(TargetType targetType, Long targetId) {
         return switch (targetType) {
-            case ROOM -> getRoomById(targetId).incrementEmojiCount();
+            case ROOM -> roomReader.getById(targetId).incrementEmojiCount();
             case QUESTION -> questionService.findById(targetId).incrementEmojiCount();
             case ANSWER -> answerService.findById(targetId).incrementEmojiCount();
         };
-    }
-
-    private Room getRoomById(Long roomId) {
-        return roomRepository.findById(roomId)
-            .orElseThrow(() -> new ErrorException(NOT_FOUND_ROOM));
     }
 
 }

@@ -1,10 +1,12 @@
 package com.oronaminc.join.answer.service;
 
-import static com.oronaminc.join.global.exception.ErrorCode.BADREQUEST_DUPLICATION_ANSWER;
-import static com.oronaminc.join.global.exception.ErrorCode.NOT_FOUND_PARTICIPANT;
+import static com.oronaminc.join.global.exception.ErrorCode.*;
+
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.oronaminc.join.answer.dao.AnswerRepository;
 import com.oronaminc.join.answer.domain.Answer;
 import com.oronaminc.join.answer.dto.AnswerCreateRequest;
@@ -15,11 +17,10 @@ import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.participant.dao.ParticipantRepository;
 import com.oronaminc.join.question.dao.QuestionRepository;
 import com.oronaminc.join.question.domain.Question;
-import com.oronaminc.join.room.dao.RoomRepository;
 import com.oronaminc.join.room.domain.Room;
+import com.oronaminc.join.room.service.RoomReader;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
@@ -28,9 +29,9 @@ public class AnswerService {
 
     private final AnswerRepository answerRepository;
     private final MemberRepository memberRepository;
-    private final RoomRepository roomRepository;
     private final QuestionRepository questionRepository;
     private final ParticipantRepository participantRepository;
+    private final RoomReader roomReader;
 
     @Transactional
     public Answer create(Long roomId, Long memberId, Long questionId ,AnswerCreateRequest requestDto ){
@@ -38,8 +39,7 @@ public class AnswerService {
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_MEMBER));
 
-        Room room = roomRepository.findById(roomId)
-            .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_ROOM));
+        Room room = roomReader.getById(roomId);
 
         Question question = questionRepository.findByIdAndRoomId(questionId, roomId)
             .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_QUESTION));
