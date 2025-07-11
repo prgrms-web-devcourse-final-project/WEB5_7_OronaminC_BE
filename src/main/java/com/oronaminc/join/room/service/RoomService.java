@@ -94,6 +94,7 @@ public class RoomService {
     public void deleteRoom(Long memberId, Long roomId) {
         participantService.validatePresenter(roomId, memberId);
         Room room = this.getRoomById(roomId);
+        Document document = documentService.getDocumentByRoomId(roomId);
 
         if (room.getRoomStatus().equals(RoomStatus.STARTED)) {
             throw new ErrorException(BAD_REQUEST_ROOM_STARTED);
@@ -102,6 +103,8 @@ public class RoomService {
         participantService.deleteParticipantByRoomId(roomId);
         questionService.deleteByRoomId(roomId);
         emojiService.deleteByRoomEmoji(roomId);
+        // S3 버킷 내 파일 삭제
+        s3Service.deleteFile(document.getFileUrl());
         documentService.deleteByRoomId(roomId);
         roomRepository.deleteById(roomId);
     }

@@ -56,12 +56,4 @@ public class DocumentService {
         documentRepository.save(DocumentMapper.toDocument(objectKey, fileName, room));
     }
 
-
-    // 전체 URL에서 ObjectKey 추출
-    private String extractObjectKey(String documentUrl) {
-        String path = URI.create(documentUrl).getPath();
-
-        return path.startsWith("/") ? path.substring(1) : path;
-    }
-
 }
