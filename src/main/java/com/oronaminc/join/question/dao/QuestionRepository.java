@@ -105,4 +105,8 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
         group by q.room.id
     """)
     List<Object[]> countByRoomIds(List<Long> roomIds);
+
+    List<Question> findByRoomId(Long roomId);
+
+    void deleteByRoomId(Long roomId);
 }

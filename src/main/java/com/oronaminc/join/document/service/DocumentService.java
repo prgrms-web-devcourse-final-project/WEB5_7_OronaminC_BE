@@ -28,6 +28,10 @@ public class DocumentService {
                 .orElseThrow(() -> new ErrorException(NOT_FOUND_FILE));
     }
 
+    public void deleteByRoomId(Long roomId) {
+        documentRepository.deleteByRoomId(roomId);
+    }
+
     public DocumentResponse generatePresignedUrl(DocumentRequest request, String memberRole) {
         if (!memberRole.equals(MemberType.MEMBER.name())) {
             throw new ErrorException(ErrorCode.UNAUTHORIZED_MEMBER);
@@ -45,4 +49,5 @@ public class DocumentService {
 
         return path.startsWith("/") ? path.substring(1) : path;
     }
+
 }
