@@ -3,11 +3,16 @@ package com.oronaminc.join.document.service;
 
 import com.oronaminc.join.document.dto.DocumentRequest;
 import com.oronaminc.join.document.dto.DocumentResponse;
+import com.oronaminc.join.document.mapper.DocumentMapper;
 import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.infra.service.S3Service;
 import com.oronaminc.join.member.domain.MemberType;
 import static com.oronaminc.join.global.exception.ErrorCode.*;
+
+import com.oronaminc.join.room.dao.RoomRepository;
+import com.oronaminc.join.room.domain.Room;
+import com.oronaminc.join.room.service.RoomService;
 import org.springframework.stereotype.Service;
 import com.oronaminc.join.document.dao.DocumentRepository;
 import com.oronaminc.join.document.domain.Document;
@@ -22,6 +27,7 @@ import java.util.UUID;
 public class DocumentService {
 
     private final DocumentRepository documentRepository;
+    private final RoomRepository roomRepository;
     private final S3Service s3Service;
 
     public Document getDocumentByRoomId(Long roomId) {
@@ -45,6 +51,11 @@ public class DocumentService {
         return new DocumentResponse(presignedUrl, objectKey);
     }
 
+    public void saveDocument(String objectKey, Room room) {
+        String fileName = objectKey.replaceAll("^.*/","");
+
+        documentRepository.save(DocumentMapper.toDocument(objectKey, fileName, room));
+    }
 
 
     // 전체 URL에서 ObjectKey 추출

@@ -47,6 +47,8 @@ public class RoomService {
         String code = this.generateCode();
         Room room = RoomMapper.toRoom(createRoomRequest, code);
         roomRepository.save(room);
+
+        documentService.saveDocument(createRoomRequest.documentUrl(), room);
         participantService.savePresenterAndTeam(presenterEmail, createRoomRequest.teamEmail(), room);
         return RoomMapper.toCreateRoomResponse(room);
     }
