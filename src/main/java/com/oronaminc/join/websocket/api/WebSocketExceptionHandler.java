@@ -43,7 +43,6 @@ public class WebSocketExceptionHandler {
     public ErrorResponse handleCustomException(ErrorException e, Message<?> message) {
         // 비즈니스 오류 (ex. 존재하지 않는 ~~에 접근)
 
-        log.info("--- e.getErrorCode() = {}", e.getErrorCode());
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
         log.info("에러를 보낼 세션 ID: {}", accessor.getSessionId());
 
