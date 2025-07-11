@@ -9,10 +9,12 @@ import com.oronaminc.join.emoji.dto.EmojiResponse;
 import com.oronaminc.join.member.service.MemberService;
 import com.oronaminc.join.question.service.QuestionService;
 import com.oronaminc.join.room.service.RoomService;
+import com.oronaminc.join.emoji.repository.EmojiRepository;
+
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Service;
 
 @Service
 @Transactional(readOnly = true)
@@ -24,6 +26,15 @@ public class EmojiService {
     private final QuestionService questionService;
     private final AnswerService answerService;
     private final MemberService memberService;
+
+    public Integer countRoomEmoji(Long roomId) {
+        return emojiRepository.countByTargetIdAndTargetType(roomId, TargetType.ROOM);
+    }
+
+    @Transactional
+    public void deleteByRoomEmoji(Long roomId) {
+        emojiRepository.deleteByTargetTypeAndTargetId(TargetType.ROOM, roomId);
+    }
 
     @Transactional
     public EmojiResponse toggleEmoji(Long memberId, EmojiRequest emojiRequest) {

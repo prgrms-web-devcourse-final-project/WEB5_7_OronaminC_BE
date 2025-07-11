@@ -27,13 +27,13 @@ public class ParticipantService {
     private final MemberService memberService;
 
     public void savePresenterAndTeam(String presenterEmail, List<String> teamEmail, Room room) {
-        saveParticipant(presenterEmail, room, ParticipantType.PRESENTER);
+        saveMemberParticipantByEmail(presenterEmail, room, ParticipantType.PRESENTER);
         for (String email : teamEmail) {
-            saveParticipant(email, room, ParticipantType.TEAM);
+            saveMemberParticipantByEmail(email, room, ParticipantType.TEAM);
         }
     }
 
-    public void saveParticipant(String email, Room room, ParticipantType participantType) {
+    public void saveMemberParticipantByEmail(String email, Room room, ParticipantType participantType) {
         Member participantMember = memberService.findByEmail(email);
         if (participantMember.getMemberType().equals(MemberType.GUEST)) {
             throw new ErrorException(UNAUTHORIZED_TEAM_GUEST);
@@ -41,5 +41,52 @@ public class ParticipantService {
         Participant participant = ParticipantMapper.toParticipant(participantMember, room, participantType);
         participantRepository.save(participant);
     }
+    
+    public void saveParticipantById(Long memberId, Room room, ParticipantType participantType) {
+        Member participantMember = memberService.findById(memberId);
+        if (participantRepository.existsByRoomIdAndMemberId(room.getId(), participantMember.getId())) {
+            return;
+        }
+        Participant participant = ParticipantMapper.toParticipant(participantMember, room, participantType);
+        participantRepository.save(participant);
+    }
 
+    public void validateParticipant(Long memberId, Long roomId) {
+        if (!participantRepository.existsByRoomIdAndMemberId(roomId, memberId)) {
+            throw new ErrorException(NOT_FOUND_PARTICIPANT);
+        }
+    }
+
+    public Participant getPresenter(Long roomId) {
+        return participantRepository.findByRoomIdAndParticipantType(roomId, ParticipantType.PRESENTER)
+                .orElseThrow(() -> new ErrorException(NOT_FOUND_PARTICIPANT));
+    }
+
+    public List<Participant> getTeam(Long roomId) {
+        return participantRepository.findAllByRoomIdAndParticipantType(roomId, ParticipantType.TEAM);
+    }
+
+    public void updateTeam(Room room, List<String> emails) {
+        List<Participant> team = this.getTeam(room.getId());
+        for (Participant participant : team) {
+            if (!emails.contains(participant.getMember().getEmail())) {
+                participantRepository.delete(participant);
+            }
+        }
+
+        for (String email : emails) {
+            this.saveMemberParticipantByEmail(email, room, ParticipantType.TEAM);
+        }
+    }
+
+    public void validatePresenter(Long roomId, Long memberId) {
+        Participant presenter = this.getPresenter(roomId);
+        if (!presenter.getMember().getId().equals(memberId)) {
+            throw new ErrorException(UNAUTHORIZED_UPDATE_AND_DELETE);
+        }
+    }
+
+    public void deleteParticipantByRoomId(Long roomId) {
+        participantRepository.deleteByRoomId(roomId);
+    }
 }

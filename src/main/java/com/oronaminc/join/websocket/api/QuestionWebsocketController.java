@@ -4,7 +4,7 @@ import com.oronaminc.join.member.security.MemberDetails;
 import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.dto.QuestionCreateRequest;
 import com.oronaminc.join.question.dto.QuestionCreateResponse;
-import com.oronaminc.join.question.mapper.QuestionMapper;
+import com.oronaminc.join.question.util.QuestionMapper;
 import com.oronaminc.join.question.service.QuestionService;
 import java.security.Principal;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,6 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
