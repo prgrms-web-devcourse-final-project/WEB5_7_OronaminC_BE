@@ -1,5 +1,6 @@
 package com.oronaminc.join.global.exception;
 
+import static com.oronaminc.join.global.exception.ErrorStatus.BAD_REQUEST;
 import static com.oronaminc.join.global.exception.ErrorStatus.INTERNAL_SERVER_ERROR;
 import static com.oronaminc.join.global.exception.ErrorStatus.NOT_FOUND;
 import static com.oronaminc.join.global.exception.ErrorStatus.UNAUTHORIZED;

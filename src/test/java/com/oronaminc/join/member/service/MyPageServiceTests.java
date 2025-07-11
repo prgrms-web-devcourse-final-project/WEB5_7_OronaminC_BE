@@ -1,5 +1,8 @@
 package com.oronaminc.join.member.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.dto.MyPageType;
 import com.oronaminc.join.member.dto.MyProfileGetResponse;
@@ -14,16 +17,12 @@ import com.oronaminc.join.participant.domain.ParticipantType;
 import com.oronaminc.join.question.dao.QuestionRepository;
 import com.oronaminc.join.room.domain.Room;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -59,7 +58,7 @@ class MyPageServiceTests {
             new ParticipantCountDto(ParticipantType.GUEST, 1L)
         );
 
-        when(memberService.getMember(member.getId())).thenReturn(member);
+        when(memberService.findById(member.getId())).thenReturn(member);
         when(participantRepository.countByMemberIdGroupByParticipantType(member.getId()))
             .thenReturn(pc);
 
@@ -82,7 +81,7 @@ class MyPageServiceTests {
 
         List<ParticipantCountDto> pc = List.of();
 
-        when(memberService.getMember(member.getId())).thenReturn(member);
+        when(memberService.findById(member.getId())).thenReturn(member);
         when(participantRepository.countByMemberIdGroupByParticipantType(member.getId()))
             .thenReturn(pc);
 
@@ -106,7 +105,7 @@ class MyPageServiceTests {
         String newNickname = "newNickname";
         MyProfileUpdateRequest request = new MyProfileUpdateRequest(newNickname);
 
-        when(memberService.getMember(member.getId())).thenReturn(member);
+        when(memberService.findById(member.getId())).thenReturn(member);
 
         // when
         MyProfileUpdateResponse response =
@@ -140,7 +139,6 @@ class MyPageServiceTests {
         ReflectionTestUtils.setField(room2, "createdAt", LocalDateTime.now());
         ReflectionTestUtils.setField(room3, "createdAt", LocalDateTime.now());
 
-
         Participant participant1 = Participant.builder()
             .room(room1)
             .member(member)
@@ -157,15 +155,14 @@ class MyPageServiceTests {
             .participantType(ParticipantType.GUEST)
             .build();
 
-
         List<Participant> pc = List.of(participant1, participant2, participant3);
         Page<Participant> participantPage = new PageImpl<>(pc, pageable, 1);
 
         List<Long> roomIds = List.of(room1.getId(), room2.getId(), room3.getId());
         List<Object[]> questions = List.of(
-            new Object[]{ room1.getId(), 1L },
-            new Object[]{ room2.getId(), 2L },
-            new Object[]{ room3.getId(), 3L }
+            new Object[]{room1.getId(), 1L},
+            new Object[]{room2.getId(), 2L},
+            new Object[]{room3.getId(), 3L}
         );
 
         when(participantRepository.findByMemberId(memberId, pageable))

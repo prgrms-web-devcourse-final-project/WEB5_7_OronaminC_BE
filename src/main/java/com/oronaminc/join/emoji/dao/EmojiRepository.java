@@ -7,6 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface EmojiRepository extends JpaRepository<Emoji, String> {
 
-    Optional<Emoji> findByMemberIdAndTargetIdAndTargetType(Long memberId, Long targetId, TargetType targetType);
+    Integer countByTargetIdAndTargetType(Long targetId, TargetType targetType);
+
+    void deleteByTargetTypeAndTargetId(TargetType targetType, Long targetId);
+
+    Optional<Emoji> findByMemberIdAndTargetIdAndTargetType(Long memberId, Long targetId,
+        TargetType targetType);
 
 }

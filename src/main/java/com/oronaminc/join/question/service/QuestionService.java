@@ -1,21 +1,11 @@
 package com.oronaminc.join.question.service;
 
-import static com.oronaminc.join.global.exception.ErrorCode.*;
-
-import java.util.List;
-
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import static com.oronaminc.join.global.exception.ErrorCode.NOT_FOUND_PARTICIPANT;
 
 import com.oronaminc.join.answer.service.AnswerService;
 import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.global.util.SliceUtil;
-import com.oronaminc.join.member.dao.MemberRepository;
-import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.dao.MemberRepository;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.participant.dao.ParticipantRepository;
@@ -28,14 +18,16 @@ import com.oronaminc.join.question.dto.QuestionFlatResponse;
 import com.oronaminc.join.question.util.QuestionMapper;
 import com.oronaminc.join.room.dao.RoomRepository;
 import com.oronaminc.join.room.domain.Room;
-
-import com.oronaminc.join.question.mapper.QuestionMapper;
-import com.oronaminc.join.room.dao.RoomRepository;
-import com.oronaminc.join.room.domain.Room;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class QuestionService {
 
@@ -63,7 +55,6 @@ public class QuestionService {
         return question;
     }
 
-    @Transactional(readOnly = true)
     public Slice<QuestionAssembleResponse> getQuestions(
         QuestionSort sort,
         Long lastId,
@@ -79,17 +70,17 @@ public class QuestionService {
 
         List<QuestionFlatResponse> questions = switch (sort) {
             case QuestionSort.CREATEDAT -> questionRepository.findByCreatedAt(lastId,
-                    memberId, roomId, pageable);
+                memberId, roomId, pageable);
             case QuestionSort.EMOJI -> questionRepository.findByEmojiCount(lastId,
-                    lastEmojiCount, memberId, roomId, pageable);
+                lastEmojiCount, memberId, roomId, pageable);
             case QuestionSort.MYQUESTION -> questionRepository.findByMyQuestion(lastId,
-                    memberId, roomId, pageable);
+                memberId, roomId, pageable);
         };
 
-        List<QuestionAssembleResponse> assembledList  = questions.stream()
+        List<QuestionAssembleResponse> assembledList = questions.stream()
             .map(QuestionMapper::toQuestionListResponse).toList();
 
-        return SliceUtil.toSlice(assembledList , PageRequest.of(0, size));
+        return SliceUtil.toSlice(assembledList, PageRequest.of(0, size));
     }
 
     private Room getRoom(Long roomId) {
@@ -102,6 +93,7 @@ public class QuestionService {
             .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_MEMBER));
     }
 
+    @Transactional
     public void deleteByRoomId(Long roomId) {
         List<Question> questions = questionRepository.findByRoomId(roomId);
         answerService.deleteByQuestionList(questions);

@@ -1,21 +1,19 @@
 package com.oronaminc.join.participant.dao;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.oronaminc.join.member.dao.MemberRepository;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.dto.ParticipantCountDto;
 import com.oronaminc.join.participant.domain.Participant;
 import com.oronaminc.join.participant.domain.ParticipantType;
-import com.oronaminc.join.question.dao.QuestionRepository;
 import com.oronaminc.join.room.dao.RoomRepository;
 import com.oronaminc.join.room.domain.Room;
 import java.util.List;
-import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace.NONE;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -71,11 +69,11 @@ class ParticipantRepositoryTests {
             .build()
         );
     }
-    
+
     @Test
     @DisplayName("멤버ID로 생성한방, 참여한방 수를 조회한다.")
-    void countByMemberIdGroupByParticipantType_test(){
-    	// given
+    void countByMemberIdGroupByParticipantType_test() {
+        // given
 
         // when
         List<ParticipantCountDto> result = participantRepository.countByMemberIdGroupByParticipantType(
@@ -90,12 +88,12 @@ class ParticipantRepositoryTests {
 
     @Test
     @DisplayName("해당 멤버가 생성/참가한 모든 방이 조회된다.")
-    void findByMemberId_test(){
+    void findByMemberId_test() {
 
-    	// given
+        // given
         Pageable pageable = PageRequest.of(0, 10);
 
-    	// when
+        // when
         Page<Participant> result = participantRepository.findByMemberId(member.getId(),
             pageable);
 
@@ -105,13 +103,14 @@ class ParticipantRepositoryTests {
 
     @Test
     @DisplayName("해당 멤버가 생성한 모든 방이 조회된다.")
-    void findByMemberIdAndParticipantType_test(){
+    void findByMemberIdAndParticipantType_test() {
 
-    	// given
+        // given
         Pageable pageable = PageRequest.of(0, 10);
 
-    	// when
-        Page<Participant> result = participantRepository.findByMemberIdAndParticipantType(member.getId(),
+        // when
+        Page<Participant> result = participantRepository.findByMemberIdAndParticipantType(
+            member.getId(),
             ParticipantType.PRESENTER, pageable);
 
         // then
@@ -120,13 +119,14 @@ class ParticipantRepositoryTests {
 
     @Test
     @DisplayName("해당 멤버가 참여한 모든 방이 조회된다.")
-    void findByMemberIdAndParticipantTypeNot_test(){
+    void findByMemberIdAndParticipantTypeNot_test() {
 
-    	// given
+        // given
         Pageable pageable = PageRequest.of(0, 10);
 
-    	// when
-        Page<Participant> result = participantRepository.findByMemberIdAndParticipantTypeNot(member.getId(),
+        // when
+        Page<Participant> result = participantRepository.findByMemberIdAndParticipantTypeNot(
+            member.getId(),
             ParticipantType.PRESENTER, pageable);
 
         // then
