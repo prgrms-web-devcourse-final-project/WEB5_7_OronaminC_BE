@@ -7,7 +7,6 @@ import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.dto.MyPageType;
 import com.oronaminc.join.member.dto.MyProfileGetResponse;
 import com.oronaminc.join.member.dto.MyProfileUpdateRequest;
-import com.oronaminc.join.member.dto.MyProfileUpdateResponse;
 import com.oronaminc.join.member.dto.MyRoomsGetResponse;
 import com.oronaminc.join.member.dto.ParticipantCountDto;
 import com.oronaminc.join.member.dto.ParticipationType;
@@ -108,11 +107,9 @@ class MyPageServiceTests {
         when(memberService.findById(member.getId())).thenReturn(member);
 
         // when
-        MyProfileUpdateResponse response =
-            myPageService.updateMyProfile(request, member.getId());
+        myPageService.updateMyProfile(request, member.getId());
 
         // then
-        assertThat(response.memberId()).isEqualTo(member.getId());
         assertThat(member.getNickname()).isEqualTo(newNickname);
 
     }

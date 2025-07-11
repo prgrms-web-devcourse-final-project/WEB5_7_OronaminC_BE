@@ -4,7 +4,6 @@ import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.dto.MyPageType;
 import com.oronaminc.join.member.dto.MyProfileGetResponse;
 import com.oronaminc.join.member.dto.MyProfileUpdateRequest;
-import com.oronaminc.join.member.dto.MyProfileUpdateResponse;
 import com.oronaminc.join.member.dto.MyRoomsDto;
 import com.oronaminc.join.member.dto.MyRoomsGetResponse;
 import com.oronaminc.join.member.dto.ParticipantCountDto;
@@ -54,10 +53,9 @@ public class MyPageService {
     }
 
     @Transactional
-    public MyProfileUpdateResponse updateMyProfile(MyProfileUpdateRequest request, Long memberId) {
+    public void updateMyProfile(MyProfileUpdateRequest request, Long memberId) {
         Member member = memberService.findById(memberId);
         member.updateNickname(request.nickname());
-        return new MyProfileUpdateResponse(memberId);
     }
 
     public MyRoomsGetResponse getMyRooms(Long memberId, MyPageType type, Pageable pageable) {
