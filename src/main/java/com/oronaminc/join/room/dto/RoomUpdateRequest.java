@@ -34,6 +34,10 @@ public record RoomUpdateRequest(
         @NotNull
         @Size(max = 5)
         @Schema(description = "발표방 추가한 팀원 목록", example = "{팀원1@example.com, 팀원2@example.com}")
-        List<String> teamEmail
+        List<String> teamEmail,
+
+        @NotBlank
+        @Schema(description = "발표자료 ObjectKey", example = "documents/UUID_발표자료.pdf")
+        String documentUrl
 ) {
 }

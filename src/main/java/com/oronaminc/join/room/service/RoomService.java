@@ -80,11 +80,13 @@ public class RoomService {
     public void updateRoom(Long memberId, Long roomId, RoomUpdateRequest updateRoomRequest) {
         participantService.validatePresenter(roomId, memberId);
         Room room = this.getRoomById(roomId);
+        Document document = documentService.getDocumentByRoomId(roomId);
 
         if (room.getRoomStatus().equals(RoomStatus.STARTED)) {
             throw new ErrorException(BAD_REQUEST_ROOM_STARTED);
         }
 
+        document.update(updateRoomRequest.documentUrl());
         room.update(updateRoomRequest);
         participantService.updateTeam(room, updateRoomRequest.teamEmail());
     }
