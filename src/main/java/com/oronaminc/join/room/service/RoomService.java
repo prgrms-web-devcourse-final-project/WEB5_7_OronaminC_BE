@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.oronaminc.join.document.domain.Document;
+import com.oronaminc.join.document.service.DocumentReader;
 import com.oronaminc.join.document.service.DocumentService;
 import com.oronaminc.join.emoji.service.EmojiService;
 import com.oronaminc.join.global.exception.ErrorException;
@@ -35,25 +36,29 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 @RequiredArgsConstructor
 public class RoomService {
+
     private final RoomRepository roomRepository;
     private final ParticipantService participantService;
     private final DocumentService documentService;
     private final QuestionService questionService;
+    private final DocumentReader documentReader;
     private final EmojiService emojiService;
+    private final RoomReader roomReader;
 
     private static final int CODE_LENGTH = 6;
 
-    public CreateRoomResponse createRoom(CreateRoomRequest createRoomRequest, String presenterEmail) {
+    public CreateRoomResponse createRoom(CreateRoomRequest createRoomRequest,
+        String presenterEmail) {
         String code = this.generateCode();
         Room room = RoomMapper.toRoom(createRoomRequest, code);
         roomRepository.save(room);
-        participantService.savePresenterAndTeam(presenterEmail, createRoomRequest.teamEmail(), room);
+        participantService.savePresenterAndTeam(presenterEmail, createRoomRequest.teamEmail(),
+            room);
         return RoomMapper.toCreateRoomResponse(room);
     }
 
     public JoinRoomResponse joinRoom(Long memberId, JoinRoomRequest joinRoomRequest) {
-        Room room = roomRepository.findBySecretCode(joinRoomRequest.secretCode())
-                .orElseThrow(() -> new ErrorException(NOT_FOUND_ROOM));
+        Room room = roomReader.getBySecretCode(joinRoomRequest.secretCode());
 
         participantService.saveParticipantById(memberId, room, ParticipantType.GUEST);
         return new JoinRoomResponse(room.getId());
@@ -62,18 +67,18 @@ public class RoomService {
     public RoomDetailResponse getRoomDetail(Long memberId, Long roomId) {
         participantService.validateParticipant(memberId, roomId);
 
-        Room room = this.getRoomById(roomId);
+        Room room = roomReader.getById(roomId);
 
         Participant presenter = participantService.getPresenter(roomId);
         List<Participant> team = participantService.getTeam(roomId);
-        Document document = documentService.getDocumentByRoomId(roomId);
+        Document document = documentReader.getByRoomId(roomId);
 
         return RoomMapper.toRoomDetailResponse(room, presenter, team, document, memberId);
     }
 
     public void updateRoom(Long memberId, Long roomId, RoomUpdateRequest updateRoomRequest) {
         participantService.validatePresenter(roomId, memberId);
-        Room room = this.getRoomById(roomId);
+        Room room = roomReader.getById(roomId);
 
         if (room.getRoomStatus().equals(RoomStatus.STARTED)) {
             throw new ErrorException(BAD_REQUEST_ROOM_STARTED);
@@ -85,7 +90,7 @@ public class RoomService {
 
     public void deleteRoom(Long memberId, Long roomId) {
         participantService.validatePresenter(roomId, memberId);
-        Room room = this.getRoomById(roomId);
+        Room room = roomReader.getById(roomId);
 
         if (room.getRoomStatus().equals(RoomStatus.STARTED)) {
             throw new ErrorException(BAD_REQUEST_ROOM_STARTED);
@@ -98,9 +103,10 @@ public class RoomService {
         roomRepository.deleteById(roomId);
     }
 
-    public void updateRoomStatus(Long memberId, Long roomId, RoomUpdateStatusRequest roomUpdateStatusRequest) {
+    public void updateRoomStatus(Long memberId, Long roomId,
+        RoomUpdateStatusRequest roomUpdateStatusRequest) {
         participantService.validatePresenter(roomId, memberId);
-        Room room = this.getRoomById(roomId);
+        Room room = roomReader.getById(roomId);
 
         RoomStatus updateStatus = roomUpdateStatusRequest.roomStatus();
         List<RoomStatus> canUpdateStatus = List.of(RoomStatus.STARTED, RoomStatus.ENDED);
@@ -112,20 +118,15 @@ public class RoomService {
 
     public RoomUpdateInfoResponse getRoomUpdateInfo(Long memberId, Long roomId) {
         participantService.validatePresenter(roomId, memberId);
-        Room room = this.getRoomById(roomId);
+        Room room = roomReader.getById(roomId);
         List<Participant> team = participantService.getTeam(roomId);
         return RoomMapper.toRoomUpdateInfoResponse(room, team);
     }
 
-    private Room getRoomById(Long roomId) {
-        return roomRepository.findById(roomId)
-                .orElseThrow(() -> new ErrorException(NOT_FOUND_ROOM));
-    }
-
     private String generateCode() {
-        while(true){
+        while (true) {
             String code = CodeGenerator.generateCode(CODE_LENGTH);
-            if (!roomRepository.existsBySecretCode(code)) {
+            if (!roomReader.existsBySecretCode(code)) {
                 return code;
             }
         }

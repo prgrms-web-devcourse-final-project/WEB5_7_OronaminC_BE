@@ -60,4 +60,15 @@ public class Room extends BaseEntity {
     public void updateStatus(RoomStatus roomStatus) {
         this.roomStatus = roomStatus;
     }
+
+    public Long incrementEmojiCount() {
+        return ++this.emojiCount;
+    }
+
+    public Long decrementEmojiCount() {
+        if (this.emojiCount > 0) {
+            this.emojiCount--;
+        }
+        return this.emojiCount;
+    }
 }

@@ -14,6 +14,7 @@ import com.oronaminc.join.member.dao.MemberRepository;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.domain.MemberType;
 import com.oronaminc.join.member.dto.GuestLoginRequest;
+import com.oronaminc.join.member.service.MemberReader;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class AuthService extends DefaultOAuth2UserService {
     private final MemberRepository memberRepository;
+    private final MemberReader memberReader;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -35,7 +37,7 @@ public class AuthService extends DefaultOAuth2UserService {
         Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
 
 
-        Optional<Member> optionalMember = memberRepository.findByEmail(kakaoAccount.get("email").toString());
+        Optional<Member> optionalMember = memberReader.findByEmail(kakaoAccount.get("email").toString());
 
         Member member = optionalMember.orElseGet(
                 () -> memberRepository.save(

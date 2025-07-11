@@ -60,4 +60,15 @@ public class Answer extends BaseEntity {
             .build();
     }
 
+    public Long incrementEmojiCount() {
+        return ++this.emojiCount;
+    }
+
+    public Long decrementEmojiCount() {
+        if (this.emojiCount > 0) {
+            this.emojiCount--;
+        }
+        return this.emojiCount;
+    }
+
 }
