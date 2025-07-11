@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.oronaminc.join.answer.dao.AnswerRepository;
 import com.oronaminc.join.answer.domain.Answer;
 import com.oronaminc.join.answer.dto.AnswerCreateRequest;
-import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.service.MemberReader;
@@ -29,6 +28,7 @@ public class AnswerService {
     private final QuestionReader questionReader;
     private final MemberReader memberReader;
     private final ParticipantService participantService;
+    private final AnswerReader answerReader;
 
     @Transactional
     public Answer create(Long roomId, Long memberId, Long questionId ,AnswerCreateRequest requestDto ){
@@ -39,7 +39,7 @@ public class AnswerService {
 
         participantService.validateParticipant(memberId, roomId);
 
-        if(answerRepository.existsByQuestionIdAndMemberId(question.getId(), member.getId())){
+        if(answerReader.existsByQuestionIdAndMemberId(question.getId(), member.getId())){
             throw new ErrorException(BADREQUEST_DUPLICATION_ANSWER);
         }
 
@@ -52,10 +52,5 @@ public class AnswerService {
 
     public void deleteByQuestionList(List<Question> questions) {
         answerRepository.deleteByQuestionIn(questions);
-    }
-
-    public Answer findById(Long id) {
-        return answerRepository.findById(id)
-            .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_ROOM));
     }
 }

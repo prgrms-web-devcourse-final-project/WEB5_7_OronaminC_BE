@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.oronaminc.join.answer.service.AnswerService;
+import com.oronaminc.join.answer.service.AnswerReader;
 import com.oronaminc.join.emoji.dao.EmojiRepository;
 import com.oronaminc.join.emoji.domain.Emoji;
 import com.oronaminc.join.emoji.domain.TargetType;
@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class EmojiService {
 
     private final EmojiRepository emojiRepository;
-    private final AnswerService answerService;
+    private final AnswerReader answerReader;
     private final RoomReader roomReader;
     private final QuestionReader questionReader;
     private final MemberReader memberReader;
@@ -63,7 +63,7 @@ public class EmojiService {
         return switch (targetType) {
             case ROOM -> roomReader.getById(targetId).decrementEmojiCount();
             case QUESTION -> questionReader.getById(targetId).decrementEmojiCount();
-            case ANSWER -> answerService.findById(targetId).decrementEmojiCount();
+            case ANSWER -> answerReader.getById(targetId).decrementEmojiCount();
         };
     }
 
@@ -71,7 +71,7 @@ public class EmojiService {
         return switch (targetType) {
             case ROOM -> roomReader.getById(targetId).incrementEmojiCount();
             case QUESTION -> questionReader.getById(targetId).incrementEmojiCount();
-            case ANSWER -> answerService.findById(targetId).incrementEmojiCount();
+            case ANSWER -> answerReader.getById(targetId).incrementEmojiCount();
         };
     }
 
