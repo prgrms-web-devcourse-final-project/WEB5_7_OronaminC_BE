@@ -26,6 +26,7 @@ jobs:
 
       - name: application-ci.yml 주입
         run: |
+          mkdir -p src/main/resources
           echo "${{ secrets.APPLICATION_YML_CI }}" | base64 --decode > src/main/resources/application-ci.yml
 
       - name: 권한 세팅
