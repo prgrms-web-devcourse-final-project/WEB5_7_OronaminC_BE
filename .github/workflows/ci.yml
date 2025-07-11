@@ -12,12 +12,6 @@ jobs:
 
     env:
       SPRING_PROFILES_ACTIVE: ci
-      DB_URL: ${{ secrets.DB_URL }}
-      DB_USERNAME: ${{ secrets.DB_USERNAME }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
-      KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
-      KAKAO_REDIRECT_URI: ${{ secrets.KAKAO_REDIRECT_URI }}
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
     steps:
@@ -29,6 +23,11 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+
+      - name: application-ci.yml 주입
+        run: |
+          mkdir -p src/main/resources
+          echo "${{ secrets.APPLICATION_YML_CI }}" | base64 --decode > src/main/resources/application-ci.yml
 
       - name: 권한 세팅
         run: chmod +x ./gradlew
