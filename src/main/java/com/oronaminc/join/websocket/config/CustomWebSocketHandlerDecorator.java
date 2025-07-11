@@ -1,10 +1,5 @@
 package com.oronaminc.join.websocket.config;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketSession;
@@ -15,7 +10,8 @@ public class CustomWebSocketHandlerDecorator extends WebSocketHandlerDecorator {
 
     private final WebsocketSessionManager sessionManager;
 
-    public CustomWebSocketHandlerDecorator( WebSocketHandler delegate, WebsocketSessionManager sessionManager) {
+    public CustomWebSocketHandlerDecorator(WebSocketHandler delegate,
+        WebsocketSessionManager sessionManager) {
         super(delegate);
         this.sessionManager = sessionManager;
     }

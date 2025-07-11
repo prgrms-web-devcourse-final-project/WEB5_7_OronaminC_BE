@@ -25,13 +25,15 @@ public class CustomHandshakeHandler extends DefaultHandshakeHandler {
             throw new ErrorException(ErrorCode.NOT_FOUND_SESSION);
         }
 
-        Principal principal = servletRequest.getUserPrincipal();
-        // 쿠키 없이 연결
-        if (principal == null) {
-            throw new ErrorException(ErrorCode.ACCESS_DENIED_SESSION);
+        String userId = (String) session.getAttribute("LOGIN_USER_ID");
+        System.out.println("CustomHandshakeHandler userId = " + userId);
+
+        if (userId == null) {
+            // fallback 경로로 전송
+            return null;
         }
 
-        return principal;
+        return new StompPrincipal(userId);
     }
 
 }

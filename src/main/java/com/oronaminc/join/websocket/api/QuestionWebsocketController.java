@@ -1,5 +1,6 @@
 package com.oronaminc.join.websocket.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oronaminc.join.member.security.MemberDetails;
 import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.dto.QuestionCreateRequest;
@@ -13,7 +14,6 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
@@ -23,6 +23,7 @@ import org.springframework.stereotype.Controller;
 public class QuestionWebsocketController {
 
     private final QuestionService questionService;
+    private final ObjectMapper objectMapper;
 
     @MessageMapping("/rooms/{roomId}/questions/create")
     @SendTo("/topic/rooms/{roomId}/questions")

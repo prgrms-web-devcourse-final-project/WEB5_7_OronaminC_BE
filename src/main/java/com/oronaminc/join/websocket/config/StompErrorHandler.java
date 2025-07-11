@@ -7,13 +7,16 @@ import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.global.exception.ErrorResponse;
 import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
 
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class StompErrorHandler extends StompSubProtocolErrorHandler {
@@ -43,6 +46,9 @@ public class StompErrorHandler extends StompSubProtocolErrorHandler {
         StompHeaderAccessor headers = StompHeaderAccessor.create(StompCommand.ERROR);
         // 에러 메시지를 헤더에 포함
         headers.setMessage(ee.getMessage());
+        headers.setDestination("/user/queue/errors");
+        headers.setContentType(MimeTypeUtils.APPLICATION_JSON);
+        headers.setLeaveMutable(true);
 
         try {
             String json = objectMapper.writeValueAsString(
