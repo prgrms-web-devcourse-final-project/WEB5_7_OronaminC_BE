@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.domain.MemberType;
-import com.oronaminc.join.member.service.MemberService;
+import com.oronaminc.join.member.service.MemberReader;
 import com.oronaminc.join.participant.dao.ParticipantRepository;
 import com.oronaminc.join.participant.domain.Participant;
 import com.oronaminc.join.participant.domain.ParticipantType;
@@ -24,7 +24,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ParticipantService {
     private final ParticipantRepository participantRepository;
-    private final MemberService memberService;
+    private final ParticipantReader participantReader;
+    private final MemberReader memberReader;
 
     public void savePresenterAndTeam(String presenterEmail, List<String> teamEmail, Room room) {
         saveMemberParticipantByEmail(presenterEmail, room, ParticipantType.PRESENTER);
@@ -34,7 +35,7 @@ public class ParticipantService {
     }
 
     public void saveMemberParticipantByEmail(String email, Room room, ParticipantType participantType) {
-        Member participantMember = memberService.findByEmail(email);
+        Member participantMember = memberReader.getByEmail(email);
         if (participantMember.getMemberType().equals(MemberType.GUEST)) {
             throw new ErrorException(UNAUTHORIZED_TEAM_GUEST);
         }
@@ -43,8 +44,8 @@ public class ParticipantService {
     }
     
     public void saveParticipantById(Long memberId, Room room, ParticipantType participantType) {
-        Member participantMember = memberService.findById(memberId);
-        if (participantRepository.existsByRoomIdAndMemberId(room.getId(), participantMember.getId())) {
+        Member participantMember = memberReader.getById(memberId);
+        if (participantReader.existsByRoomIdAndMemberId(room.getId(), participantMember.getId())) {
             return;
         }
         Participant participant = ParticipantMapper.toParticipant(participantMember, room, participantType);
@@ -52,18 +53,18 @@ public class ParticipantService {
     }
 
     public void validateParticipant(Long memberId, Long roomId) {
-        if (!participantRepository.existsByRoomIdAndMemberId(roomId, memberId)) {
+        if (!participantReader.existsByRoomIdAndMemberId(roomId, memberId)) {
             throw new ErrorException(NOT_FOUND_PARTICIPANT);
         }
     }
 
     public Participant getPresenter(Long roomId) {
-        return participantRepository.findByRoomIdAndParticipantType(roomId, ParticipantType.PRESENTER)
+        return participantReader.findByRoomIdAndParticipantType(roomId, ParticipantType.PRESENTER)
                 .orElseThrow(() -> new ErrorException(NOT_FOUND_PARTICIPANT));
     }
 
     public List<Participant> getTeam(Long roomId) {
-        return participantRepository.findAllByRoomIdAndParticipantType(roomId, ParticipantType.TEAM);
+        return participantReader.findAllByRoomIdAndParticipantType(roomId, ParticipantType.TEAM);
     }
 
     public void updateTeam(Room room, List<String> emails) {

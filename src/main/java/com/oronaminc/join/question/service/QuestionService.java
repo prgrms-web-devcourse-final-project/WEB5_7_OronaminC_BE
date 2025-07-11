@@ -1,14 +1,18 @@
 package com.oronaminc.join.question.service;
 
-import static com.oronaminc.join.global.exception.ErrorCode.NOT_FOUND_PARTICIPANT;
+import java.util.List;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.oronaminc.join.answer.service.AnswerService;
-import com.oronaminc.join.global.exception.ErrorCode;
-import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.global.util.SliceUtil;
-import com.oronaminc.join.member.dao.MemberRepository;
 import com.oronaminc.join.member.domain.Member;
-import com.oronaminc.join.participant.dao.ParticipantRepository;
+import com.oronaminc.join.member.service.MemberReader;
+import com.oronaminc.join.participant.service.ParticipantService;
 import com.oronaminc.join.question.dao.QuestionRepository;
 import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.domain.QuestionSort;
@@ -16,15 +20,10 @@ import com.oronaminc.join.question.dto.QuestionAssembleResponse;
 import com.oronaminc.join.question.dto.QuestionCreateRequest;
 import com.oronaminc.join.question.dto.QuestionFlatResponse;
 import com.oronaminc.join.question.util.QuestionMapper;
-import com.oronaminc.join.room.dao.RoomRepository;
 import com.oronaminc.join.room.domain.Room;
-import java.util.List;
+import com.oronaminc.join.room.service.RoomReader;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
@@ -32,21 +31,20 @@ import org.springframework.transaction.annotation.Transactional;
 public class QuestionService {
 
     private final QuestionRepository questionRepository;
-    private final RoomRepository roomRepository;
-    private final MemberRepository memberRepository;
-    private final ParticipantRepository participantRepository;
+    private final ParticipantService participantService;
     private final AnswerService answerService;
+    private final QuestionReader questionReader;
+    private final MemberReader memberReader;
+    private final RoomReader roomReader;
 
     @Transactional
     public Question create(Long roomId, Long memberId, QuestionCreateRequest requestDto) {
 
-        Member member = getMember(memberId);
+        Member member = memberReader.getById(memberId);
 
-        Room room = getRoom(roomId);
+        Room room = roomReader.getById(roomId);
 
-        if (!participantRepository.existsByRoomIdAndMemberId(room.getId(), member.getId())) {
-            throw new ErrorException(NOT_FOUND_PARTICIPANT);
-        }
+        participantService.validateParticipant(memberId, roomId);
 
         Question question = QuestionMapper.toQuestion(room, member, requestDto);
 
@@ -63,17 +61,17 @@ public class QuestionService {
         Long memberId,
         Long roomId
     ) {
-        getMember(memberId);
-        getRoom(roomId);
+        memberReader.getById(memberId);
+        roomReader.getById(roomId);
 
         Pageable pageable = PageRequest.of(0, size + 1);
 
         List<QuestionFlatResponse> questions = switch (sort) {
-            case QuestionSort.CREATEDAT -> questionRepository.findByCreatedAt(lastId,
+            case QuestionSort.CREATEDAT -> questionReader.findByCreatedAt(lastId,
                 memberId, roomId, pageable);
-            case QuestionSort.EMOJI -> questionRepository.findByEmojiCount(lastId,
+            case QuestionSort.EMOJI -> questionReader.findByEmojiCount(lastId,
                 lastEmojiCount, memberId, roomId, pageable);
-            case QuestionSort.MYQUESTION -> questionRepository.findByMyQuestion(lastId,
+            case QuestionSort.MYQUESTION -> questionReader.findByMyQuestion(lastId,
                 memberId, roomId, pageable);
         };
 
@@ -83,26 +81,12 @@ public class QuestionService {
         return SliceUtil.toSlice(assembledList, PageRequest.of(0, size));
     }
 
-    private Room getRoom(Long roomId) {
-        return roomRepository.findById(roomId)
-            .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_ROOM));
-    }
-
-    private Member getMember(Long memberId) {
-        return memberRepository.findById(memberId)
-            .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_MEMBER));
-    }
 
     @Transactional
     public void deleteByRoomId(Long roomId) {
-        List<Question> questions = questionRepository.findByRoomId(roomId);
+        List<Question> questions = questionReader.findByRoomId(roomId);
         answerService.deleteByQuestionList(questions);
         questionRepository.deleteByRoomId(roomId);
-    }
-
-    public Question findById(Long id) {
-        return questionRepository.findById(id)
-            .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_QUESTION));
     }
 
 }
