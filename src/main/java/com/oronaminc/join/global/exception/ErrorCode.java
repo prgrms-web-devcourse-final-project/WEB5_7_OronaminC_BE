@@ -31,7 +31,8 @@ public enum ErrorCode {
 
     UNAUTHORIZED_ROLE_ANSWER("ANSWER-001", "팀원 또는 발표자만 댓글을 작성할 수 있습니다.", UNAUTHORIZED),
     NOT_FOUND_EXIST_ANSWER("ANSWER-002", "해당 질문에 대한 답변이 존재하지 않습니다.", NOT_FOUND),
-    BADREQUEST_DUPLICATION_ANSWER("ANSWER-003", "이미 답변한 질문입니다.", BAD_REQUEST);
+    NOT_FOUND_ANSWER("ANSWER-003", "답변이 존재하지 않습니다.", NOT_FOUND),
+    BADREQUEST_DUPLICATION_ANSWER("ANSWER-004", "이미 답변한 질문입니다.", BAD_REQUEST);
 
     private final String code;
     private final String message;

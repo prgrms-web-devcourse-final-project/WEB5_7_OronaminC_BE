@@ -22,7 +22,7 @@ public class RoomReader {
     }
 
     public Room getById(Long roomId) {
-        return this.findById(roomId)
+        return roomRepository.findById(roomId)
                 .orElseThrow(() -> new ErrorException(NOT_FOUND_ROOM));
     }
 

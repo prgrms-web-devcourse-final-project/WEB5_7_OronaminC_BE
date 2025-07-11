@@ -34,7 +34,7 @@ public class QuestionReader {
 
     public Question getByIdAndRoomId(Long questionId, Long roomId) {
         return this.findByIdAndRoomId(questionId, roomId)
-                .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_QUESTION));
+                .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_ROOM_QUESTION));
     }
 
     public List<QuestionFlatResponse> findByCreatedAt(Long lastId, Long memberId, Long roomId, Pageable pageable) {

@@ -1,18 +1,12 @@
 package com.oronaminc.join.answer.service;
 
-import static org.assertj.core.api.AssertionsForClassTypes.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.*;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import static com.oronaminc.join.global.exception.ErrorCode.NOT_FOUND_ROOM;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willThrow;
 
 import com.oronaminc.join.answer.dao.AnswerRepository;
 import com.oronaminc.join.answer.domain.Answer;
@@ -20,8 +14,7 @@ import com.oronaminc.join.answer.dto.AnswerCreateRequest;
 import com.oronaminc.join.answer.dto.AnswerGetResponse;
 import com.oronaminc.join.emoji.domain.Emoji;
 import com.oronaminc.join.emoji.domain.TargetType;
-import com.oronaminc.join.emoji.repository.EmojiRepository;
-import com.oronaminc.join.emoji.repository.EmojiRepository;
+import com.oronaminc.join.emoji.service.EmojiReader;
 import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.member.domain.Member;
@@ -34,6 +27,16 @@ import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.service.QuestionReader;
 import com.oronaminc.join.room.domain.Room;
 import com.oronaminc.join.room.domain.RoomStatus;
+import com.oronaminc.join.room.service.RoomReader;
+import java.time.LocalDateTime;
+import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class AnswerServiceTests {
@@ -50,8 +53,11 @@ public class AnswerServiceTests {
     @Mock
     private AnswerRepository answerRepository;
     @Mock
+    private RoomReader roomReader;
+    @Mock
     private AnswerReader answerReader;
-    @Mock private EmojiRepository emojiRepository;
+    @Mock
+    private EmojiReader emojiReader;
 
     private Member mockMember;
     private Room mockRoom;
@@ -63,39 +69,39 @@ public class AnswerServiceTests {
     @BeforeEach
     void setUp() {
         mockMember = Member.builder()
-                .id(1L)
-                .email("user@email.com")
-                .nickname("유저")
-                .memberType(MemberType.MEMBER)
-                .build();
+            .id(1L)
+            .email("user@email.com")
+            .nickname("유저")
+            .memberType(MemberType.MEMBER)
+            .build();
 
         mockRoom = Room.builder()
-                .id(1L)
-                .title("제목")
-                .description("내용")
-                .secretCode("123456")
-                .emojiCount(0L)
-                .participantLimit(0)
-                .endedAt(LocalDateTime.now())
-                .version(1)
-                .roomStatus(RoomStatus.STARTED)
-                .build();
+            .id(1L)
+            .title("제목")
+            .description("내용")
+            .secretCode("123456")
+            .emojiCount(0L)
+            .participantLimit(0)
+            .endedAt(LocalDateTime.now())
+            .version(1)
+            .roomStatus(RoomStatus.STARTED)
+            .build();
 
         mockQuestion = Question.builder()
-                .id(1L)
-                .room(mockRoom)
-                .emojiCount(0L)
-                .content("질문입니다.")
-                .member(mockMember)
-                .version(1)
-                .build();
+            .id(1L)
+            .room(mockRoom)
+            .emojiCount(0L)
+            .content("질문입니다.")
+            .member(mockMember)
+            .version(1)
+            .build();
 
         mockParticipant = Participant.builder()
-                .id(1L)
-                .member(mockMember)
-                .room(mockRoom)
-                .participantType(ParticipantType.TEAM)
-                .build();
+            .id(1L)
+            .member(mockMember)
+            .room(mockRoom)
+            .participantType(ParticipantType.TEAM)
+            .build();
 
         request = new AnswerCreateRequest("답변입니다.");
     }
@@ -106,16 +112,17 @@ public class AnswerServiceTests {
         // given
 
         Answer answer = Answer.builder()
-                .id(1L)
-                .member(mockMember)
-                .question(mockQuestion)
-                .emojiCount(0L)
-                .version(1)
-                .content("답변입니다")
-                .build();
+            .id(1L)
+            .member(mockMember)
+            .question(mockQuestion)
+            .emojiCount(0L)
+            .version(1)
+            .content("답변입니다")
+            .build();
 
-        given(questionReader.getByIdAndRoomId(1L, 1L)).willReturn(mockQuestion);
         given(memberReader.getById(1L)).willReturn(mockMember);
+        given(roomReader.getById(1L)).willReturn(mockRoom);
+        given(questionReader.getByIdAndRoomId(1L, 1L)).willReturn(mockQuestion);
         given(answerReader.existsByQuestionIdAndMemberId(1L, 1L)).willReturn(false);
         given(answerRepository.save(any(Answer.class))).willReturn(answer);
 
@@ -153,12 +160,14 @@ public class AnswerServiceTests {
             .build();
 
         // mocking
-        given(memberRepository.findById(memberId)).willReturn(Optional.of(mockMember));
-        given(roomRepository.findById(roomId)).willReturn(Optional.of(mockRoom));
-        given(questionRepository.findByIdAndRoomId(questionId, roomId)).willReturn(Optional.of(mockQuestion));
-        given(answerRepository.findByQuestionId(questionId)).willReturn(Optional.of(mockAnswer));
-        given(emojiRepository.countByTargetIdAndTargetType(mockAnswer.getId(), TargetType.ANSWER)).willReturn(5);
-        given(emojiRepository.findByMemberIdAndTargetIdAndTargetType(memberId, mockAnswer.getId(), TargetType.ANSWER)).willReturn(Optional.of(mockEmoji));
+        given(memberReader.getById(memberId)).willReturn(mockMember);
+        given(roomReader.getById(roomId)).willReturn(mockRoom);
+        given(questionReader.getByIdAndRoomId(questionId, roomId)).willReturn(mockQuestion);
+        given(answerReader.getExistById(questionId)).willReturn(mockAnswer);
+        given(emojiReader.countByTargetIdAndTargetType(mockAnswer.getId(),
+            TargetType.ANSWER)).willReturn(5);
+        given(emojiReader.findByMemberIdAndTargetIdAndTargetType(memberId, mockAnswer.getId(),
+            TargetType.ANSWER)).willReturn(Optional.of(mockEmoji));
 
         // when
         AnswerGetResponse response = answerService.getAnswer(roomId, questionId, memberId);
@@ -176,42 +185,45 @@ public class AnswerServiceTests {
     @DisplayName("존재하지 않는 member가 들어오면 예외 발생")
     void createAnswer_member_fail() {
         // given
-        given(memberReader.getById(anyLong())).willThrow(new ErrorException(ErrorCode.NOT_FOUND_MEMBER));
+        given(memberReader.getById(anyLong())).willThrow(
+            new ErrorException(ErrorCode.NOT_FOUND_MEMBER));
 
         // when & then
         assertThatThrownBy(() -> answerService.create(1L, 1L, 1L, request))
-                .isInstanceOf(ErrorException.class)
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_MEMBER);
+            .isInstanceOf(ErrorException.class)
+            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_MEMBER);
 
     }
 
-    // @Test
-    // @DisplayName("존재하지 않는 room이 들어오면 예외 발생")
-    // void createAnswer_room_fail() {
-    //     // given
-    //     given(memberReader.getById(1L)).willReturn(mockMember);
-    //
-    //     // when & then
-    //     assertThatThrownBy(() -> answerService.create(1L, 1L, 1L, request))
-    //             .isInstanceOf(ErrorException.class)
-    //             .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_ROOM);
-    //
-    // }
+     @Test
+     @DisplayName("존재하지 않는 room이 들어오면 예외 발생")
+     void createAnswer_room_fail() {
+         // given
+         given(memberReader.getById(1L)).willReturn(mockMember);
+         given(roomReader.getById(anyLong())).willThrow(
+             new ErrorException(NOT_FOUND_ROOM));
+         // when & then
+         assertThatThrownBy(() -> answerService.create(1L, 1L, 1L, request))
+                 .isInstanceOf(ErrorException.class)
+                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_ROOM);
+
+     }
 
     @Test
     @DisplayName("존재하지 않는 participant가 들어오면 예외 발생")
     void createAnswer_participant_fail() {
         // given
         given(memberReader.getById(1L)).willReturn(mockMember);
+        given(roomReader.getById(1L)).willReturn(mockRoom);
         given(questionReader.getByIdAndRoomId(1L, 1L)).willReturn(mockQuestion);
         willThrow(new ErrorException(ErrorCode.NOT_FOUND_PARTICIPANT))
-                .given(participantService)
-                .validateParticipant(1L, 1L);
+            .given(participantService)
+            .validateParticipant(1L, 1L);
 
         // when & then
         assertThatThrownBy(() -> answerService.create(1L, 1L, 1L, request))
-                .isInstanceOf(ErrorException.class)
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_PARTICIPANT);
+            .isInstanceOf(ErrorException.class)
+            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_PARTICIPANT);
 
     }
 
@@ -220,12 +232,13 @@ public class AnswerServiceTests {
     void createAnswer_question_fail() {
         // given
         given(memberReader.getById(1L)).willReturn(mockMember);
-        given(questionReader.getByIdAndRoomId(1L, 1L)).willThrow(new ErrorException(ErrorCode.NOT_FOUND_QUESTION));
+        given(questionReader.getByIdAndRoomId(1L, 1L)).willThrow(
+            new ErrorException(ErrorCode.NOT_FOUND_QUESTION));
 
         // when & then
         assertThatThrownBy(() -> answerService.create(1L, 1L, 1L, request))
-                .isInstanceOf(ErrorException.class)
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_QUESTION);
+            .isInstanceOf(ErrorException.class)
+            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_QUESTION);
 
     }
 
@@ -234,13 +247,14 @@ public class AnswerServiceTests {
     void createAnswer_duplicate_fail() {
         // given
         given(memberReader.getById(1L)).willReturn(mockMember);
+        given(roomReader.getById(1L)).willReturn(mockRoom);
         given(questionReader.getByIdAndRoomId(1L, 1L)).willReturn(mockQuestion);
         given(answerReader.existsByQuestionIdAndMemberId(1L, 1L)).willReturn(true);
 
         // when & then
         assertThatThrownBy(() -> answerService.create(1L, 1L, 1L, request))
-                .isInstanceOf(ErrorException.class)
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.BADREQUEST_DUPLICATION_ANSWER);
+            .isInstanceOf(ErrorException.class)
+            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.BADREQUEST_DUPLICATION_ANSWER);
 
     }
 }
