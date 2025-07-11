@@ -14,7 +14,7 @@ public record RoomDetailResponse(
         String name,
         List<String> team,
         String roomCode,
-        String documentUrl,
+        String presignedUrl,
         Integer participantCount,
         Integer participantLimit,
         Long emojiCount,

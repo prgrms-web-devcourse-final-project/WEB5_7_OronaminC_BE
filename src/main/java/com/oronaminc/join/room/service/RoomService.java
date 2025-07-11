@@ -1,11 +1,11 @@
 package com.oronaminc.join.room.service;
 
-import static com.oronaminc.join.global.exception.ErrorCode.*;
-
 import java.util.List;
-
+import com.oronaminc.join.infra.service.S3Service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.oronaminc.join.global.exception.ErrorCode.*;
 
 import com.oronaminc.join.document.domain.Document;
 import com.oronaminc.join.document.service.DocumentReader;
@@ -43,7 +43,9 @@ public class RoomService {
     private final QuestionService questionService;
     private final DocumentReader documentReader;
     private final EmojiService emojiService;
+    private final S3Service s3Service;
     private final RoomReader roomReader;
+
 
     private static final int CODE_LENGTH = 6;
 
@@ -52,8 +54,10 @@ public class RoomService {
         String code = this.generateCode();
         Room room = RoomMapper.toRoom(createRoomRequest, code);
         roomRepository.save(room);
-        participantService.savePresenterAndTeam(presenterEmail, createRoomRequest.teamEmail(),
-            room);
+
+        documentService.saveDocument(createRoomRequest.documentUrl(), room);
+        participantService.savePresenterAndTeam(presenterEmail, createRoomRequest.teamEmail(), room);
+
         return RoomMapper.toCreateRoomResponse(room);
     }
 
@@ -73,24 +77,31 @@ public class RoomService {
         List<Participant> team = participantService.getTeam(roomId);
         Document document = documentReader.getByRoomId(roomId);
 
-        return RoomMapper.toRoomDetailResponse(room, presenter, team, document, memberId);
+        String presignedUrl = s3Service.generatePresignedUrl(document.getFileUrl());
+
+        return RoomMapper.toRoomDetailResponse(room, presenter, team, presignedUrl, memberId);
     }
 
     public void updateRoom(Long memberId, Long roomId, RoomUpdateRequest updateRoomRequest) {
         participantService.validatePresenter(roomId, memberId);
+
         Room room = roomReader.getById(roomId);
+        Document document = documentReader.getByRoomId(roomId);
 
         if (room.getRoomStatus().equals(RoomStatus.STARTED)) {
             throw new ErrorException(BAD_REQUEST_ROOM_STARTED);
         }
 
+        document.update(updateRoomRequest.documentUrl());
         room.update(updateRoomRequest);
         participantService.updateTeam(room, updateRoomRequest.teamEmail());
     }
 
     public void deleteRoom(Long memberId, Long roomId) {
         participantService.validatePresenter(roomId, memberId);
+
         Room room = roomReader.getById(roomId);
+        Document document = documentReader.getByRoomId(roomId);
 
         if (room.getRoomStatus().equals(RoomStatus.STARTED)) {
             throw new ErrorException(BAD_REQUEST_ROOM_STARTED);
@@ -99,6 +110,8 @@ public class RoomService {
         participantService.deleteParticipantByRoomId(roomId);
         questionService.deleteByRoomId(roomId);
         emojiService.deleteByRoomEmoji(roomId);
+        // S3 버킷 내 파일 삭제
+        s3Service.deleteFile(document.getFileUrl());
         documentService.deleteByRoomId(roomId);
         roomRepository.deleteById(roomId);
     }
