@@ -19,8 +19,10 @@ import com.oronaminc.join.room.dao.RoomRepository;
 import com.oronaminc.join.room.domain.Room;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class AnswerService {
 
@@ -30,6 +32,7 @@ public class AnswerService {
     private final QuestionRepository questionRepository;
     private final ParticipantRepository participantRepository;
 
+    @Transactional
     public Answer create(Long roomId, Long memberId, Long questionId ,AnswerCreateRequest requestDto ){
 
         Member member = memberRepository.findById(memberId)
@@ -58,5 +61,10 @@ public class AnswerService {
 
     public void deleteByQuestionList(List<Question> questions) {
         answerRepository.deleteByQuestionIn(questions);
+    }
+
+    public Answer findById(Long id) {
+        return answerRepository.findById(id)
+            .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_ROOM));
     }
 }

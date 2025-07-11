@@ -4,7 +4,6 @@ import com.oronaminc.join.global.entity.BaseEntity;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.question.dto.QuestionCreateRequest;
 import com.oronaminc.join.room.domain.Room;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -59,4 +58,16 @@ public class Question extends BaseEntity {
             .emojiCount(0L)
             .build();
     }
+
+    public Long incrementEmojiCount() {
+        return ++this.emojiCount;
+    }
+
+    public Long decrementEmojiCount() {
+        if (this.emojiCount > 0) {
+            this.emojiCount--;
+        }
+        return this.emojiCount;
+    }
+
 }

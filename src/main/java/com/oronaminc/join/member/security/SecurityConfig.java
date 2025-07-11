@@ -34,7 +34,8 @@ public class SecurityConfig {
                                 "/oauth2/authorization/**",
                                 "/login/oauth2/code/kakao",
                                 "/api/auth/logout",
-                                "/dev/**"
+                                "/dev/**",
+                                "/ws/**"
                         )
                         .permitAll()
                         .anyRequest().authenticated()

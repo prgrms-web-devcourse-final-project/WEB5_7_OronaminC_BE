@@ -1,11 +1,8 @@
 package com.oronaminc.join.room.service;
 
-import static com.oronaminc.join.global.exception.ErrorCode.*;
-
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import static com.oronaminc.join.global.exception.ErrorCode.BAD_REQUEST_ROOM_STARTED;
+import static com.oronaminc.join.global.exception.ErrorCode.BAD_REQUEST_UPDATE_STATUS;
+import static com.oronaminc.join.global.exception.ErrorCode.NOT_FOUND_ROOM;
 
 import com.oronaminc.join.document.domain.Document;
 import com.oronaminc.join.document.service.DocumentService;
@@ -28,13 +25,16 @@ import com.oronaminc.join.room.dto.RoomUpdateRequest;
 import com.oronaminc.join.room.dto.RoomUpdateStatusRequest;
 import com.oronaminc.join.room.util.CodeGenerator;
 import com.oronaminc.join.room.util.RoomMapper;
-
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class RoomService {
+
     private final RoomRepository roomRepository;
     private final ParticipantService participantService;
     private final DocumentService documentService;
@@ -43,17 +43,19 @@ public class RoomService {
 
     private static final int CODE_LENGTH = 6;
 
-    public CreateRoomResponse createRoom(CreateRoomRequest createRoomRequest, String presenterEmail) {
+    public CreateRoomResponse createRoom(CreateRoomRequest createRoomRequest,
+        String presenterEmail) {
         String code = this.generateCode();
         Room room = RoomMapper.toRoom(createRoomRequest, code);
         roomRepository.save(room);
-        participantService.savePresenterAndTeam(presenterEmail, createRoomRequest.teamEmail(), room);
+        participantService.savePresenterAndTeam(presenterEmail, createRoomRequest.teamEmail(),
+            room);
         return RoomMapper.toCreateRoomResponse(room);
     }
 
     public JoinRoomResponse joinRoom(Long memberId, JoinRoomRequest joinRoomRequest) {
         Room room = roomRepository.findBySecretCode(joinRoomRequest.secretCode())
-                .orElseThrow(() -> new ErrorException(NOT_FOUND_ROOM));
+            .orElseThrow(() -> new ErrorException(NOT_FOUND_ROOM));
 
         participantService.saveParticipantById(memberId, room, ParticipantType.GUEST);
         return new JoinRoomResponse(room.getId());
@@ -98,7 +100,8 @@ public class RoomService {
         roomRepository.deleteById(roomId);
     }
 
-    public void updateRoomStatus(Long memberId, Long roomId, RoomUpdateStatusRequest roomUpdateStatusRequest) {
+    public void updateRoomStatus(Long memberId, Long roomId,
+        RoomUpdateStatusRequest roomUpdateStatusRequest) {
         participantService.validatePresenter(roomId, memberId);
         Room room = this.getRoomById(roomId);
 
@@ -119,11 +122,11 @@ public class RoomService {
 
     private Room getRoomById(Long roomId) {
         return roomRepository.findById(roomId)
-                .orElseThrow(() -> new ErrorException(NOT_FOUND_ROOM));
+            .orElseThrow(() -> new ErrorException(NOT_FOUND_ROOM));
     }
 
     private String generateCode() {
-        while(true){
+        while (true) {
             String code = CodeGenerator.generateCode(CODE_LENGTH);
             if (!roomRepository.existsBySecretCode(code)) {
                 return code;

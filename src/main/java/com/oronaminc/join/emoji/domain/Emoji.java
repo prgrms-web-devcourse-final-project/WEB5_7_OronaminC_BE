@@ -2,7 +2,14 @@ package com.oronaminc.join.emoji.domain;
 
 import com.oronaminc.join.global.entity.BaseEntity;
 import com.oronaminc.join.member.domain.Member;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,5 +36,14 @@ public class Emoji extends BaseEntity {
     private TargetType targetType;
 
     private Long targetId;
+
+    public static Emoji create(Member member, TargetType targetType, Long targetId) {
+        return Emoji.builder()
+            .member(member)
+            .targetType(targetType)
+            .targetId(targetId)
+            .build();
+    }
+
 
 }
