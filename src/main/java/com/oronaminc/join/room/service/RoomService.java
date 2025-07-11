@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.oronaminc.join.document.domain.Document;
+import com.oronaminc.join.document.service.DocumentReader;
 import com.oronaminc.join.document.service.DocumentService;
 import com.oronaminc.join.emoji.service.EmojiService;
 import com.oronaminc.join.global.exception.ErrorException;
@@ -42,6 +43,7 @@ public class RoomService {
     private final QuestionService questionService;
     private final EmojiService emojiService;
     private final RoomReader roomReader;
+    private final DocumentReader documentReader;
 
     private static final int CODE_LENGTH = 6;
 
@@ -69,7 +71,7 @@ public class RoomService {
 
         Participant presenter = participantService.getPresenter(roomId);
         List<Participant> team = participantService.getTeam(roomId);
-        Document document = documentService.getDocumentByRoomId(roomId);
+        Document document = documentReader.getByRoomId(roomId);
 
         return RoomMapper.toRoomDetailResponse(room, presenter, team, document, memberId);
     }
