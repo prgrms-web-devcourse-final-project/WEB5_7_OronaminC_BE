@@ -1,6 +1,7 @@
 package com.oronaminc.join.question.dao;
 
 import com.oronaminc.join.question.domain.Question;
+import java.util.Optional;
 import com.oronaminc.join.question.dto.QuestionFlatResponse;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
@@ -9,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface QuestionRepository extends JpaRepository<Question, Long> {
+
+    Optional<Question> findByIdAndRoomId(Long questionId, Long roomId);
 
     @Query("""
         SELECT new com.oronaminc.join.question.dto.QuestionFlatResponse(
