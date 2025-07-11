@@ -15,6 +15,7 @@ import com.oronaminc.join.document.domain.Document;
 import lombok.RequiredArgsConstructor;
 
 import java.net.URI;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -37,11 +38,14 @@ public class DocumentService {
             throw new ErrorException(ErrorCode.UNAUTHORIZED_MEMBER);
         }
 
-        String objectKey = request.fileName();
+        String uuid = UUID.randomUUID().toString();
+        String objectKey = "documents/" + uuid + "_" + request.fileName();
         String presignedUrl = s3Service.generateUploadPresignedUrl(objectKey);
 
-        return new DocumentResponse(presignedUrl);
+        return new DocumentResponse(presignedUrl, objectKey);
     }
+
+
 
     // 전체 URL에서 ObjectKey 추출
     private String extractObjectKey(String documentUrl) {

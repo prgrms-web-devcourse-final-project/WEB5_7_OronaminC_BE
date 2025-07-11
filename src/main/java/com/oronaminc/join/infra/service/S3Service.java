@@ -22,12 +22,9 @@ public class S3Service {
 
     // 업로드용
     public String generateUploadPresignedUrl(String key) {
-        String uuid = UUID.randomUUID().toString();
-        String newKey = uuid + "_" + key;
-
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucket)
-                .key(newKey)
+                .key(key)
                 .build();
 
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
