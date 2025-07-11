@@ -2,11 +2,12 @@ package com.oronaminc.join.answer.service;
 
 import static com.oronaminc.join.global.exception.ErrorCode.BADREQUEST_DUPLICATION_ANSWER;
 import static com.oronaminc.join.global.exception.ErrorCode.NOT_FOUND_PARTICIPANT;
+import java.util.List;
 
+import org.springframework.stereotype.Service;
 import com.oronaminc.join.answer.dao.AnswerRepository;
 import com.oronaminc.join.answer.domain.Answer;
 import com.oronaminc.join.answer.dto.AnswerCreateRequest;
-import com.oronaminc.join.answer.mapper.AnswerMapper;
 import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.member.dao.MemberRepository;
@@ -14,11 +15,10 @@ import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.participant.dao.ParticipantRepository;
 import com.oronaminc.join.question.dao.QuestionRepository;
 import com.oronaminc.join.question.domain.Question;
-import com.oronaminc.join.question.service.QuestionService;
 import com.oronaminc.join.room.dao.RoomRepository;
 import com.oronaminc.join.room.domain.Room;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -56,4 +56,7 @@ public class AnswerService {
         return answer;
     }
 
+    public void deleteByQuestionList(List<Question> questions) {
+        answerRepository.deleteByQuestionIn(questions);
+    }
 }

@@ -11,6 +11,7 @@ import com.oronaminc.join.room.domain.RoomType;
 import com.oronaminc.join.room.dto.CreateRoomRequest;
 import com.oronaminc.join.room.dto.CreateRoomResponse;
 import com.oronaminc.join.room.dto.RoomDetailResponse;
+import com.oronaminc.join.room.dto.RoomUpdateInfoResponse;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -53,6 +54,16 @@ public class RoomMapper {
                 )
                 .roomStatus(room.getRoomStatus())
                 .createdAt(room.getCreatedAt())
+                .build();
+    }
+
+    public static RoomUpdateInfoResponse toRoomUpdateInfoResponse(Room room, List<Participant> team) {
+        return RoomUpdateInfoResponse.builder()
+                .title(room.getTitle())
+                .description(room.getDescription())
+                .endDate(room.getEndedAt().toLocalDate())
+                .participantLimit(room.getParticipantLimit())
+                .teamEmail(team.stream().map(teamParticipant -> teamParticipant.getMember().getEmail()).toList())
                 .build();
     }
 }

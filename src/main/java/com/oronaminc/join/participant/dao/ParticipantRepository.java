@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+
 public interface ParticipantRepository extends JpaRepository<Participant, Long> {
 
     @Query(
@@ -59,4 +60,6 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
         Pageable pageable);
 
     Optional<Participant> findByRoomIdAndMemberId( @Param("roomId") Long roomId, @Param("memberId") Long memberId );
+
+    void deleteByRoomId(Long roomId);
 }
