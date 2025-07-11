@@ -52,15 +52,15 @@ public class EmojiService {
             emojiCount = decrementEmojiCount(targetType, targetId);
 
             return new EmojiResponse("DELETE", targetType, targetId, emojiCount);
-
-        } else {
-            Emoji emoji = Emoji.create(memberService.findById(memberId), targetType, targetId);
-            emojiRepository.save(emoji);
-
-            emojiCount = incrementEmojiCount(targetType, targetId);
-
-            return new EmojiResponse("CREATE", targetType, targetId, emojiCount);
         }
+
+        Emoji emoji = Emoji.create(memberService.findById(memberId), targetType, targetId);
+        emojiRepository.save(emoji);
+
+        emojiCount = incrementEmojiCount(targetType, targetId);
+
+        return new EmojiResponse("CREATE", targetType, targetId, emojiCount);
+
     }
 
     private Long decrementEmojiCount(TargetType targetType, Long targetId) {
