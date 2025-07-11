@@ -25,23 +25,20 @@ import com.oronaminc.join.member.dto.MyProfileUpdateRequest;
 import com.oronaminc.join.member.dto.MyRoomsGetResponse;
 import com.oronaminc.join.member.dto.ParticipantCountDto;
 import com.oronaminc.join.member.dto.ParticipationType;
-import com.oronaminc.join.participant.dao.ParticipantRepository;
 import com.oronaminc.join.participant.domain.Participant;
 import com.oronaminc.join.participant.domain.ParticipantType;
-import com.oronaminc.join.question.dao.QuestionRepository;
+import com.oronaminc.join.participant.service.ParticipantReader;
+import com.oronaminc.join.question.service.QuestionReader;
 import com.oronaminc.join.room.domain.Room;
 
 @ExtendWith(MockitoExtension.class)
 class MyPageServiceTests {
 
     @Mock
-    private MemberService memberService;
+    private ParticipantReader participantReader;
 
     @Mock
-    private ParticipantRepository participantRepository;
-
-    @Mock
-    private QuestionRepository questionRepository;
+    private QuestionReader questionReader;
 
     @Mock
     private MemberReader memberReader;
@@ -63,7 +60,7 @@ class MyPageServiceTests {
         );
 
         when(memberReader.getById(member.getId())).thenReturn(member);
-        when(participantRepository.countByMemberIdGroupByParticipantType(member.getId()))
+        when(participantReader.countByMemberIdGroupByParticipantType(member.getId()))
             .thenReturn(pc);
 
         // when
@@ -86,7 +83,7 @@ class MyPageServiceTests {
         List<ParticipantCountDto> pc = List.of();
 
         when(memberReader.getById(member.getId())).thenReturn(member);
-        when(participantRepository.countByMemberIdGroupByParticipantType(member.getId()))
+        when(participantReader.countByMemberIdGroupByParticipantType(member.getId()))
             .thenReturn(pc);
 
         // when
@@ -167,9 +164,9 @@ class MyPageServiceTests {
             new Object[]{room3.getId(), 3L}
         );
 
-        when(participantRepository.findByMemberId(memberId, pageable))
+        when(participantReader.findByMemberId(memberId, pageable))
             .thenReturn(participantPage);
-        when(questionRepository.countByRoomIds(roomIds)).thenReturn(questions);
+        when(questionReader.countByRoomIds(roomIds)).thenReturn(questions);
 
         // when
         MyRoomsGetResponse result = myPageService.getMyRooms(memberId, type, pageable);
