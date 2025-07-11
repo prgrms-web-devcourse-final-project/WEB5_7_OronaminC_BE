@@ -1,4 +1,4 @@
-package com.oronaminc.join.member.mapper;
+package com.oronaminc.join.member.util;
 
 import com.oronaminc.join.member.dto.MyRoomsDto;
 import com.oronaminc.join.member.dto.MyRoomsGetResponse;

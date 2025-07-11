@@ -1,10 +1,14 @@
 package com.oronaminc.join.room.service;
 
-import static com.oronaminc.join.global.exception.ErrorCode.BAD_REQUEST_ROOM_STARTED;
-import static com.oronaminc.join.global.exception.ErrorCode.BAD_REQUEST_UPDATE_STATUS;
-import static com.oronaminc.join.global.exception.ErrorCode.NOT_FOUND_ROOM;
+import java.util.List;
+import com.oronaminc.join.infra.service.S3Service;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import static com.oronaminc.join.global.exception.ErrorCode.*;
 
 import com.oronaminc.join.document.domain.Document;
+import com.oronaminc.join.document.service.DocumentReader;
 import com.oronaminc.join.document.service.DocumentService;
 import com.oronaminc.join.emoji.service.EmojiService;
 import com.oronaminc.join.global.exception.ErrorException;
@@ -25,10 +29,8 @@ import com.oronaminc.join.room.dto.RoomUpdateRequest;
 import com.oronaminc.join.room.dto.RoomUpdateStatusRequest;
 import com.oronaminc.join.room.util.CodeGenerator;
 import com.oronaminc.join.room.util.RoomMapper;
-import java.util.List;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
@@ -39,7 +41,11 @@ public class RoomService {
     private final ParticipantService participantService;
     private final DocumentService documentService;
     private final QuestionService questionService;
+    private final DocumentReader documentReader;
     private final EmojiService emojiService;
+    private final S3Service s3Service;
+    private final RoomReader roomReader;
+
 
     private static final int CODE_LENGTH = 6;
 
@@ -48,14 +54,15 @@ public class RoomService {
         String code = this.generateCode();
         Room room = RoomMapper.toRoom(createRoomRequest, code);
         roomRepository.save(room);
-        participantService.savePresenterAndTeam(presenterEmail, createRoomRequest.teamEmail(),
-            room);
+
+        documentService.saveDocument(createRoomRequest.documentUrl(), room);
+        participantService.savePresenterAndTeam(presenterEmail, createRoomRequest.teamEmail(), room);
+
         return RoomMapper.toCreateRoomResponse(room);
     }
 
     public JoinRoomResponse joinRoom(Long memberId, JoinRoomRequest joinRoomRequest) {
-        Room room = roomRepository.findBySecretCode(joinRoomRequest.secretCode())
-            .orElseThrow(() -> new ErrorException(NOT_FOUND_ROOM));
+        Room room = roomReader.getBySecretCode(joinRoomRequest.secretCode());
 
         participantService.saveParticipantById(memberId, room, ParticipantType.GUEST);
         return new JoinRoomResponse(room.getId());
@@ -64,30 +71,37 @@ public class RoomService {
     public RoomDetailResponse getRoomDetail(Long memberId, Long roomId) {
         participantService.validateParticipant(memberId, roomId);
 
-        Room room = this.getRoomById(roomId);
+        Room room = roomReader.getById(roomId);
 
         Participant presenter = participantService.getPresenter(roomId);
         List<Participant> team = participantService.getTeam(roomId);
-        Document document = documentService.getDocumentByRoomId(roomId);
+        Document document = documentReader.getByRoomId(roomId);
 
-        return RoomMapper.toRoomDetailResponse(room, presenter, team, document, memberId);
+        String presignedUrl = s3Service.generatePresignedUrl(document.getFileUrl());
+
+        return RoomMapper.toRoomDetailResponse(room, presenter, team, presignedUrl, memberId);
     }
 
     public void updateRoom(Long memberId, Long roomId, RoomUpdateRequest updateRoomRequest) {
         participantService.validatePresenter(roomId, memberId);
-        Room room = this.getRoomById(roomId);
+
+        Room room = roomReader.getById(roomId);
+        Document document = documentReader.getByRoomId(roomId);
 
         if (room.getRoomStatus().equals(RoomStatus.STARTED)) {
             throw new ErrorException(BAD_REQUEST_ROOM_STARTED);
         }
 
+        document.update(updateRoomRequest.documentUrl());
         room.update(updateRoomRequest);
         participantService.updateTeam(room, updateRoomRequest.teamEmail());
     }
 
     public void deleteRoom(Long memberId, Long roomId) {
         participantService.validatePresenter(roomId, memberId);
-        Room room = this.getRoomById(roomId);
+
+        Room room = roomReader.getById(roomId);
+        Document document = documentReader.getByRoomId(roomId);
 
         if (room.getRoomStatus().equals(RoomStatus.STARTED)) {
             throw new ErrorException(BAD_REQUEST_ROOM_STARTED);
@@ -96,6 +110,8 @@ public class RoomService {
         participantService.deleteParticipantByRoomId(roomId);
         questionService.deleteByRoomId(roomId);
         emojiService.deleteByRoomEmoji(roomId);
+        // S3 버킷 내 파일 삭제
+        s3Service.deleteFile(document.getFileUrl());
         documentService.deleteByRoomId(roomId);
         roomRepository.deleteById(roomId);
     }
@@ -103,7 +119,7 @@ public class RoomService {
     public void updateRoomStatus(Long memberId, Long roomId,
         RoomUpdateStatusRequest roomUpdateStatusRequest) {
         participantService.validatePresenter(roomId, memberId);
-        Room room = this.getRoomById(roomId);
+        Room room = roomReader.getById(roomId);
 
         RoomStatus updateStatus = roomUpdateStatusRequest.roomStatus();
         List<RoomStatus> canUpdateStatus = List.of(RoomStatus.STARTED, RoomStatus.ENDED);
@@ -115,20 +131,15 @@ public class RoomService {
 
     public RoomUpdateInfoResponse getRoomUpdateInfo(Long memberId, Long roomId) {
         participantService.validatePresenter(roomId, memberId);
-        Room room = this.getRoomById(roomId);
+        Room room = roomReader.getById(roomId);
         List<Participant> team = participantService.getTeam(roomId);
         return RoomMapper.toRoomUpdateInfoResponse(room, team);
-    }
-
-    private Room getRoomById(Long roomId) {
-        return roomRepository.findById(roomId)
-            .orElseThrow(() -> new ErrorException(NOT_FOUND_ROOM));
     }
 
     private String generateCode() {
         while (true) {
             String code = CodeGenerator.generateCode(CODE_LENGTH);
-            if (!roomRepository.existsBySecretCode(code)) {
+            if (!roomReader.existsBySecretCode(code)) {
                 return code;
             }
         }
