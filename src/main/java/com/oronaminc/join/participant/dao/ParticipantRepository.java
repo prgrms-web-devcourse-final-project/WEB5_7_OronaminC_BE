@@ -3,15 +3,15 @@ package com.oronaminc.join.participant.dao;
 import java.util.List;
 import java.util.Optional;
 
+import com.oronaminc.join.member.dto.ParticipantCountDto;
+import com.oronaminc.join.participant.domain.Participant;
+import com.oronaminc.join.participant.domain.ParticipantType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.oronaminc.join.member.dto.ParticipantCountDto;
-import com.oronaminc.join.participant.domain.Participant;
-import com.oronaminc.join.participant.domain.ParticipantType;
 
 public interface ParticipantRepository extends JpaRepository<Participant, Long> {
 
@@ -58,6 +58,8 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
         """)
     Page<Participant> findByMemberIdAndParticipantTypeNot(Long memberId, ParticipantType pType,
         Pageable pageable);
+
+    Optional<Participant> findByRoomIdAndMemberId( @Param("roomId") Long roomId, @Param("memberId") Long memberId );
 
     void deleteByRoomId(Long roomId);
 }
