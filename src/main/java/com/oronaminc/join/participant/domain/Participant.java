@@ -1,5 +1,10 @@
 package com.oronaminc.join.participant.domain;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 
 import com.oronaminc.join.global.entity.BaseEntity;
 import com.oronaminc.join.member.domain.Member;
@@ -11,28 +16,31 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+// TODO: ddl-auto: create,update에만 유효 -> 추후 flyway sql 생성
+@Table(name = "participant", indexes = {
+    @Index(name = "idx_participant_room_member", columnList = "room_id, member_id")
+})
 public class Participant extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "room_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id", nullable = false)
     private Room room;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ParticipantType participantType;
 
     private LocalDateTime exitedAt;

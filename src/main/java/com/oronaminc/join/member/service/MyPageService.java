@@ -4,20 +4,16 @@ import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.dto.MyPageType;
 import com.oronaminc.join.member.dto.MyProfileGetResponse;
 import com.oronaminc.join.member.dto.MyProfileUpdateRequest;
-import com.oronaminc.join.member.dto.MyProfileUpdateResponse;
 import com.oronaminc.join.member.dto.MyRoomsDto;
 import com.oronaminc.join.member.dto.MyRoomsGetResponse;
 import com.oronaminc.join.member.dto.ParticipantCountDto;
-import com.oronaminc.join.member.dto.ParticipationType;
 import com.oronaminc.join.member.mapper.MyPageMapper;
 import com.oronaminc.join.participant.dao.ParticipantRepository;
 import com.oronaminc.join.participant.domain.Participant;
 import com.oronaminc.join.participant.domain.ParticipantType;
 import com.oronaminc.join.question.dao.QuestionRepository;
-import com.oronaminc.join.room.domain.Room;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -50,17 +46,16 @@ public class MyPageService {
         }
 
         return new MyProfileGetResponse(
-            memberService.getMember(memberId).getNickname(),
+            memberService.findById(memberId).getNickname(),
             createdRoomCount,
             joinedRoomCount
         );
     }
 
     @Transactional
-    public MyProfileUpdateResponse updateMyProfile(MyProfileUpdateRequest request, Long memberId) {
-        Member member = memberService.getMember(memberId);
+    public void updateMyProfile(MyProfileUpdateRequest request, Long memberId) {
+        Member member = memberService.findById(memberId);
         member.updateNickname(request.nickname());
-        return new MyProfileUpdateResponse(memberId);
     }
 
     public MyRoomsGetResponse getMyRooms(Long memberId, MyPageType type, Pageable pageable) {
@@ -72,7 +67,6 @@ public class MyPageService {
             case JOINED -> participantRepository.findByMemberIdAndParticipantTypeNot(memberId,
                 ParticipantType.PRESENTER, pageable);
         };
-
 
         List<Long> roomIds = participants.stream()
             .map(p -> p.getRoom().getId())
