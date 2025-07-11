@@ -7,4 +7,5 @@ import com.oronaminc.join.emoji.domain.TargetType;
 
 public interface EmojiRepository extends JpaRepository<Emoji, Long> {
     Integer countByTargetIdAndTargetType(Long targetId, TargetType targetType);
+    void deleteByTargetTypeAndTargetId(TargetType targetType, Long targetId);
 }

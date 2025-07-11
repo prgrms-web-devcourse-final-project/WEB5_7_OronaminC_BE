@@ -1,29 +1,33 @@
 package com.oronaminc.join.question.service;
 
-import static com.oronaminc.join.global.exception.ErrorCode.NOT_FOUND_PARTICIPANT;
+import static com.oronaminc.join.global.exception.ErrorCode.*;
 
-import com.oronaminc.join.global.exception.ErrorCode;
-import com.oronaminc.join.global.exception.ErrorException;
-import com.oronaminc.join.global.util.SliceUtil;
-import com.oronaminc.join.member.domain.Member;
-import com.oronaminc.join.member.dao.MemberRepository;
-import com.oronaminc.join.participant.dao.ParticipantRepository;
-import com.oronaminc.join.question.domain.Question;
-import com.oronaminc.join.question.domain.QuestionSort;
-import com.oronaminc.join.question.dto.QuestionCreateRequest;
-import com.oronaminc.join.question.dto.QuestionFlatResponse;
-import com.oronaminc.join.question.dto.QuestionAssembleResponse;
-import com.oronaminc.join.question.util.QuestionMapper;
-import com.oronaminc.join.question.dao.QuestionRepository;
-import com.oronaminc.join.room.domain.Room;
-import com.oronaminc.join.room.dao.RoomRepository;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.oronaminc.join.answer.service.AnswerService;
+import com.oronaminc.join.global.exception.ErrorCode;
+import com.oronaminc.join.global.exception.ErrorException;
+import com.oronaminc.join.global.util.SliceUtil;
+import com.oronaminc.join.member.dao.MemberRepository;
+import com.oronaminc.join.member.domain.Member;
+import com.oronaminc.join.participant.dao.ParticipantRepository;
+import com.oronaminc.join.question.dao.QuestionRepository;
+import com.oronaminc.join.question.domain.Question;
+import com.oronaminc.join.question.domain.QuestionSort;
+import com.oronaminc.join.question.dto.QuestionAssembleResponse;
+import com.oronaminc.join.question.dto.QuestionCreateRequest;
+import com.oronaminc.join.question.dto.QuestionFlatResponse;
+import com.oronaminc.join.question.util.QuestionMapper;
+import com.oronaminc.join.room.dao.RoomRepository;
+import com.oronaminc.join.room.domain.Room;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +37,7 @@ public class QuestionService {
     private final RoomRepository roomRepository;
     private final MemberRepository memberRepository;
     private final ParticipantRepository participantRepository;
+    private final AnswerService answerService;
 
     @Transactional
     public Question create(Long roomId, Long memberId, QuestionCreateRequest requestDto) {
@@ -89,5 +94,10 @@ public class QuestionService {
     private Member getMember(Long memberId) {
         return memberRepository.findById(memberId)
             .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_MEMBER));
+    }
+    public void deleteByRoomId(Long roomId) {
+        List<Question> questions = questionRepository.findByRoomId(roomId);
+        answerService.deleteByQuestionList(questions);
+        questionRepository.deleteByRoomId(roomId);
     }
 }

@@ -3,6 +3,7 @@ package com.oronaminc.join.answer.service;
 import static com.oronaminc.join.global.exception.ErrorCode.BADREQUEST_DUPLICATION_ANSWER;
 import static com.oronaminc.join.global.exception.ErrorCode.NOT_FOUND_PARTICIPANT;
 
+import java.util.List;
 import com.oronaminc.join.answer.dao.AnswerRepository;
 import com.oronaminc.join.answer.domain.Answer;
 import com.oronaminc.join.answer.dto.AnswerCreateRequest;
@@ -29,6 +30,7 @@ public class AnswerService {
     private final RoomRepository roomRepository;
     private final QuestionRepository questionRepository;
     private final ParticipantRepository participantRepository;
+    private final AnswerRepository answerRepository;
 
     public Answer create(Long roomId, Long memberId, Long questionId ,AnswerCreateRequest requestDto ){
 
@@ -56,4 +58,8 @@ public class AnswerService {
         return answer;
     }
 
+    public void deleteByQuestionList(List<Question> questions) {
+          answerRepository.deleteByQuestionIn(questions);
+      }
+  
 }

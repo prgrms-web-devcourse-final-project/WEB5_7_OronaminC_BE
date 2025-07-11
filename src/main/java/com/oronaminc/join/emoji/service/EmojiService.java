@@ -15,4 +15,8 @@ public class EmojiService {
     public Integer countRoomEmoji(Long roomId) {
         return emojiRepository.countByTargetIdAndTargetType(roomId, TargetType.ROOM);
     }
+
+    public void deleteByRoomEmoji(Long roomId) {
+        emojiRepository.deleteByTargetTypeAndTargetId(TargetType.ROOM, roomId);
+    }
 }
