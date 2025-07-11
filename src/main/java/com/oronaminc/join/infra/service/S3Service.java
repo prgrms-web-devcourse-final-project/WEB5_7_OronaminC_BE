@@ -9,7 +9,6 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 import java.time.Duration;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -20,8 +19,7 @@ public class S3Service {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    // 업로드용
-    public String generateUploadPresignedUrl(String key) {
+    public String generatePresignedUrl(String key) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucket)
                 .key(key)
@@ -36,24 +34,5 @@ public class S3Service {
 
         return presignedRequest.url().toString();
     }
-
-    // 다운로드용
-    public String generateDownloadPresignedUrl(String key) {
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .bucket(bucket)
-                .key(key)
-                .build();
-
-        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(3))
-                .getObjectRequest(getObjectRequest)
-                .build();
-
-        PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(presignRequest);
-
-        return presignedRequest.url().toString();
-    }
-
-
 
 }

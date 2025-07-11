@@ -10,9 +10,8 @@ import com.oronaminc.join.infra.service.S3Service;
 import com.oronaminc.join.member.domain.MemberType;
 import static com.oronaminc.join.global.exception.ErrorCode.*;
 
-import com.oronaminc.join.room.dao.RoomRepository;
 import com.oronaminc.join.room.domain.Room;
-import com.oronaminc.join.room.service.RoomService;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import com.oronaminc.join.document.dao.DocumentRepository;
 import com.oronaminc.join.document.domain.Document;
@@ -27,7 +26,6 @@ import java.util.UUID;
 public class DocumentService {
 
     private final DocumentRepository documentRepository;
-    private final RoomRepository roomRepository;
     private final S3Service s3Service;
 
     public Document getDocumentByRoomId(Long roomId) {
@@ -46,11 +44,12 @@ public class DocumentService {
 
         String uuid = UUID.randomUUID().toString();
         String objectKey = "documents/" + uuid + "_" + request.fileName();
-        String presignedUrl = s3Service.generateUploadPresignedUrl(objectKey);
+        String presignedUrl = s3Service.generatePresignedUrl(objectKey);
 
         return new DocumentResponse(presignedUrl, objectKey);
     }
 
+    @Transactional
     public void saveDocument(String objectKey, Room room) {
         String fileName = objectKey.replaceAll("^.*/","");
 

@@ -4,6 +4,7 @@ import static com.oronaminc.join.global.exception.ErrorCode.*;
 
 import java.util.List;
 
+import com.oronaminc.join.infra.service.S3Service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +41,7 @@ public class RoomService {
     private final DocumentService documentService;
     private final QuestionService questionService;
     private final EmojiService emojiService;
+    private final S3Service s3Service;
 
     private static final int CODE_LENGTH = 6;
 
@@ -70,7 +72,9 @@ public class RoomService {
         List<Participant> team = participantService.getTeam(roomId);
         Document document = documentService.getDocumentByRoomId(roomId);
 
-        return RoomMapper.toRoomDetailResponse(room, presenter, team, document, memberId);
+        String presignedUrl = s3Service.generatePresignedUrl(document.getFileUrl());
+
+        return RoomMapper.toRoomDetailResponse(room, presenter, team, presignedUrl, memberId);
     }
 
     public void updateRoom(Long memberId, Long roomId, RoomUpdateRequest updateRoomRequest) {
