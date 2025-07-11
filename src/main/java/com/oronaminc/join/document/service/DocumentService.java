@@ -19,4 +19,8 @@ public class DocumentService {
         return documentRepository.findByRoomId(roomId)
                 .orElseThrow(() -> new ErrorException(NOT_FOUND_FILE));
     }
+
+    public void deleteByRoomId(Long roomId) {
+        documentRepository.deleteByRoomId(roomId);
+    }
 }

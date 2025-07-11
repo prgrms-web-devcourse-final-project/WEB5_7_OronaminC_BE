@@ -65,4 +65,28 @@ public class ParticipantService {
     public List<Participant> getTeam(Long roomId) {
         return participantRepository.findAllByRoomIdAndParticipantType(roomId, ParticipantType.TEAM);
     }
+
+    public void updateTeam(Room room, List<String> emails) {
+        List<Participant> team = this.getTeam(room.getId());
+        for (Participant participant : team) {
+            if (!emails.contains(participant.getMember().getEmail())) {
+                participantRepository.delete(participant);
+            }
+        }
+
+        for (String email : emails) {
+            this.saveMemberParticipantByEmail(email, room, ParticipantType.TEAM);
+        }
+    }
+
+    public void validatePresenter(Long roomId, Long memberId) {
+        Participant presenter = this.getPresenter(roomId);
+        if (!presenter.getMember().getId().equals(memberId)) {
+            throw new ErrorException(UNAUTHORIZED_UPDATE_AND_DELETE);
+        }
+    }
+
+    public void deleteParticipantByRoomId(Long roomId) {
+        participantRepository.deleteByRoomId(roomId);
+    }
 }
