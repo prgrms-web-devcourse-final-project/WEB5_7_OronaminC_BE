@@ -27,6 +27,7 @@ public class EmojiService {
     private final RoomReader roomReader;
     private final QuestionReader questionReader;
     private final MemberReader memberReader;
+    private final EmojiReader emojiReader;
 
     @Transactional
     public void deleteByRoomEmoji(Long roomId) {
@@ -39,7 +40,7 @@ public class EmojiService {
         TargetType targetType = emojiRequest.targetType();
         Long targetId = emojiRequest.targetId();
 
-        Optional<Emoji> findEmoji = emojiRepository.findByMemberIdAndTargetIdAndTargetType(
+        Optional<Emoji> findEmoji = emojiReader.findByMemberIdAndTargetIdAndTargetType(
             memberId, targetId, targetType);
 
         if (findEmoji.isPresent()) {
