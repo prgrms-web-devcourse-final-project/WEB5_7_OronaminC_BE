@@ -12,7 +12,7 @@ import com.oronaminc.join.emoji.domain.TargetType;
 import com.oronaminc.join.emoji.dto.EmojiRequest;
 import com.oronaminc.join.emoji.dto.EmojiResponse;
 import com.oronaminc.join.member.service.MemberService;
-import com.oronaminc.join.question.service.QuestionService;
+import com.oronaminc.join.question.service.QuestionReader;
 import com.oronaminc.join.room.service.RoomReader;
 
 import lombok.RequiredArgsConstructor;
@@ -23,10 +23,10 @@ import lombok.RequiredArgsConstructor;
 public class EmojiService {
 
     private final EmojiRepository emojiRepository;
-    private final QuestionService questionService;
     private final AnswerService answerService;
     private final MemberService memberService;
     private final RoomReader roomReader;
+    private final QuestionReader questionReader;
 
     @Transactional
     public void deleteByRoomEmoji(Long roomId) {
@@ -61,7 +61,7 @@ public class EmojiService {
     private Long decrementEmojiCount(TargetType targetType, Long targetId) {
         return switch (targetType) {
             case ROOM -> roomReader.getById(targetId).decrementEmojiCount();
-            case QUESTION -> questionService.findById(targetId).decrementEmojiCount();
+            case QUESTION -> questionReader.getById(targetId).decrementEmojiCount();
             case ANSWER -> answerService.findById(targetId).decrementEmojiCount();
         };
     }
@@ -69,7 +69,7 @@ public class EmojiService {
     private Long incrementEmojiCount(TargetType targetType, Long targetId) {
         return switch (targetType) {
             case ROOM -> roomReader.getById(targetId).incrementEmojiCount();
-            case QUESTION -> questionService.findById(targetId).incrementEmojiCount();
+            case QUESTION -> questionReader.getById(targetId).incrementEmojiCount();
             case ANSWER -> answerService.findById(targetId).incrementEmojiCount();
         };
     }

@@ -39,6 +39,7 @@ public class QuestionService {
     private final ParticipantRepository participantRepository;
     private final AnswerService answerService;
     private final RoomReader roomReader;
+    private final QuestionReader questionReader;
 
     @Transactional
     public Question create(Long roomId, Long memberId, QuestionCreateRequest requestDto) {
@@ -72,11 +73,11 @@ public class QuestionService {
         Pageable pageable = PageRequest.of(0, size + 1);
 
         List<QuestionFlatResponse> questions = switch (sort) {
-            case QuestionSort.CREATEDAT -> questionRepository.findByCreatedAt(lastId,
+            case QuestionSort.CREATEDAT -> questionReader.findByCreatedAt(lastId,
                 memberId, roomId, pageable);
-            case QuestionSort.EMOJI -> questionRepository.findByEmojiCount(lastId,
+            case QuestionSort.EMOJI -> questionReader.findByEmojiCount(lastId,
                 lastEmojiCount, memberId, roomId, pageable);
-            case QuestionSort.MYQUESTION -> questionRepository.findByMyQuestion(lastId,
+            case QuestionSort.MYQUESTION -> questionReader.findByMyQuestion(lastId,
                 memberId, roomId, pageable);
         };
 
@@ -93,14 +94,9 @@ public class QuestionService {
 
     @Transactional
     public void deleteByRoomId(Long roomId) {
-        List<Question> questions = questionRepository.findByRoomId(roomId);
+        List<Question> questions = questionReader.findByRoomId(roomId);
         answerService.deleteByQuestionList(questions);
         questionRepository.deleteByRoomId(roomId);
-    }
-
-    public Question findById(Long id) {
-        return questionRepository.findById(id)
-            .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_QUESTION));
     }
 
 }

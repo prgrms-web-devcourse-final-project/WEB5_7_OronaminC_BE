@@ -15,8 +15,8 @@ import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.member.dao.MemberRepository;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.participant.dao.ParticipantRepository;
-import com.oronaminc.join.question.dao.QuestionRepository;
 import com.oronaminc.join.question.domain.Question;
+import com.oronaminc.join.question.service.QuestionReader;
 import com.oronaminc.join.room.domain.Room;
 import com.oronaminc.join.room.service.RoomReader;
 
@@ -29,9 +29,9 @@ public class AnswerService {
 
     private final AnswerRepository answerRepository;
     private final MemberRepository memberRepository;
-    private final QuestionRepository questionRepository;
     private final ParticipantRepository participantRepository;
     private final RoomReader roomReader;
+    private final QuestionReader questionReader;
 
     @Transactional
     public Answer create(Long roomId, Long memberId, Long questionId ,AnswerCreateRequest requestDto ){
@@ -41,8 +41,7 @@ public class AnswerService {
 
         Room room = roomReader.getById(roomId);
 
-        Question question = questionRepository.findByIdAndRoomId(questionId, roomId)
-            .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_QUESTION));
+        Question question = questionReader.getByIdAndRoomId(questionId, roomId);
 
         if (!participantRepository.existsByRoomIdAndMemberId(room.getId(), member.getId())) {
             throw new ErrorException(NOT_FOUND_PARTICIPANT);

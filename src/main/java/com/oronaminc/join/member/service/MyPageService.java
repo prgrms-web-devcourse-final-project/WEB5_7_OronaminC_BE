@@ -1,5 +1,14 @@
 package com.oronaminc.join.member.service;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.dto.MyPageType;
 import com.oronaminc.join.member.dto.MyProfileGetResponse;
@@ -11,15 +20,9 @@ import com.oronaminc.join.member.mapper.MyPageMapper;
 import com.oronaminc.join.participant.dao.ParticipantRepository;
 import com.oronaminc.join.participant.domain.Participant;
 import com.oronaminc.join.participant.domain.ParticipantType;
-import com.oronaminc.join.question.dao.QuestionRepository;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.oronaminc.join.question.service.QuestionReader;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
@@ -27,8 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MyPageService {
 
     private final ParticipantRepository participantRepository;
-    private final QuestionRepository questionRepository;
-
+    private final QuestionReader questionReader;
     private final MemberService memberService;
 
     public MyProfileGetResponse getMyProfile(Long memberId) {
@@ -71,7 +73,7 @@ public class MyPageService {
         List<Long> roomIds = participants.stream()
             .map(p -> p.getRoom().getId())
             .toList();
-        List<Object[]> questionCounts = questionRepository.countByRoomIds(roomIds);
+        List<Object[]> questionCounts = questionReader.countByRoomIds(roomIds);
         Map<Long, Long> countMap = questionCounts.stream()
             .collect(Collectors.toMap(
                 row -> (Long) row[0],
