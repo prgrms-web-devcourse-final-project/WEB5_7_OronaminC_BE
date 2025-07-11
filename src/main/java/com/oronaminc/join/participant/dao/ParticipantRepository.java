@@ -58,9 +58,5 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     Page<Participant> findByMemberIdAndParticipantTypeNot(Long memberId, ParticipantType pType,
         Pageable pageable);
 
-    @Query(
-        "SELECT p FROM Participant p "
-            + "WHERE p.room.id = :roomId AND p.member.id = :memberId"
-    )
     Optional<Participant> findByRoomIdAndMemberId( @Param("roomId") Long roomId, @Param("memberId") Long memberId );
 }

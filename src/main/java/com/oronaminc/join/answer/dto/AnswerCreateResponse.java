@@ -15,13 +15,12 @@ public record AnswerCreateResponse(
     Long answerId,
     @Schema(description = "답변 내용", example = "답변입니다.")
     String content,
-    @Schema(description = "답변 생성/삭제/수정 상태", example = "CREATE")
+    @Schema(description = "답변 내용에 대한 공감 수", example = "23")
     int emojiCount,
-    @Schema(description = "답변 생성/삭제/수정 상태", example = "CREATE")
-    boolean isEojied,
-    @Schema(description = "답변 생성/삭제/수정 상태", example = "CREATE")
+    @Schema(description = "답변 공감 여부", example = "true")
+    boolean isEmojied,
+    @Schema(description = "작성자 정보  DTO")
     WriterDto writer,
-    @Schema(description = "답변 생성/삭제/수정 상태", example = "CREATE")
     LocalDateTime createdAt
 ) {
 

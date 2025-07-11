@@ -21,7 +21,7 @@ public class PermissionValidator {
             .orElseThrow(() -> new ErrorException(NOT_FOUND_PARTICIPANT));
         ParticipantType type = participant.getParticipantType();
 
-        if(type != ParticipantType.PRESENTER && type != ParticipantType.TEAM){
+        if(type == ParticipantType.GUEST){
             throw new ErrorException(UNAUTHORIZED_ROLE_ANSWER);
         }
     }

@@ -49,7 +49,7 @@ public class AnswerService {
             throw new ErrorException(BADREQUEST_DUPLICATION_ANSWER);
         }
 
-        Answer answer = AnswerMapper.toAnswer(question, member, requestDto);
+        Answer answer = Answer.create(question, member, requestDto);
 
         answerRepository.save(answer);
 
