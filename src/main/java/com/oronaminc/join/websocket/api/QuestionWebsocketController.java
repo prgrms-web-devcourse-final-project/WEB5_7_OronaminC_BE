@@ -33,8 +33,7 @@ public class QuestionWebsocketController {
         Principal principal
     ) {
 
-        MemberDetails memberDetails = (MemberDetails) ((Authentication) principal).getPrincipal();
-        Long memberId = memberDetails.getId();
+        Long memberId = Long.valueOf(principal.getName());
 
         Question question = questionService.create(roomId, memberId, request);
 

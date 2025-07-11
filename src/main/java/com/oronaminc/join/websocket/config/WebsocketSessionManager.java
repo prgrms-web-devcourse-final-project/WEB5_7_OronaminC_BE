@@ -14,6 +14,7 @@ public class WebsocketSessionManager {
 
     public void registerSession(WebSocketSession session) {
         sessions.put(session.getId(), session);
+
     }
 
     public void removeSession(String sessionId) {
