@@ -22,7 +22,11 @@ public enum ErrorCode {
 
     ACCESS_DENIED_SESSION("SESSION-1201", "접근 권한이 없습니다.", FORBIDDEN),
     NOT_FOUND_SESSION("SESSION-1202", "세션이 유효하지 않습니다.", UNAUTHORIZED),
-    EXPIRED_SESSION("SESSION-1203", "세션이 만료되었습니다.", UNAUTHORIZED);
+    EXPIRED_SESSION("SESSION-1203", "세션이 만료되었습니다.", UNAUTHORIZED),
+
+    SOCKET_ERROR("SOCKET-3000", "웹소켓 연결 중 서버 오류가 발생했습니다.", INTERNAL_SERVER_ERROR),
+    SOCKET_RUNTIME_ERROR("SOCKET-2000", "처리되지 않은 오류가 발생했습니다", INTERNAL_SERVER_ERROR),
+    SOCKET_VALIDATION_ERROR("SOCKET-1001", "입력값이 유효하지 않습니다.", BAD_REQUEST);
 
     private final String code;
     private final String message;

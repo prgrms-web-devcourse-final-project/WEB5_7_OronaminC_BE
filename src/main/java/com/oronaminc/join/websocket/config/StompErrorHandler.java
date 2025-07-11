@@ -46,7 +46,7 @@ public class StompErrorHandler extends StompSubProtocolErrorHandler {
 
         try {
             String json = objectMapper.writeValueAsString(
-                new ErrorResponse(errorCode.getCode(), errorCode.getMessage()));
+                new ErrorResponse(errorCode));
 
             return MessageBuilder.createMessage(json.getBytes(StandardCharsets.UTF_8),
                 headers.getMessageHeaders());
