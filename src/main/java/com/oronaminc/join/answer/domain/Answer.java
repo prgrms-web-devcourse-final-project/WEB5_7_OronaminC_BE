@@ -51,11 +51,11 @@ public class Answer extends BaseEntity {
     @Version
     private Integer version;
 
-    public static Answer create(Question question, Member member, AnswerCreateRequest requestDto) {
+    public static Answer create(Question question, Member member, String content) {
         return Answer.builder()
             .question(question)
             .member(member)
-            .content(requestDto.content())
+            .content(content)
             .emojiCount(0L)
             .build();
     }

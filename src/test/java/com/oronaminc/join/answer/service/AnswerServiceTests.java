@@ -175,7 +175,7 @@ public class AnswerServiceTests {
         // when & then
         assertThatThrownBy(() -> answerService.create(1L, 1L, 1L, request))
             .isInstanceOf(ErrorException.class)
-            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_QUESTION);
+            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_ROOM_QUESTION);
 
     }
 

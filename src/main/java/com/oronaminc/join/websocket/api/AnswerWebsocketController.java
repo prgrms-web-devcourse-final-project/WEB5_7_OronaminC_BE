@@ -6,11 +6,7 @@ import com.oronaminc.join.answer.dto.AnswerCreateResponse;
 import com.oronaminc.join.answer.mapper.AnswerMapper;
 import com.oronaminc.join.answer.service.AnswerService;
 import com.oronaminc.join.answer.util.PermissionValidator;
-import com.oronaminc.join.member.dao.MemberRepository;
 import com.oronaminc.join.member.security.MemberDetails;
-import com.oronaminc.join.participant.dao.ParticipantRepository;
-import com.oronaminc.join.question.dao.QuestionRepository;
-import com.oronaminc.join.room.dao.RoomRepository;
 import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,13 +22,8 @@ import org.springframework.stereotype.Controller;
 @RequiredArgsConstructor
 public class AnswerWebsocketController {
 
-    private final MemberRepository memberRepository;
-
     private final AnswerService answerService;
     private final PermissionValidator permissionValidator;
-    private final RoomRepository roomRepository;
-    private final ParticipantRepository participantRepository;
-    private final QuestionRepository questionRepository;
 
     @MessageMapping("/rooms/{roomId}/question/{questionId}/answers/create")
     @SendTo("/topic/rooms/{roomId}/answers")
