@@ -54,11 +54,7 @@ public class EmojiService {
             return new EmojiResponse("DELETE", targetType, targetId, emojiCount);
 
         } else {
-            Emoji emoji = Emoji.builder()
-                .member(memberService.findById(memberId))
-                .targetType(targetType)
-                .targetId(targetId)
-                .build();
+            Emoji emoji = Emoji.create(memberService.findById(memberId), targetType, targetId);
             emojiRepository.save(emoji);
 
             emojiCount = incrementEmojiCount(targetType, targetId);
