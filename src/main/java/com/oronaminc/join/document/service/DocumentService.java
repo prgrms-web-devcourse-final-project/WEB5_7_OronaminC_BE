@@ -1,18 +1,22 @@
 package com.oronaminc.join.document.service;
 
-import java.net.URI;
-
 import org.springframework.stereotype.Service;
 
 import com.oronaminc.join.document.dao.DocumentRepository;
 import com.oronaminc.join.document.dto.DocumentRequest;
 import com.oronaminc.join.document.dto.DocumentResponse;
+import com.oronaminc.join.document.mapper.DocumentMapper;
 import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.infra.service.S3Service;
 import com.oronaminc.join.member.domain.MemberType;
+import com.oronaminc.join.room.domain.Room;
+import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.UUID;
+
 
 @Service
 @RequiredArgsConstructor
@@ -30,17 +34,18 @@ public class DocumentService {
             throw new ErrorException(ErrorCode.UNAUTHORIZED_MEMBER);
         }
 
-        String objectKey = request.fileName();
-        String presignedUrl = s3Service.generateUploadPresignedUrl(objectKey);
+        String uuid = UUID.randomUUID().toString();
+        String objectKey = "documents/" + uuid + "_" + request.fileName();
+        String presignedUrl = s3Service.generatePresignedUrl(objectKey);
 
-        return new DocumentResponse(presignedUrl);
+        return new DocumentResponse(presignedUrl, objectKey);
     }
 
-    // 전체 URL에서 ObjectKey 추출
-    private String extractObjectKey(String documentUrl) {
-        String path = URI.create(documentUrl).getPath();
+    @Transactional
+    public void saveDocument(String objectKey, Room room) {
+        String fileName = objectKey.replaceAll("^.*/","");
 
-        return path.startsWith("/") ? path.substring(1) : path;
+        documentRepository.save(DocumentMapper.toDocument(objectKey, fileName, room));
     }
 
 }

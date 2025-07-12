@@ -6,7 +6,10 @@ import com.oronaminc.join.answer.dto.AnswerCreateResponse;
 import com.oronaminc.join.answer.mapper.AnswerMapper;
 import com.oronaminc.join.answer.service.AnswerService;
 import com.oronaminc.join.answer.util.PermissionValidator;
-import com.oronaminc.join.member.security.MemberDetails;
+import com.oronaminc.join.member.dao.MemberRepository;
+import com.oronaminc.join.participant.dao.ParticipantRepository;
+import com.oronaminc.join.question.dao.QuestionRepository;
+import com.oronaminc.join.room.dao.RoomRepository;
 import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +17,6 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
 @Slf4j
@@ -33,8 +35,7 @@ public class AnswerWebsocketController {
         @Payload AnswerCreateRequest request,
         Principal principal
     ) {
-        MemberDetails memberDetails = (MemberDetails) ((Authentication) principal).getPrincipal();
-        Long memberId = memberDetails.getId();
+        Long memberId = Long.valueOf(principal.getName());
 
         permissionValidator.validateAnswerPermission(roomId, memberId);
 
