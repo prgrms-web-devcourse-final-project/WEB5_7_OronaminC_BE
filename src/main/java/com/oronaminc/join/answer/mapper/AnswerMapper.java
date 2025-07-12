@@ -29,7 +29,7 @@ public class AnswerMapper {
             .build();
     }
 
-    public static AnswerGetResponse toAnswerGetResponse(Answer answer, int emojiCount, boolean isEmojied) {
+    public static AnswerGetResponse toAnswerGetResponse(Answer answer, Long emojiCount, boolean isEmojied) {
         return AnswerGetResponse.builder()
             .answerId(answer.getId())
             .emojiCount(emojiCount)

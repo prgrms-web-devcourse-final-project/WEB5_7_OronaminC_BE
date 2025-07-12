@@ -28,7 +28,7 @@ public class AnswerReader {
         return answerRepository.findById(answerId);
     }
 
-    public Answer getExistById(Long questionId) {
+    public Answer getByQuestionId(Long questionId) {
         return answerRepository.findByQuestionId(questionId)
             .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_EXIST_ANSWER));
     }

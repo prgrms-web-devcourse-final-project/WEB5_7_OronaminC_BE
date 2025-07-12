@@ -62,10 +62,9 @@ public class AnswerService {
         Member member = memberReader.getById(memberId);
         roomReader.getById(roomId);
         questionReader.getByIdAndRoomId(questionId, roomId);
-        Answer answer = answerReader.getExistById(questionId);
+        Answer answer = answerReader.getByQuestionId(questionId);
 
-        int emojiCount = emojiReader.countByTargetIdAndTargetType(answer.getId(),
-            TargetType.ANSWER);
+        Long emojiCount = answer.getEmojiCount();
         boolean isEmojied = emojiReader.findByMemberIdAndTargetIdAndTargetType(member.getId(),
             answer.getId(), TargetType.ANSWER).isPresent();
 

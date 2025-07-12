@@ -10,7 +10,7 @@ import lombok.Builder;
 public record AnswerGetResponse(
     Long answerId,
     @Schema(description = "답변 내용에 대한 공감 수", example = "23")
-    int emojiCount,
+    Long emojiCount,
     @Schema(description = "답변 공감 여부", example = "true")
     boolean Emojied,
     @Schema(description = "답변 내용", example = "답변입니다.")

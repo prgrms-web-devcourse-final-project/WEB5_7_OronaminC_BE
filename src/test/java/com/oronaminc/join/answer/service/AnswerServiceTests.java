@@ -148,7 +148,7 @@ public class AnswerServiceTests {
             .question(mockQuestion)
             .member(mockMember)
             .content("답변입니다.")
-            .emojiCount(0L)
+            .emojiCount(5L)
             .version(0)
             .build();
 
@@ -163,9 +163,7 @@ public class AnswerServiceTests {
         given(memberReader.getById(memberId)).willReturn(mockMember);
         given(roomReader.getById(roomId)).willReturn(mockRoom);
         given(questionReader.getByIdAndRoomId(questionId, roomId)).willReturn(mockQuestion);
-        given(answerReader.getExistById(questionId)).willReturn(mockAnswer);
-        given(emojiReader.countByTargetIdAndTargetType(mockAnswer.getId(),
-            TargetType.ANSWER)).willReturn(5);
+        given(answerReader.getByQuestionId(questionId)).willReturn(mockAnswer);
         given(emojiReader.findByMemberIdAndTargetIdAndTargetType(memberId, mockAnswer.getId(),
             TargetType.ANSWER)).willReturn(Optional.of(mockEmoji));
 
@@ -175,7 +173,7 @@ public class AnswerServiceTests {
         // then
         assertThat(response.answerId()).isEqualTo(mockAnswer.getId());
         assertThat(response.content()).isEqualTo(mockAnswer.getContent());
-        assertThat(response.emojiCount()).isEqualTo(5);
+        assertThat(response.emojiCount()).isEqualTo(5L);
         assertThat(response.Emojied()).isTrue();
         assertThat(response.writer().memberId()).isEqualTo(mockMember.getId());
         assertThat(response.writer().nickname()).isEqualTo(mockMember.getNickname());
