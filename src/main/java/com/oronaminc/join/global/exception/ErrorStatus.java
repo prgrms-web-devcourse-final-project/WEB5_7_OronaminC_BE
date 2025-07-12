@@ -6,5 +6,6 @@ public enum ErrorStatus {
     INTERNAL_SERVER_ERROR,
     ALREADY_EXISTS,
     BAD_REQUEST,
-    UNAUTHORIZED
+    UNAUTHORIZED,
+    FORBIDDEN
 }

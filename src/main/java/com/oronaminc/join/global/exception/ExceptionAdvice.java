@@ -24,6 +24,7 @@ public class ExceptionAdvice {
             case INTERNAL_SERVER_ERROR -> HttpStatus.INTERNAL_SERVER_ERROR;
             case ALREADY_EXISTS, BAD_REQUEST -> HttpStatus.BAD_REQUEST;
             case UNAUTHORIZED -> HttpStatus.UNAUTHORIZED;
+            case FORBIDDEN -> HttpStatus.FORBIDDEN;
         };
 
         return ResponseEntity.status(httpStatus)

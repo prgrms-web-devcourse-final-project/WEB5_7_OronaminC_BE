@@ -1,6 +1,7 @@
 package com.oronaminc.join.global.exception;
 
 import static com.oronaminc.join.global.exception.ErrorStatus.BAD_REQUEST;
+import static com.oronaminc.join.global.exception.ErrorStatus.FORBIDDEN;
 import static com.oronaminc.join.global.exception.ErrorStatus.INTERNAL_SERVER_ERROR;
 import static com.oronaminc.join.global.exception.ErrorStatus.NOT_FOUND;
 import static com.oronaminc.join.global.exception.ErrorStatus.UNAUTHORIZED;
@@ -30,8 +31,16 @@ public enum ErrorCode {
 
     UNAUTHORIZED_ROLE_ANSWER("ANSWER-001", "팀원 또는 발표자만 댓글을 작성할 수 있습니다.", UNAUTHORIZED),
     BADREQUEST_DUPLICATION_ANSWER("ANSWER-002", "이미 답변한 질문입니다.", BAD_REQUEST),
-    NOT_FOUND_ANSWER("ANSWER-003", "존재하지 않는 답변입니다.", NOT_FOUND)
-    ;
+    NOT_FOUND_ANSWER("ANSWER-003", "존재하지 않는 답변입니다.", NOT_FOUND),
+
+
+    ACCESS_DENIED_SESSION("SESSION-1201", "접근 권한이 없습니다.", FORBIDDEN),
+    NOT_FOUND_SESSION("SESSION-1202", "세션이 유효하지 않습니다.", UNAUTHORIZED),
+    EXPIRED_SESSION("SESSION-1203", "세션이 만료되었습니다.", UNAUTHORIZED),
+
+    SOCKET_ERROR("SOCKET-3000", "웹소켓 연결 중 서버 오류가 발생했습니다.", INTERNAL_SERVER_ERROR),
+    SOCKET_RUNTIME_ERROR("SOCKET-2000", "처리되지 않은 오류가 발생했습니다", INTERNAL_SERVER_ERROR),
+    SOCKET_VALIDATION_ERROR("SOCKET-1001", "입력값이 유효하지 않습니다.", BAD_REQUEST);
 
     private final String code;
     private final String message;
