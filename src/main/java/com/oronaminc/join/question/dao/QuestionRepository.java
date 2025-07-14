@@ -115,11 +115,6 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     void deleteByRoomId(Long roomId);
 
-    @Query("""
-        select count(q)
-        from Question q
-        where q.room.id = :roomId
-    """)
     Long countByRoomId(@Param("roomId") Long roomId);
 
     @Query ("""
