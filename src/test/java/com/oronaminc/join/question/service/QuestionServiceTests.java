@@ -190,7 +190,7 @@ class QuestionServiceTests {
         // when then
         assertThatThrownBy(() -> questionService.update(notMemberId, roomId, 1L, request))
             .isInstanceOf(ErrorException.class)
-            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.UNAUTHORIZED_QUESTION);
+            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.UNAUTHORIZED_EDIT_QUESTION);
 
     }
 

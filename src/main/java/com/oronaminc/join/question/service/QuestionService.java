@@ -91,7 +91,7 @@ public class QuestionService {
 
         // 작성자 권한
         if (!question.getMember().getId().equals(memberId)) {
-            throw new ErrorException(ErrorCode.UNAUTHORIZED_QUESTION);
+            throw new ErrorException(ErrorCode.UNAUTHORIZED_EDIT_QUESTION);
         }
 
         question.updateContent(request.content());
@@ -106,7 +106,7 @@ public class QuestionService {
         // 관리자가 아님 && 작성자도 아님
         if (!participantReader.existsPresenterOrTeamByMemberId(roomId, memberId)
         && !question.getMember().getId().equals(memberId)) {
-            throw new ErrorException(ErrorCode.UNAUTHORIZED_QUESTION);
+            throw new ErrorException(ErrorCode.UNAUTHORIZED_DELETE_QUESTION);
         }
 
         questionRepository.deleteByIdAndRoomId(questionId, roomId);
