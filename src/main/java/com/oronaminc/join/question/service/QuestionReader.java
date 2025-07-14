@@ -3,6 +3,8 @@ package com.oronaminc.join.question.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.oronaminc.join.room.dto.TopQnADto;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
@@ -59,5 +61,11 @@ public class QuestionReader {
 
     public boolean existsInRoom(Long roomId) {
         return !questionRepository.findByRoomId(roomId).isEmpty();
+    }
+
+    public Long countByRoomId(Long roomId) { return questionRepository.countByRoomId(roomId);}
+
+    public List<TopQnADto> findTop3QnA(Long roomId) {
+        return questionRepository.findTop3QnAByRoomId(roomId, PageRequest.of(0,3));
     }
 }

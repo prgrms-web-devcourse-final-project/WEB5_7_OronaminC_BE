@@ -1,5 +1,6 @@
 package com.oronaminc.join.room.api;
 
+import com.oronaminc.join.room.dto.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,14 +14,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.oronaminc.join.member.security.MemberDetails;
-import com.oronaminc.join.room.dto.CreateRoomRequest;
-import com.oronaminc.join.room.dto.CreateRoomResponse;
-import com.oronaminc.join.room.dto.JoinRoomRequest;
-import com.oronaminc.join.room.dto.JoinRoomResponse;
-import com.oronaminc.join.room.dto.RoomDetailResponse;
-import com.oronaminc.join.room.dto.RoomUpdateInfoResponse;
-import com.oronaminc.join.room.dto.RoomUpdateRequest;
-import com.oronaminc.join.room.dto.RoomUpdateStatusRequest;
 import com.oronaminc.join.room.service.RoomService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -102,5 +95,14 @@ public class RoomController {
             @AuthenticationPrincipal MemberDetails memberDetails
     ) {
         return roomService.getRoomUpdateInfo(memberDetails.getId(), roomId);
+    }
+
+    @GetMapping("/{roomId}/report")
+    @ResponseStatus(HttpStatus.OK)
+    public ReportResponse getReport(
+            @PathVariable Long roomId,
+            @AuthenticationPrincipal MemberDetails memberDetails
+    ) {
+        return roomService.getRoomReport(roomId, memberDetails.getId());
     }
 }
