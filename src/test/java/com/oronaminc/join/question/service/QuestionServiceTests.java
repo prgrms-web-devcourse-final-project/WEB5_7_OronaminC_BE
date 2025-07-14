@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -116,6 +117,65 @@ class QuestionServiceTests {
             .nickname("테스트유저")
             .createdAt(LocalDateTime.of(2000, 1, 1, 1, 1))
             .build();
+
+    }
+
+    @Test
+    @DisplayName("질문이 성공적으로 수정된다")
+    void updateQuestion_success() {
+        // given
+        Long roomId = 1L;
+        Long memberId = 1L;
+
+        Question question = Question.builder().id(1L).room(mockRoom).member(mockMember).content("변경 전").build();
+
+        given(questionReader.findByIdAndRoomId(1L, roomId)).willReturn(
+            Optional.of(question));
+
+        // when
+        Question updated = questionService.update(memberId, roomId, 1L, request);
+
+        // then
+        assertThat(updated.getId()).isEqualTo(1L);
+        assertThat(updated.getContent()).isEqualTo("질문입니다");
+
+    }
+
+    @Test
+    @DisplayName("잘못된 값이 들어오면 질문 수정이 실패한다")
+    void updateQuestion_found_fail() {
+        // given
+        Long notRoomId = 999L;
+        Long memberId = 1L;
+
+        Question question = Question.builder().id(1L).room(mockRoom).member(mockMember).content("변경 전").build();
+
+        given(questionReader.findByIdAndRoomId(1L, notRoomId)).willThrow(
+            new ErrorException(ErrorCode.NOT_FOUND_ROOM_QUESTION));
+
+        // when & then
+        assertThatThrownBy(() -> questionService.update(999L, notRoomId, 1L, request))
+            .isInstanceOf(ErrorException.class)
+            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_ROOM_QUESTION);
+
+    }
+
+    @Test
+    @DisplayName("작성자가 아니면 질문 수정이 실패한다")
+    void updateQuestion_fail() {
+        // given
+        Long roomId = 1L;
+        Long notMemberId = 999L;
+
+        Question question = Question.builder().id(1L).room(mockRoom).member(mockMember).content("변경 전").build();
+
+        given(questionReader.findByIdAndRoomId(1L, roomId)).willReturn(
+            Optional.of(question));
+
+        // when then
+        assertThatThrownBy(() -> questionService.update(notMemberId, roomId, 1L, request))
+            .isInstanceOf(ErrorException.class)
+            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.UNAUTHORIZED_QUESTION);
 
     }
 
