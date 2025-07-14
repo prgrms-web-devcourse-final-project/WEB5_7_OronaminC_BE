@@ -14,13 +14,16 @@ public class EmojiFacade {
 
     private final EmojiService emojiService;
 
-    public EmojiResponse toggleEmoji(Long memberId, EmojiRequest emojiRequest)
-        throws InterruptedException {
+    public EmojiResponse toggleEmoji(Long memberId, EmojiRequest emojiRequest) {
         for (int i = 0; i < 10; i++) {
             try {
                 return emojiService.toggleEmoji(memberId, emojiRequest);
             } catch (ObjectOptimisticLockingFailureException e) {
-                Thread.sleep(50);
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException ex) {
+                    throw new ErrorException(ErrorCode.EMOJI_CONFLICT);
+                }
             }
         }
         throw new ErrorException(ErrorCode.EMOJI_CONFLICT);
