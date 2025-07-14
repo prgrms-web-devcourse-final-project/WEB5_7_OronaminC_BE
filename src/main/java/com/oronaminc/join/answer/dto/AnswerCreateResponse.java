@@ -9,6 +9,8 @@ import lombok.Builder;
 @Schema(description = "WebSocket STOMP 통신 답변 응답 DTO")
 public record AnswerCreateResponse(
     //TODO: QuestionCreateResponse와 유사-> 둘중 하나만?
+    @Schema(description = "답변이 생성될 질문 ID")
+    Long questionId,
     @Schema(description = "답변 생성/삭제/수정 상태", example = "CREATE")
     String event,
     @Schema(description = "답변 ID", example = "11")
