@@ -2,6 +2,9 @@ package com.oronaminc.join.answer.service;
 
 import static com.oronaminc.join.global.exception.ErrorCode.*;
 
+import com.oronaminc.join.global.exception.ErrorCode;
+import com.oronaminc.join.room.domain.Room;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
@@ -25,8 +28,13 @@ public class AnswerReader {
         return answerRepository.findById(answerId);
     }
 
+    public Answer getByQuestionId(Long questionId) {
+        return answerRepository.findByQuestionId(questionId)
+            .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_EXIST_ANSWER));
+    }
+
     public Answer getById(Long answerId) {
         return findById(answerId)
-                .orElseThrow(() -> new ErrorException(NOT_FOUND_ANSWER));
+            .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_ANSWER));
     }
 }

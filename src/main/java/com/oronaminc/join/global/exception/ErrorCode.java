@@ -27,11 +27,13 @@ public enum ErrorCode {
     FILE_UPLOAD_FAILED("FILE-001", "파일 업로드에 실패하였습니다.", INTERNAL_SERVER_ERROR),
     NOT_FOUND_FILE("FILE-002", "존재하지 않는 파일입니다.", NOT_FOUND),
 
-    NOT_FOUND_QUESTION("QUESTION-001", "질문을 찾을 수 없습니다.", NOT_FOUND),
+    NOT_FOUND_ROOM_QUESTION("QUESTION-001", "질문을 해당 방에서 찾을 수 없습니다.", NOT_FOUND),
+    NOT_FOUND_QUESTION("QUESTION-002", "질문을 찾을 수 없습니다.", NOT_FOUND),
 
     UNAUTHORIZED_ROLE_ANSWER("ANSWER-001", "팀원 또는 발표자만 댓글을 작성할 수 있습니다.", UNAUTHORIZED),
-    BADREQUEST_DUPLICATION_ANSWER("ANSWER-002", "이미 답변한 질문입니다.", BAD_REQUEST),
-    NOT_FOUND_ANSWER("ANSWER-003", "존재하지 않는 답변입니다.", NOT_FOUND),
+    NOT_FOUND_EXIST_ANSWER("ANSWER-002", "해당 질문에 대한 답변이 존재하지 않습니다.", NOT_FOUND),
+    NOT_FOUND_ANSWER("ANSWER-003", "답변이 존재하지 않습니다.", NOT_FOUND),
+    BADREQUEST_DUPLICATION_ANSWER("ANSWER-004", "이미 답변한 질문입니다.", BAD_REQUEST),
 
 
     ACCESS_DENIED_SESSION("SESSION-1201", "접근 권한이 없습니다.", FORBIDDEN),

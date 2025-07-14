@@ -18,4 +18,9 @@ public class EmojiReader {
     public Optional<Emoji> findByMemberIdAndTargetIdAndTargetType(Long memberId, Long targetId, TargetType targetType) {
         return emojiRepository.findByMemberIdAndTargetIdAndTargetType(memberId, targetId, targetType);
     }
+
+    public Integer countByTargetIdAndTargetType(Long targetId, TargetType targetType) {
+        return emojiRepository.countByTargetIdAndTargetType(targetId, targetType);
+    }
+
 }
