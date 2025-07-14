@@ -144,8 +144,7 @@ class QuestionServiceTests {
 
         Question question = Question.builder().id(1L).room(mockRoom).member(mockMember).content("변경 전").build();
 
-        given(questionReader.findByIdAndRoomId(1L, roomId)).willReturn(
-            Optional.of(question));
+        given(questionReader.getByIdAndRoomId(1L, roomId)).willReturn(question);
 
         // when
         Question updated = questionService.update(memberId, roomId, 1L, request);
@@ -161,11 +160,8 @@ class QuestionServiceTests {
     void updateQuestion_found_fail() {
         // given
         Long notRoomId = 999L;
-        Long memberId = 1L;
 
-        Question question = Question.builder().id(1L).room(mockRoom).member(mockMember).content("변경 전").build();
-
-        given(questionReader.findByIdAndRoomId(1L, notRoomId)).willThrow(
+        given(questionReader.getByIdAndRoomId(1L, notRoomId)).willThrow(
             new ErrorException(ErrorCode.NOT_FOUND_ROOM_QUESTION));
 
         // when & then
@@ -184,8 +180,7 @@ class QuestionServiceTests {
 
         Question question = Question.builder().id(1L).room(mockRoom).member(mockMember).content("변경 전").build();
 
-        given(questionReader.findByIdAndRoomId(1L, roomId)).willReturn(
-            Optional.of(question));
+        given(questionReader.getByIdAndRoomId(1L, roomId)).willReturn(question);
 
         // when then
         assertThatThrownBy(() -> questionService.update(notMemberId, roomId, 1L, request))
