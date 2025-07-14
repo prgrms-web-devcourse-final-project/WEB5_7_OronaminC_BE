@@ -1,6 +1,7 @@
 package com.oronaminc.join.global.exception;
 
 import static com.oronaminc.join.global.exception.ErrorStatus.BAD_REQUEST;
+import static com.oronaminc.join.global.exception.ErrorStatus.CONFLICT;
 import static com.oronaminc.join.global.exception.ErrorStatus.FORBIDDEN;
 import static com.oronaminc.join.global.exception.ErrorStatus.INTERNAL_SERVER_ERROR;
 import static com.oronaminc.join.global.exception.ErrorStatus.NOT_FOUND;
@@ -42,7 +43,9 @@ public enum ErrorCode {
 
     SOCKET_ERROR("SOCKET-3000", "웹소켓 연결 중 서버 오류가 발생했습니다.", INTERNAL_SERVER_ERROR),
     SOCKET_RUNTIME_ERROR("SOCKET-2000", "처리되지 않은 오류가 발생했습니다", INTERNAL_SERVER_ERROR),
-    SOCKET_VALIDATION_ERROR("SOCKET-1001", "입력값이 유효하지 않습니다.", BAD_REQUEST);
+    SOCKET_VALIDATION_ERROR("SOCKET-1001", "입력값이 유효하지 않습니다.", BAD_REQUEST),
+
+    EMOJI_CONFLICT("EMOJI-001", "공감 처리 중 충돌이 발생했습니다.", CONFLICT);
 
     private final String code;
     private final String message;
