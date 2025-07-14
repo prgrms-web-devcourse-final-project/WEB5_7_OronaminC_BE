@@ -4,6 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
+import com.oronaminc.join.participant.service.ParticipantReader;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -54,13 +55,14 @@ class QuestionServiceTests {
     @Mock
     private MemberReader memberReader;
     @Mock
+    private ParticipantReader participantReader;
+    @Mock
     private ParticipantService participantService;
     @Mock
     private QuestionReader questionReader;
 
     private Room mockRoom;
     private Member mockMember;
-    private Participant mockParticipant;
     private QuestionCreateRequest request;
     private QuestionFlatResponse mockQ1;
     private QuestionFlatResponse mockQ2;
@@ -88,13 +90,6 @@ class QuestionServiceTests {
             .roomStatus(RoomStatus.STARTED)
             .build();
 
-        mockParticipant = Participant.builder()
-            .id(1L)
-            .room(mockRoom)
-            .member(mockMember)
-            .participantType(ParticipantType.GUEST)
-            .build();
-
         request = new QuestionCreateRequest("질문입니다");
 
         mockQ1 = QuestionFlatResponse.builder()
@@ -118,6 +113,26 @@ class QuestionServiceTests {
             .createdAt(LocalDateTime.of(2000, 1, 1, 1, 1))
             .build();
 
+    }
+
+    @Test
+    @DisplayName("질문 작성자이거나 관리자이면 질문이 성공적으로 삭제된다")
+    void delete_sucess() {
+        // given
+        Long roomId = 1L;
+        Long memberId = 1L;
+
+        Question question = Question.builder().id(1L).room(mockRoom).member(mockMember)
+            .content("질문").build();
+
+        given(questionReader.getByIdAndRoomId(1L, roomId)).willReturn(question);
+        given(participantReader.existsPresenterOrTeamByMemberId(roomId, memberId)).willReturn(true);
+        doNothing().when(questionRepository).deleteByIdAndRoomId(1L, roomId);
+
+        Long deleted = questionService.delete(memberId, roomId, 1L);
+
+        assertThat(deleted).isEqualTo(1L);
+        verify(questionRepository).deleteByIdAndRoomId(1L, roomId);
     }
 
     @Test
