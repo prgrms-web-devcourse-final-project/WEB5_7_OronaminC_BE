@@ -6,6 +6,7 @@ import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.dto.QuestionCreateRequest;
 import com.oronaminc.join.question.dto.QuestionCreateResponse;
+import com.oronaminc.join.question.dto.QuestionDeleteResponse;
 import com.oronaminc.join.question.dto.QuestionFlatResponse;
 import com.oronaminc.join.question.dto.QuestionAssembleResponse;
 import com.oronaminc.join.question.dto.QuestionListResponse;
@@ -59,6 +60,13 @@ public class QuestionMapper {
             .questionId(question.getId())
             .content(question.getContent())
             .build();
+    }
+
+    public static QuestionDeleteResponse toQuestionDeleteResponse(Long questionId) {
+        return new QuestionDeleteResponse(
+            "DELETE",
+            questionId
+        );
     }
 
     public static QuestionListResponse toQuestionListResponse(

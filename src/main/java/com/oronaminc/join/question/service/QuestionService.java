@@ -2,6 +2,7 @@ package com.oronaminc.join.question.service;
 
 import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
+import com.oronaminc.join.participant.service.ParticipantReader;
 import java.util.List;
 
 import org.springframework.data.domain.PageRequest;
@@ -38,6 +39,7 @@ public class QuestionService {
     private final QuestionReader questionReader;
     private final MemberReader memberReader;
     private final RoomReader roomReader;
+    private final ParticipantReader participantReader;
 
     @Transactional
     public Question create(Long roomId, Long memberId, QuestionCreateRequest requestDto) {
@@ -85,10 +87,9 @@ public class QuestionService {
 
     @Transactional
     public Question update(Long memberId, Long roomId, Long questionId, QuestionCreateRequest request) {
-        Question question = questionReader.findByIdAndRoomId(questionId, roomId)
-            .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_ROOM_QUESTION));
+        Question question = questionReader.getByIdAndRoomId(questionId, roomId);
 
-        // 수정 권한 없음
+        // 작성자 권한
         if (!question.getMember().getId().equals(memberId)) {
             throw new ErrorException(ErrorCode.UNAUTHORIZED_QUESTION);
         }
@@ -96,6 +97,21 @@ public class QuestionService {
         question.updateContent(request.content());
 
         return question;
+    }
+
+    @Transactional
+    public Long delete(Long memberId, Long roomId, Long questionId) {
+        Question question = questionReader.getByIdAndRoomId(questionId, roomId);
+
+        // 관리자가 아님 && 작성자도 아님
+        if (!participantReader.existsPresenterOrTeamByMemberId(roomId, memberId)
+        && !question.getMember().getId().equals(memberId)) {
+            throw new ErrorException(ErrorCode.UNAUTHORIZED_QUESTION);
+        }
+
+        questionRepository.deleteByIdAndRoomId(questionId, roomId);
+
+        return question.getId();
     }
 
 

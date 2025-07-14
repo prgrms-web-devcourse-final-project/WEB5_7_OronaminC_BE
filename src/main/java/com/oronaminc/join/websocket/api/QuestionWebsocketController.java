@@ -5,6 +5,7 @@ import com.oronaminc.join.member.security.MemberDetails;
 import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.dto.QuestionCreateRequest;
 import com.oronaminc.join.question.dto.QuestionCreateResponse;
+import com.oronaminc.join.question.dto.QuestionDeleteResponse;
 import com.oronaminc.join.question.dto.QuestionUpdateResponse;
 import com.oronaminc.join.question.util.QuestionMapper;
 import com.oronaminc.join.question.service.QuestionService;
@@ -57,5 +58,20 @@ public class QuestionWebsocketController {
         Question updated = questionService.update(memberId, roomId, questionId, request);
 
         return QuestionMapper.toQuestionUpdateResponse(updated);
+    }
+
+    @MessageMapping("rooms/{roomId}/questions/{questionId}/delete")
+    @SendTo("/topic/rooms/{roomId}/questions")
+    public QuestionDeleteResponse delete(
+        @DestinationVariable Long roomId,
+        @DestinationVariable Long questionId,
+        Principal principal
+    ) {
+
+        Long memberId = Long.valueOf(principal.getName());
+
+        Long deletedId = questionService.delete(memberId, roomId, questionId);
+
+        return QuestionMapper.toQuestionDeleteResponse(deletedId);
     }
 }
