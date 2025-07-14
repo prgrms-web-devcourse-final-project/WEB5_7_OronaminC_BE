@@ -1,32 +1,21 @@
 package com.oronaminc.join.question.service;
 
-import static org.assertj.core.api.AssertionsForClassTypes.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.*;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.doNothing;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.verify;
+import static org.mockito.BDDMockito.willThrow;
 
-import com.oronaminc.join.participant.service.ParticipantReader;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
-import org.springframework.test.context.ActiveProfiles;
-
+import com.oronaminc.join.answer.service.AnswerService;
 import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.domain.MemberType;
 import com.oronaminc.join.member.service.MemberReader;
-import com.oronaminc.join.participant.domain.Participant;
-import com.oronaminc.join.participant.domain.ParticipantType;
+import com.oronaminc.join.participant.service.ParticipantReader;
 import com.oronaminc.join.participant.service.ParticipantService;
 import com.oronaminc.join.question.dao.QuestionRepository;
 import com.oronaminc.join.question.domain.Question;
@@ -37,8 +26,19 @@ import com.oronaminc.join.question.dto.QuestionFlatResponse;
 import com.oronaminc.join.room.domain.Room;
 import com.oronaminc.join.room.domain.RoomStatus;
 import com.oronaminc.join.room.service.RoomReader;
-
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.test.context.ActiveProfiles;
 
 @Slf4j
 @ActiveProfiles("test")
@@ -60,6 +60,8 @@ class QuestionServiceTests {
     private ParticipantService participantService;
     @Mock
     private QuestionReader questionReader;
+    @Mock
+    private AnswerService answerService;
 
     private Room mockRoom;
     private Member mockMember;
@@ -125,14 +127,16 @@ class QuestionServiceTests {
         Question question = Question.builder().id(1L).room(mockRoom).member(mockMember)
             .content("질문").build();
 
+        given(participantReader.existsByRoomIdAndMemberId(roomId, memberId)).willReturn(true);
         given(questionReader.getByIdAndRoomId(1L, roomId)).willReturn(question);
         given(participantReader.existsPresenterOrTeamByMemberId(roomId, memberId)).willReturn(true);
-        doNothing().when(questionRepository).deleteByIdAndRoomId(1L, roomId);
+        doNothing().when(questionRepository).deleteById(1L);
+        doNothing().when(answerService).deleteByQuestion(1L);
 
         Long deleted = questionService.delete(memberId, roomId, 1L);
 
         assertThat(deleted).isEqualTo(1L);
-        verify(questionRepository).deleteByIdAndRoomId(1L, roomId);
+        verify(questionRepository).deleteById(1L);
     }
 
     @Test
@@ -142,8 +146,10 @@ class QuestionServiceTests {
         Long roomId = 1L;
         Long memberId = 1L;
 
-        Question question = Question.builder().id(1L).room(mockRoom).member(mockMember).content("변경 전").build();
+        Question question = Question.builder().id(1L).room(mockRoom).member(mockMember)
+            .content("변경 전").build();
 
+        given(participantReader.existsByRoomIdAndMemberId(roomId, memberId)).willReturn(true);
         given(questionReader.getByIdAndRoomId(1L, roomId)).willReturn(question);
 
         // when
@@ -178,8 +184,10 @@ class QuestionServiceTests {
         Long roomId = 1L;
         Long notMemberId = 999L;
 
-        Question question = Question.builder().id(1L).room(mockRoom).member(mockMember).content("변경 전").build();
+        Question question = Question.builder().id(1L).room(mockRoom).member(mockMember)
+            .content("변경 전").build();
 
+        given(participantReader.existsByRoomIdAndMemberId(roomId, notMemberId)).willReturn(true);
         given(questionReader.getByIdAndRoomId(1L, roomId)).willReturn(question);
 
         // when then
@@ -197,7 +205,6 @@ class QuestionServiceTests {
         Long memberId = 1L;
         int size = 1;
 
-
         List<QuestionFlatResponse> mockList = List.of(mockQ1, mockQ2);
 
         given(memberReader.getById(memberId)).willReturn(mockMember);
@@ -205,8 +212,8 @@ class QuestionServiceTests {
         given(questionReader.findByCreatedAt(null, memberId, roomId, PageRequest.of(0, size + 1)))
             .willReturn(mockList);
 
-
-        Slice<QuestionAssembleResponse> result = questionService.getQuestions(QuestionSort.CREATEDAT,
+        Slice<QuestionAssembleResponse> result = questionService.getQuestions(
+            QuestionSort.CREATEDAT,
             null, null, size, memberId, roomId);
 
         assertThat(result).isNotNull();
@@ -225,9 +232,9 @@ class QuestionServiceTests {
 
         given(memberReader.getById(memberId)).willReturn(mockMember);
         given(roomReader.getById(roomId)).willReturn(mockRoom);
-        given(questionReader.findByEmojiCount(null, null, memberId, roomId, PageRequest.of(0, size + 1)))
+        given(questionReader.findByEmojiCount(null, null, memberId, roomId,
+            PageRequest.of(0, size + 1)))
             .willReturn(mockList);
-
 
         Slice<QuestionAssembleResponse> result = questionService.getQuestions(QuestionSort.EMOJI,
             null, null, size, memberId, roomId);
@@ -251,8 +258,8 @@ class QuestionServiceTests {
         given(questionReader.findByMyQuestion(null, memberId, roomId, PageRequest.of(0, size + 1)))
             .willReturn(mockList);
 
-
-        Slice<QuestionAssembleResponse> result = questionService.getQuestions(QuestionSort.MYQUESTION,
+        Slice<QuestionAssembleResponse> result = questionService.getQuestions(
+            QuestionSort.MYQUESTION,
             null, null, size, memberId, roomId);
 
         assertThat(result).isNotNull();
@@ -293,7 +300,8 @@ class QuestionServiceTests {
     @DisplayName("존재하지 않는 member가 들어오면 예외 발생")
     void createQuestion_member_fail() {
         // given
-        given(memberReader.getById(anyLong())).willThrow(new ErrorException(ErrorCode.NOT_FOUND_MEMBER));
+        given(memberReader.getById(anyLong())).willThrow(
+            new ErrorException(ErrorCode.NOT_FOUND_MEMBER));
 
         // when & then
         assertThatThrownBy(() -> questionService.create(1L, 1L, request))
@@ -307,7 +315,8 @@ class QuestionServiceTests {
     void createQuestion_room_fail() {
         // given
         given(memberReader.getById(anyLong())).willReturn(mockMember);
-        given(roomReader.getById(anyLong())).willThrow(new ErrorException(ErrorCode.NOT_FOUND_ROOM));
+        given(roomReader.getById(anyLong())).willThrow(
+            new ErrorException(ErrorCode.NOT_FOUND_ROOM));
 
         // when & then
         assertThatThrownBy(() -> questionService.create(1L, 1L, request))
@@ -326,9 +335,8 @@ class QuestionServiceTests {
         given(memberReader.getById(memberId)).willReturn(mockMember);
         given(roomReader.getById(roomId)).willReturn(mockRoom);
         willThrow(new ErrorException(ErrorCode.NOT_FOUND_PARTICIPANT))
-                .given(participantService)
-                .validateParticipant(roomId, memberId);
-
+            .given(participantService)
+            .validateParticipant(roomId, memberId);
 
         // when & then
         assertThatThrownBy(() -> questionService.create(1L, 1L, request))

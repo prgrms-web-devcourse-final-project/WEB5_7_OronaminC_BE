@@ -89,7 +89,12 @@ public class QuestionService {
     public Question update(Long memberId, Long roomId, Long questionId, QuestionCreateRequest request) {
         Question question = questionReader.getByIdAndRoomId(questionId, roomId);
 
-        // 작성자 권한
+        // 참여자가 아님
+        if (!participantReader.existsByRoomIdAndMemberId(roomId, memberId)) {
+            throw new ErrorException(ErrorCode.NOT_FOUND_PARTICIPANT);
+        }
+
+        // 작성자가 아님
         if (!question.getMember().getId().equals(memberId)) {
             throw new ErrorException(ErrorCode.UNAUTHORIZED_EDIT_QUESTION);
         }
@@ -103,13 +108,19 @@ public class QuestionService {
     public Long delete(Long memberId, Long roomId, Long questionId) {
         Question question = questionReader.getByIdAndRoomId(questionId, roomId);
 
+        // 참여자가 아님
+        if (!participantReader.existsByRoomIdAndMemberId(roomId, memberId)) {
+            throw new ErrorException(ErrorCode.NOT_FOUND_PARTICIPANT);
+        }
+
         // 관리자가 아님 && 작성자도 아님
         if (!participantReader.existsPresenterOrTeamByMemberId(roomId, memberId)
         && !question.getMember().getId().equals(memberId)) {
             throw new ErrorException(ErrorCode.UNAUTHORIZED_DELETE_QUESTION);
         }
 
-        questionRepository.deleteByIdAndRoomId(questionId, roomId);
+        answerService.deleteByQuestion(questionId);
+        questionRepository.deleteById(questionId);
 
         return question.getId();
     }

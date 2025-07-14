@@ -112,14 +112,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     List<Question> findByRoomId(Long roomId);
 
-    @Modifying
-    @Query("""
-        DELETE 
-        FROM Question q
-        WHERE q.id = :questionId
-        AND q.room.id = :roomId 
-    """)
-    void deleteByIdAndRoomId(@Param("questionId") Long questionId, @Param("roomId") Long roomId);
+    void deleteById(Long questionId);
 
     void deleteByRoomId(Long roomId);
 }
