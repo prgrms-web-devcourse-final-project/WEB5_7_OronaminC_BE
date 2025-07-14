@@ -9,6 +9,7 @@ import com.oronaminc.join.question.dto.QuestionCreateResponse;
 import com.oronaminc.join.question.dto.QuestionFlatResponse;
 import com.oronaminc.join.question.dto.QuestionAssembleResponse;
 import com.oronaminc.join.question.dto.QuestionListResponse;
+import com.oronaminc.join.question.dto.QuestionUpdateResponse;
 import com.oronaminc.join.room.domain.Room;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -49,6 +50,14 @@ public class QuestionMapper {
                 flatResponse.nickname()
             ))
             .createdAt(flatResponse.createdAt())
+            .build();
+    }
+
+    public static QuestionUpdateResponse toQuestionUpdateResponse(Question question) {
+        return QuestionUpdateResponse.builder()
+            .event("UPDATE")
+            .questionId(question.getId())
+            .content(question.getContent())
             .build();
     }
 

@@ -5,6 +5,7 @@ import com.oronaminc.join.member.security.MemberDetails;
 import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.dto.QuestionCreateRequest;
 import com.oronaminc.join.question.dto.QuestionCreateResponse;
+import com.oronaminc.join.question.dto.QuestionUpdateResponse;
 import com.oronaminc.join.question.util.QuestionMapper;
 import com.oronaminc.join.question.service.QuestionService;
 import java.security.Principal;
@@ -42,5 +43,19 @@ public class QuestionWebsocketController {
         return QuestionMapper.toQuestionCreateResponse(question);
     }
 
+    @MessageMapping("/rooms/{roomId}/questions/{questionId}/update")
+    @SendTo("/topic/rooms/{roomId}/questions")
+    public QuestionUpdateResponse update(
+        @DestinationVariable Long roomId,
+        @DestinationVariable Long questionId,
+        @Payload QuestionCreateRequest request,
+        Principal principal
+    ) {
 
+        Long memberId = Long.valueOf(principal.getName());
+
+        Question updated = questionService.update(memberId, roomId, questionId, request);
+
+        return QuestionMapper.toQuestionUpdateResponse(updated);
+    }
 }

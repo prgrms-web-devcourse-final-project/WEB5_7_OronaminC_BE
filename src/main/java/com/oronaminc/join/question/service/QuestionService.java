@@ -1,5 +1,7 @@
 package com.oronaminc.join.question.service;
 
+import com.oronaminc.join.global.exception.ErrorCode;
+import com.oronaminc.join.global.exception.ErrorException;
 import java.util.List;
 
 import org.springframework.data.domain.PageRequest;
@@ -79,6 +81,21 @@ public class QuestionService {
             .map(QuestionMapper::toQuestionListResponse).toList();
 
         return SliceUtil.toSlice(assembledList, PageRequest.of(0, size));
+    }
+
+    @Transactional
+    public Question update(Long memberId, Long roomId, Long questionId, QuestionCreateRequest request) {
+        Question question = questionReader.findByIdAndRoomId(questionId, roomId)
+            .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_ROOM_QUESTION));
+
+        // 수정 권한 없음
+        if (!question.getMember().getId().equals(memberId)) {
+            throw new ErrorException(ErrorCode.UNAUTHORIZED_QUESTION);
+        }
+
+        question.updateContent(request.content());
+
+        return question;
     }
 
 
