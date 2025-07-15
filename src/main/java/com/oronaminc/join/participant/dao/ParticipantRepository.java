@@ -61,5 +61,24 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
 
     Optional<Participant> findByRoomIdAndMemberId( @Param("roomId") Long roomId, @Param("memberId") Long memberId );
 
+    @Query("""
+        SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END 
+        FROM Participant p
+        WHERE p.room.id = :roomId
+        AND p.member.id = :memberId
+        AND (p.participantType = com.oronaminc.join.participant.domain.ParticipantType.PRESENTER
+            OR p.participantType = com.oronaminc.join.participant.domain.ParticipantType.TEAM)
+    """)
+    boolean existsPresenterOrTeamByMemberId(@Param("roomId") Long roomId, @Param("memberId") Long memberId);
+
     void deleteByRoomId(Long roomId);
+
+    @Query(value = """
+        SELECT COUNT(*) 
+        FROM participant
+        WHERE room_id = :roomId
+            AND exited_at IS NOT NULL 
+            AND TIMESTAMPDIFF(SECOND, created_at, exited_at) >= 30
+    """, nativeQuery = true)
+    Long countParticipantsStayedOver30Seconds(@Param("roomId") Long roomId);
 }

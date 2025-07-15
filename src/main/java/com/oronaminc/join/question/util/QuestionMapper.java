@@ -6,9 +6,11 @@ import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.dto.QuestionCreateRequest;
 import com.oronaminc.join.question.dto.QuestionCreateResponse;
+import com.oronaminc.join.question.dto.QuestionDeleteResponse;
 import com.oronaminc.join.question.dto.QuestionFlatResponse;
 import com.oronaminc.join.question.dto.QuestionAssembleResponse;
 import com.oronaminc.join.question.dto.QuestionListResponse;
+import com.oronaminc.join.question.dto.QuestionUpdateResponse;
 import com.oronaminc.join.room.domain.Room;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -50,6 +52,21 @@ public class QuestionMapper {
             ))
             .createdAt(flatResponse.createdAt())
             .build();
+    }
+
+    public static QuestionUpdateResponse toQuestionUpdateResponse(Question question) {
+        return QuestionUpdateResponse.builder()
+            .event("UPDATE")
+            .questionId(question.getId())
+            .content(question.getContent())
+            .build();
+    }
+
+    public static QuestionDeleteResponse toQuestionDeleteResponse(Long questionId) {
+        return new QuestionDeleteResponse(
+            "DELETE",
+            questionId
+        );
     }
 
     public static QuestionListResponse toQuestionListResponse(

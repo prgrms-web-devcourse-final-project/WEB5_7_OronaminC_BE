@@ -1,5 +1,8 @@
 package com.oronaminc.join.question.service;
 
+import com.oronaminc.join.global.exception.ErrorCode;
+import com.oronaminc.join.global.exception.ErrorException;
+import com.oronaminc.join.participant.service.ParticipantReader;
 import java.util.List;
 
 import org.springframework.data.domain.PageRequest;
@@ -36,6 +39,7 @@ public class QuestionService {
     private final QuestionReader questionReader;
     private final MemberReader memberReader;
     private final RoomReader roomReader;
+    private final ParticipantReader participantReader;
 
     @Transactional
     public Question create(Long roomId, Long memberId, QuestionCreateRequest requestDto) {
@@ -79,6 +83,46 @@ public class QuestionService {
             .map(QuestionMapper::toQuestionListResponse).toList();
 
         return SliceUtil.toSlice(assembledList, PageRequest.of(0, size));
+    }
+
+    @Transactional
+    public Question update(Long memberId, Long roomId, Long questionId, QuestionCreateRequest request) {
+        Question question = questionReader.getByIdAndRoomId(questionId, roomId);
+
+        // 참여자가 아님
+        if (!participantReader.existsByRoomIdAndMemberId(roomId, memberId)) {
+            throw new ErrorException(ErrorCode.NOT_FOUND_PARTICIPANT);
+        }
+
+        // 작성자가 아님
+        if (!question.getMember().getId().equals(memberId)) {
+            throw new ErrorException(ErrorCode.UNAUTHORIZED_EDIT_QUESTION);
+        }
+
+        question.updateContent(request.content());
+
+        return question;
+    }
+
+    @Transactional
+    public Long delete(Long memberId, Long roomId, Long questionId) {
+        Question question = questionReader.getByIdAndRoomId(questionId, roomId);
+
+        // 참여자가 아님
+        if (!participantReader.existsByRoomIdAndMemberId(roomId, memberId)) {
+            throw new ErrorException(ErrorCode.NOT_FOUND_PARTICIPANT);
+        }
+
+        // 관리자가 아님 && 작성자도 아님
+        if (!participantReader.existsPresenterOrTeamByMemberId(roomId, memberId)
+        && !question.getMember().getId().equals(memberId)) {
+            throw new ErrorException(ErrorCode.UNAUTHORIZED_DELETE_QUESTION);
+        }
+
+        answerService.deleteByQuestion(questionId);
+        questionRepository.deleteById(questionId);
+
+        return question.getId();
     }
 
 
