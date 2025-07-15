@@ -111,5 +111,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     List<Question> findByRoomId(Long roomId);
 
+    void deleteById(Long questionId);
+
     void deleteByRoomId(Long roomId);
 }

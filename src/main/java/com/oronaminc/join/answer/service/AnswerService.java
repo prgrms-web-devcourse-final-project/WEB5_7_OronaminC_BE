@@ -71,6 +71,10 @@ public class AnswerService {
         return AnswerMapper.toAnswerGetResponse(answer, emojiCount, isEmojied);
     }
 
+    public void deleteByQuestion(Long questionId) {
+        answerRepository.deleteByQuestionId(questionId);
+    }
+
     public void deleteByQuestionList(List<Question> questions) {
         answerRepository.deleteByQuestionIn(questions);
     }

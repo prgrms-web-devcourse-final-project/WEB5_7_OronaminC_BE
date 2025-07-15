@@ -58,6 +58,10 @@ public class ParticipantReader {
                 .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_PARTICIPANT));
     }
 
+    public boolean existsPresenterOrTeamByMemberId(Long roomId, Long memberId) {
+        return participantRepository.existsPresenterOrTeamByMemberId(roomId, memberId);
+    }
+
     public void deleteByRoomId(Long roomId) {
         participantRepository.deleteByRoomId(roomId);
     }

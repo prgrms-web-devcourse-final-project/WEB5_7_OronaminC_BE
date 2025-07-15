@@ -30,6 +30,8 @@ public enum ErrorCode {
 
     NOT_FOUND_ROOM_QUESTION("QUESTION-001", "질문을 해당 방에서 찾을 수 없습니다.", NOT_FOUND),
     NOT_FOUND_QUESTION("QUESTION-002", "질문을 찾을 수 없습니다.", NOT_FOUND),
+    UNAUTHORIZED_EDIT_QUESTION("QUESTION-003", "작성자만 질문을 수정할 수 있습니다.", UNAUTHORIZED),
+    UNAUTHORIZED_DELETE_QUESTION("QUESTION-004", "작성자 및 관리자만 질문을 삭제할 수 있습니다.", UNAUTHORIZED),
 
     UNAUTHORIZED_ROLE_ANSWER("ANSWER-001", "팀원 또는 발표자만 댓글을 작성할 수 있습니다.", UNAUTHORIZED),
     NOT_FOUND_EXIST_ANSWER("ANSWER-002", "해당 질문에 대한 답변이 존재하지 않습니다.", NOT_FOUND),

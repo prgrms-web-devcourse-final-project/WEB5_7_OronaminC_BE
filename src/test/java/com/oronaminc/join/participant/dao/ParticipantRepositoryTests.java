@@ -34,15 +34,17 @@ class ParticipantRepositoryTests {
     private RoomRepository roomRepository;
 
     private Member member;
+    private Room room1;
+    private Room room3;
 
     @BeforeEach
     void setUp() {
         member = memberRepository.save(Member.builder().build());
         Member otherMember = memberRepository.save(Member.builder().build());
 
-        Room room1 = roomRepository.save(Room.builder().build());
+        room1 = roomRepository.save(Room.builder().build());
         Room room2 = roomRepository.save(Room.builder().build());
-        Room room3 = roomRepository.save(Room.builder().build());
+        room3 = roomRepository.save(Room.builder().build());
 
         participantRepository.save(Participant.builder()
             .room(room1)
@@ -68,6 +70,34 @@ class ParticipantRepositoryTests {
             .participantType(ParticipantType.GUEST)
             .build()
         );
+    }
+
+    @Test
+    @DisplayName("member가 PRESENTER나 TEAM이면 true가 반환된다.")
+    void existsPresenterOrTeamByMemberId_true() {
+        // given
+
+        // when
+        boolean result = participantRepository.existsPresenterOrTeamByMemberId(room1.getId(),
+            member.getId());
+
+        // then
+        assertThat(result).isTrue();
+
+    }
+
+    @Test
+    @DisplayName("member가 PRESENTER나 TEAM이 아니면 false가 반환된다.")
+    void existsPresenterOrTeamByMemberId_false() {
+        // given
+
+        // when
+        boolean result = participantRepository.existsPresenterOrTeamByMemberId(room3.getId(),
+            member.getId());
+
+        // then
+        assertThat(result).isFalse();
+
     }
 
     @Test

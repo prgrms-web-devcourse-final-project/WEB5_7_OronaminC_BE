@@ -59,6 +59,10 @@ public class Question extends BaseEntity {
             .build();
     }
 
+    public void updateContent(String content) {
+        this.content = content;
+    }
+
     public Long incrementEmojiCount() {
         return ++this.emojiCount;
     }
