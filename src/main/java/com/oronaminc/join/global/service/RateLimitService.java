@@ -16,7 +16,7 @@ public class RateLimitService {
 
     private final Map<String, Bucket> cache = new ConcurrentHashMap<>();
 
-    public Bucket getBucket(Long memberId, EmojiRequest emojiRequest) {
+    public Bucket getEmojiBucket(Long memberId, EmojiRequest emojiRequest) {
         String apiKey = StringUtil.format("{}:{}:{}", memberId, emojiRequest.targetType(),
             emojiRequest.targetId());
         return cache.computeIfAbsent(apiKey, key ->

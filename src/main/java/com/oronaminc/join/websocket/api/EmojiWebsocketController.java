@@ -32,7 +32,7 @@ public class EmojiWebsocketController {
     ) {
         Long memberId = Long.valueOf(principal.getName());
 
-        Bucket bucket = rateLimitService.getBucket(memberId, emojiRequest);
+        Bucket bucket = rateLimitService.getEmojiBucket(memberId, emojiRequest);
         if (!bucket.tryConsume(1)) {
             throw new ErrorException(ErrorCode.TOO_MANY_REQUESTS_EMOJI);
         }
@@ -49,7 +49,7 @@ public class EmojiWebsocketController {
     ) {
         Long memberId = Long.valueOf(principal.getName());
 
-        Bucket bucket = rateLimitService.getBucket(memberId, emojiRequest);
+        Bucket bucket = rateLimitService.getEmojiBucket(memberId, emojiRequest);
         if (!bucket.tryConsume(1)) {
             throw new ErrorException(ErrorCode.TOO_MANY_REQUESTS_EMOJI);
         }
