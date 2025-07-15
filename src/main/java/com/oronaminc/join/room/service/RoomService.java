@@ -90,10 +90,10 @@ public class RoomService {
         Participant presenter = participantService.getPresenter(roomId);
         List<Participant> team = participantService.getTeam(roomId);
         Document document = documentReader.getByRoomId(roomId);
-
+        int participantCount = participantManager.getRoomParticipants(roomId).size();
         String presignedUrl = s3Service.generatePresignedUrl(document.getFileUrl());
 
-        return RoomMapper.toRoomDetailResponse(room, presenter, team, presignedUrl, memberId);
+        return RoomMapper.toRoomDetailResponse(room, presenter, team, presignedUrl, memberId, participantCount);
     }
 
     public void updateRoom(Long memberId, Long roomId, RoomUpdateRequest updateRoomRequest) {
