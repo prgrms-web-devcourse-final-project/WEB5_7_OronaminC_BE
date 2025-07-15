@@ -1,10 +1,5 @@
 package com.oronaminc.join.emoji.service;
 
-import java.util.Optional;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.oronaminc.join.answer.service.AnswerReader;
 import com.oronaminc.join.emoji.dao.EmojiRepository;
 import com.oronaminc.join.emoji.domain.Emoji;
@@ -14,8 +9,10 @@ import com.oronaminc.join.emoji.dto.EmojiResponse;
 import com.oronaminc.join.member.service.MemberReader;
 import com.oronaminc.join.question.service.QuestionReader;
 import com.oronaminc.join.room.service.RoomReader;
-
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
@@ -35,7 +32,7 @@ public class EmojiService {
     }
 
     @Transactional
-    public EmojiResponse toggleEmoji(Long memberId, EmojiRequest emojiRequest) {
+    public EmojiResponse createEmoji(Long memberId, EmojiRequest emojiRequest) {
         Long emojiCount;
         TargetType targetType = emojiRequest.targetType();
         Long targetId = emojiRequest.targetId();
@@ -44,18 +41,36 @@ public class EmojiService {
             memberId, targetId, targetType);
 
         if (findEmoji.isPresent()) {
-            emojiRepository.delete(findEmoji.get());
-            emojiCount = decrementEmojiCount(targetType, targetId);
-
-            return new EmojiResponse("DELETE", targetType, targetId, emojiCount);
+            emojiCount = getEmojiCount(targetType, targetId);
+            return new EmojiResponse("CREATE", targetType, targetId, emojiCount);
         }
 
-        Emoji emoji = Emoji.create(memberReader.getById(memberId), targetType, targetId);
-        emojiRepository.save(emoji);
+        emojiRepository.save(Emoji.create(memberReader.getById(memberId), targetType, targetId));
 
         emojiCount = incrementEmojiCount(targetType, targetId);
 
         return new EmojiResponse("CREATE", targetType, targetId, emojiCount);
+
+    }
+
+    @Transactional
+    public EmojiResponse deleteEmoji(Long memberId, EmojiRequest emojiRequest) {
+        Long emojiCount;
+        TargetType targetType = emojiRequest.targetType();
+        Long targetId = emojiRequest.targetId();
+
+        Optional<Emoji> findEmoji = emojiReader.findByMemberIdAndTargetIdAndTargetType(
+            memberId, targetId, targetType);
+
+        if (findEmoji.isEmpty()) {
+            emojiCount = getEmojiCount(targetType, targetId);
+            return new EmojiResponse("DELETE", targetType, targetId, emojiCount);
+        }
+
+        emojiRepository.delete(findEmoji.get());
+        emojiCount = decrementEmojiCount(targetType, targetId);
+
+        return new EmojiResponse("DELETE", targetType, targetId, emojiCount);
 
     }
 
@@ -72,6 +87,14 @@ public class EmojiService {
             case ROOM -> roomReader.getById(targetId).incrementEmojiCount();
             case QUESTION -> questionReader.getById(targetId).incrementEmojiCount();
             case ANSWER -> answerReader.getById(targetId).incrementEmojiCount();
+        };
+    }
+
+    private Long getEmojiCount(TargetType targetType, Long targetId) {
+        return switch (targetType) {
+            case ROOM -> roomReader.getById(targetId).getEmojiCount();
+            case QUESTION -> questionReader.getById(targetId).getEmojiCount();
+            case ANSWER -> answerReader.getById(targetId).getEmojiCount();
         };
     }
 

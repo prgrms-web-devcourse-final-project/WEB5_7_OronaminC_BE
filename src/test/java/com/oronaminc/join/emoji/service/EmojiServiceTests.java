@@ -1,18 +1,8 @@
 package com.oronaminc.join.emoji.service;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
-import java.util.Optional;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import com.oronaminc.join.answer.domain.Answer;
 import com.oronaminc.join.answer.service.AnswerReader;
@@ -27,6 +17,14 @@ import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.service.QuestionReader;
 import com.oronaminc.join.room.domain.Room;
 import com.oronaminc.join.room.service.RoomReader;
+import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class EmojiServiceTests {
@@ -53,7 +51,7 @@ class EmojiServiceTests {
     private EmojiService emojiService;
 
     @Test
-    @DisplayName("멤버가 발표방 좋아요를 누르지 않은 상태에서 toggle 시 좋아요 수가 +1 된다")
+    @DisplayName("멤버가 발표방 좋아요를 누르지 않은 상태에서 요청 시 좋아요 수가 +1 된다")
     void toggleEmoji_createRoomEmoji_success() {
         // given
         Member member = Member.builder().build();
@@ -79,7 +77,7 @@ class EmojiServiceTests {
         when(roomReader.getById(targetId)).thenReturn(room);
 
         // when
-        EmojiResponse response = emojiService.toggleEmoji(memberId,
+        EmojiResponse response = emojiService.createEmoji(memberId,
             new EmojiRequest(targetType, targetId));
 
         // then
@@ -91,7 +89,7 @@ class EmojiServiceTests {
     }
 
     @Test
-    @DisplayName("멤버가 질문 공감을 누르지 않은 상태에서 toggle 시 공감 수가 +1 된다")
+    @DisplayName("멤버가 질문 공감을 누르지 않은 상태에서 요청 시 공감 수가 +1 된다")
     void toggleEmoji_createQuestionEmoji_success() {
         // given
         Member member = Member.builder().build();
@@ -117,7 +115,7 @@ class EmojiServiceTests {
         when(questionReader.getById(targetId)).thenReturn(question);
 
         // when
-        EmojiResponse response = emojiService.toggleEmoji(memberId,
+        EmojiResponse response = emojiService.createEmoji(memberId,
             new EmojiRequest(targetType, targetId));
 
         // then
@@ -129,7 +127,7 @@ class EmojiServiceTests {
     }
 
     @Test
-    @DisplayName("멤버가 답변 공감을 누르지 않은 상태에서 toggle 시 공감 수가 +1 된다")
+    @DisplayName("멤버가 답변 공감을 누르지 않은 상태에서 요청 시 공감 수가 +1 된다")
     void toggleEmoji_createAnswerEmoji_success() {
         // given
         Member member = Member.builder().build();
@@ -155,7 +153,7 @@ class EmojiServiceTests {
         when(answerReader.getById(targetId)).thenReturn(answer);
 
         // when
-        EmojiResponse response = emojiService.toggleEmoji(memberId,
+        EmojiResponse response = emojiService.createEmoji(memberId,
             new EmojiRequest(targetType, targetId));
 
         // then
@@ -167,7 +165,43 @@ class EmojiServiceTests {
     }
 
     @Test
-    @DisplayName("멤버가 발표방 좋아요를 누른 상태에서 toggle 시 좋아요 수가 -1 된다")
+    @DisplayName("멤버가 발표방 좋아요를 누른 상태에서 요청 시 좋아요 수가 그대로 반환된다")
+    void toggleEmoji_createRoomEmoji_fail() {
+        // given
+        Member member = Member.builder().build();
+        Long memberId = member.getId();
+
+        TargetType targetType = TargetType.ROOM;
+        Long targetId = 100L;
+        Long emojiCount = 1L;
+
+        Room room = Room.builder().emojiCount(emojiCount).build();
+        ReflectionTestUtils.setField(room, "id", targetId);
+
+        Emoji findEmoji = Emoji.builder()
+            .member(member)
+            .targetType(targetType)
+            .targetId(targetId)
+            .build();
+
+        when(emojiReader.findByMemberIdAndTargetIdAndTargetType(memberId, targetId,
+            targetType)).thenReturn(Optional.of(findEmoji));
+        when(roomReader.getById(targetId)).thenReturn(room);
+
+        // when
+        EmojiResponse response = emojiService.createEmoji(memberId,
+            new EmojiRequest(targetType, targetId));
+
+        // then
+        assertThat(response.event()).isEqualTo("CREATE");
+        assertThat(response.targetType()).isEqualTo(targetType);
+        assertThat(response.targetId()).isEqualTo(targetId);
+        assertThat(response.emojiCount()).isEqualTo(emojiCount);
+
+    }
+
+    @Test
+    @DisplayName("멤버가 발표방 좋아요를 누른 상태에서 요청 시 좋아요 수가 -1 된다")
     void toggleEmoji_deleteRoomEmoji_success() {
         // given
         Member member = Member.builder().build();
@@ -191,7 +225,7 @@ class EmojiServiceTests {
         when(roomReader.getById(targetId)).thenReturn(room);
 
         // when
-        EmojiResponse response = emojiService.toggleEmoji(memberId,
+        EmojiResponse response = emojiService.deleteEmoji(memberId,
             new EmojiRequest(targetType, targetId));
 
         // then
@@ -203,7 +237,7 @@ class EmojiServiceTests {
     }
 
     @Test
-    @DisplayName("멤버가 질문 공감을 누른 상태에서 toggle 시 공감 수가 -1 된다")
+    @DisplayName("멤버가 질문 공감을 누른 상태에서 요청 시 공감 수가 -1 된다")
     void toggleEmoji_deleteQuestionEmoji_success() {
         // given
         Member member = Member.builder().build();
@@ -227,7 +261,7 @@ class EmojiServiceTests {
         when(questionReader.getById(targetId)).thenReturn(question);
 
         // when
-        EmojiResponse response = emojiService.toggleEmoji(memberId,
+        EmojiResponse response = emojiService.deleteEmoji(memberId,
             new EmojiRequest(targetType, targetId));
 
         // then
@@ -239,7 +273,7 @@ class EmojiServiceTests {
     }
 
     @Test
-    @DisplayName("멤버가 발표방 좋아요를 누른 상태에서 toggle 시 좋아요 수가 -1 된다")
+    @DisplayName("멤버가 발표방 좋아요를 누른 상태에서 요청 시 좋아요 수가 -1 된다")
     void toggleEmoji_deleteAnswerEmoji_success() {
         // given
         Member member = Member.builder().build();
@@ -263,7 +297,7 @@ class EmojiServiceTests {
         when(answerReader.getById(targetId)).thenReturn(answer);
 
         // when
-        EmojiResponse response = emojiService.toggleEmoji(memberId,
+        EmojiResponse response = emojiService.deleteEmoji(memberId,
             new EmojiRequest(targetType, targetId));
 
         // then
@@ -274,5 +308,40 @@ class EmojiServiceTests {
 
     }
 
+    @Test
+    @DisplayName("멤버가 발표방 좋아요를 누르지 않은 상태에서 요청 시 좋아요 수가 그대로 반환된다")
+    void toggleEmoji_deleteRoomEmoji_fail() {
+        // given
+        Member member = Member.builder().build();
+        Long memberId = member.getId();
+
+        TargetType targetType = TargetType.ROOM;
+        Long targetId = 100L;
+        Long emojiCount = 3L;
+
+        Room room = Room.builder().emojiCount(emojiCount).build();
+        ReflectionTestUtils.setField(room, "id", targetId);
+
+        Emoji findEmoji = Emoji.builder()
+            .member(member)
+            .targetType(targetType)
+            .targetId(targetId)
+            .build();
+
+        when(emojiReader.findByMemberIdAndTargetIdAndTargetType(memberId, targetId,
+            targetType)).thenReturn(Optional.empty());
+        when(roomReader.getById(targetId)).thenReturn(room);
+
+        // when
+        EmojiResponse response = emojiService.deleteEmoji(memberId,
+            new EmojiRequest(targetType, targetId));
+
+        // then
+        assertThat(response.event()).isEqualTo("DELETE");
+        assertThat(response.targetType()).isEqualTo(targetType);
+        assertThat(response.targetId()).isEqualTo(targetId);
+        assertThat(response.emojiCount()).isEqualTo(emojiCount);
+
+    }
 
 }

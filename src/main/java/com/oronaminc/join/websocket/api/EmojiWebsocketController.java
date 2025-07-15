@@ -17,16 +17,28 @@ public class EmojiWebsocketController {
 
     private final EmojiFacade emojiFacade;
 
-    @MessageMapping("/rooms/{roomId}/emojis")
+    @MessageMapping("/rooms/{roomId}/emojis/create")
     @SendTo("/topic/rooms/{roomId}/emojis")
-    public EmojiResponse toggleEmoji(
+    public EmojiResponse createEmoji(
         @DestinationVariable Long roomId,
         @Payload EmojiRequest emojiRequest,
         Principal principal
     ) {
         Long memberId = Long.valueOf(principal.getName());
 
-        return emojiFacade.toggleEmoji(memberId, emojiRequest);
+        return emojiFacade.createEmoji(memberId, emojiRequest);
+    }
+
+    @MessageMapping("/rooms/{roomId}/emojis/delete")
+    @SendTo("/topic/rooms/{roomId}/emojis")
+    public EmojiResponse deleteEmoji(
+        @DestinationVariable Long roomId,
+        @Payload EmojiRequest emojiRequest,
+        Principal principal
+    ) {
+        Long memberId = Long.valueOf(principal.getName());
+
+        return emojiFacade.deleteEmoji(memberId, emojiRequest);
     }
 
 }

@@ -3,6 +3,8 @@ package com.oronaminc.join.emoji.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.oronaminc.join.answer.service.AnswerReader;
+import com.oronaminc.join.emoji.dao.EmojiRepository;
+import com.oronaminc.join.emoji.domain.Emoji;
 import com.oronaminc.join.emoji.domain.TargetType;
 import com.oronaminc.join.emoji.dto.EmojiRequest;
 import com.oronaminc.join.member.dao.MemberRepository;
@@ -41,21 +43,25 @@ class EmojiFacadeTests {
     private MemberRepository memberRepository;
 
     @Autowired
+    private EmojiRepository emojiRepository;
+
+    @Autowired
     private EmojiFacade emojiFacade;
 
 
     @Test
-    @DisplayName("동시에 50개의 공감 요청")
+    @DisplayName("동시에 50개의 공감 생성 요청")
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    void toggleEmoji_success_test() throws InterruptedException {
+    void createEmoji_success_test() throws InterruptedException {
 
+        Long emojiCount = 0L;
         // given
         Room savedRoom = roomRepository.saveAndFlush(
             Room.builder()
                 .title("제목")
                 .description("내용")
                 .secretCode("123456")
-                .emojiCount(0L)
+                .emojiCount(emojiCount)
                 .participantLimit(0)
                 .endedAt(LocalDateTime.now())
                 .version(0)
@@ -72,7 +78,6 @@ class EmojiFacadeTests {
         for (int i = 0; i < threadCount; i++) {
             Member member = Member.builder().build();
             members.add(memberRepository.saveAndFlush(member));
-            System.out.println("memberId: " + members.get(i).getId());
         }
 
         // when
@@ -80,7 +85,7 @@ class EmojiFacadeTests {
             final int idx = i;
             executorService.submit(() -> {
                 try {
-                    emojiFacade.toggleEmoji(members.get(idx).getId(),
+                    emojiFacade.createEmoji(members.get(idx).getId(),
                         new EmojiRequest(TargetType.ROOM, roomId));
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -95,8 +100,66 @@ class EmojiFacadeTests {
 
         // then
         Room findRoom = roomRepository.findById(roomId).orElse(null);
-        assertThat(findRoom.getEmojiCount()).isEqualTo(50);
-        assertThat(findRoom.getVersion()).isEqualTo(50);
+        assertThat(findRoom.getEmojiCount()).isEqualTo(threadCount);
+        assertThat(findRoom.getVersion()).isEqualTo(threadCount);
+
+    }
+
+    @Test
+    @DisplayName("동시에 50개의 공감 삭제 요청")
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    void deleteEmoji_success_test() throws InterruptedException {
+
+        Long emojiCount = 50L;
+
+        // given
+        Room savedRoom = roomRepository.saveAndFlush(
+            Room.builder()
+                .title("제목")
+                .description("내용")
+                .secretCode("123456")
+                .emojiCount(emojiCount)
+                .participantLimit(0)
+                .endedAt(LocalDateTime.now())
+                .version(0)
+                .roomStatus(RoomStatus.STARTED)
+                .build()
+        );
+        Long roomId = savedRoom.getId();
+
+        int threadCount = 50;
+        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        List<Member> members = new ArrayList<>();
+        for (int i = 0; i < threadCount; i++) {
+            Member member = Member.builder().build();
+            members.add(memberRepository.saveAndFlush(member));
+            emojiRepository.saveAndFlush(Emoji.create(member, TargetType.ROOM, roomId));
+        }
+
+        // when
+        for (int i = 0; i < threadCount; i++) {
+            final int idx = i;
+            executorService.submit(() -> {
+                try {
+                    emojiFacade.deleteEmoji(members.get(idx).getId(),
+                        new EmojiRequest(TargetType.ROOM, roomId));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        latch.await();
+        executorService.shutdown();
+
+        // then
+        Room findRoom = roomRepository.findById(roomId).orElse(null);
+        assertThat(findRoom.getEmojiCount()).isEqualTo(0);
+        assertThat(findRoom.getVersion()).isEqualTo(threadCount);
 
     }
 
