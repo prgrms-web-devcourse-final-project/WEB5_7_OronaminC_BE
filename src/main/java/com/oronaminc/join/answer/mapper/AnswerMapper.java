@@ -3,7 +3,9 @@ package com.oronaminc.join.answer.mapper;
 import com.oronaminc.join.answer.domain.Answer;
 import com.oronaminc.join.answer.dto.AnswerCreateRequest;
 import com.oronaminc.join.answer.dto.AnswerCreateResponse;
+import com.oronaminc.join.answer.dto.AnswerDeleteResponse;
 import com.oronaminc.join.answer.dto.AnswerGetResponse;
+import com.oronaminc.join.answer.dto.AnswerUpdateResponse;
 import com.oronaminc.join.global.dto.WriterDto;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.question.domain.Question;
@@ -46,4 +48,13 @@ public class AnswerMapper {
     public static Answer toEntity(Question question, Member member, AnswerCreateRequest request) {
         return Answer.create(question, member, request.content());
     }
+
+    public static AnswerUpdateResponse toAnswerUpdateResponse(Answer answer) {
+        return AnswerUpdateResponse.builder()
+            .answerId(answer.getId())
+            .event("UPDATE")
+            .content(answer.getContent())
+            .build();
+    }
+
 }

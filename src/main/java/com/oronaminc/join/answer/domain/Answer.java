@@ -60,6 +60,10 @@ public class Answer extends BaseEntity {
             .build();
     }
 
+    public void updataContent(String content) {
+        this.content = content;
+    }
+
     public Long incrementEmojiCount() {
         return ++this.emojiCount;
     }

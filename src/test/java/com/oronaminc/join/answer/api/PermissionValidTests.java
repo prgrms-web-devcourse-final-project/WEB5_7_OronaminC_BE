@@ -83,6 +83,7 @@ public class PermissionValidTests {
 
     }
 
+
     @Test
     @DisplayName("발표방에 존재하지 않는 participant라면 예외 발생")
     void validateAnswerPermission_fail_not_found_participant() {
@@ -95,5 +96,4 @@ public class PermissionValidTests {
             .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_PARTICIPANT);
 
     }
-
 }

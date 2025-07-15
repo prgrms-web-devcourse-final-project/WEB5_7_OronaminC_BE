@@ -179,6 +179,8 @@ public class AnswerServiceTests {
         assertThat(response.writer().nickname()).isEqualTo(mockMember.getNickname());
     }
 
+
+
     @Test
     @DisplayName("존재하지 않는 member가 들어오면 예외 발생")
     void createAnswer_member_fail() {

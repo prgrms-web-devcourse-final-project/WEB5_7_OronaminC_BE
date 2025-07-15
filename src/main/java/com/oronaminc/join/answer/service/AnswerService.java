@@ -9,7 +9,6 @@ import com.oronaminc.join.answer.dto.AnswerGetResponse;
 import com.oronaminc.join.answer.mapper.AnswerMapper;
 import com.oronaminc.join.emoji.domain.TargetType;
 import com.oronaminc.join.emoji.service.EmojiReader;
-import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.service.MemberReader;
@@ -71,12 +70,28 @@ public class AnswerService {
         return AnswerMapper.toAnswerGetResponse(answer, emojiCount, isEmojied);
     }
 
+    @Transactional
+    public Answer update(Long answerId, AnswerCreateRequest request) {
+        Answer answer = answerReader.getById(answerId);
+
+        answer.updataContent(request.content());
+
+        return answer;
+    }
+
+    @Transactional
+    public void delete(Long answerId) {
+        Answer answer = answerReader.getById(answerId);
+        answerRepository.delete(answer);
+    }
+
+    @Transactional
     public void deleteByQuestion(Long questionId) {
         answerRepository.deleteByQuestionId(questionId);
     }
 
+    @Transactional
     public void deleteByQuestionList(List<Question> questions) {
         answerRepository.deleteByQuestionIn(questions);
     }
-
 }
