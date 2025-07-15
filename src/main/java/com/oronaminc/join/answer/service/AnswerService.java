@@ -4,7 +4,7 @@ import static com.oronaminc.join.global.exception.ErrorCode.BADREQUEST_DUPLICATI
 
 import com.oronaminc.join.answer.dao.AnswerRepository;
 import com.oronaminc.join.answer.domain.Answer;
-import com.oronaminc.join.answer.dto.AnswerCreateRequest;
+import com.oronaminc.join.answer.dto.AnswerRequest;
 import com.oronaminc.join.answer.dto.AnswerGetResponse;
 import com.oronaminc.join.answer.mapper.AnswerMapper;
 import com.oronaminc.join.emoji.domain.TargetType;
@@ -37,7 +37,7 @@ public class AnswerService {
 
     @Transactional
     public Answer create(Long roomId, Long memberId, Long questionId,
-        AnswerCreateRequest requestDto) {
+        AnswerRequest request) {
 
         Member member = memberReader.getById(memberId);
         Room room = roomReader.getById(roomId);
@@ -49,7 +49,7 @@ public class AnswerService {
             throw new ErrorException(BADREQUEST_DUPLICATION_ANSWER);
         }
 
-        Answer answer = AnswerMapper.toEntity(question, member, requestDto);
+        Answer answer = AnswerMapper.toEntity(question, member, request);
 
         answerRepository.save(answer);
 
@@ -71,7 +71,7 @@ public class AnswerService {
     }
 
     @Transactional
-    public Answer update(Long answerId, AnswerCreateRequest request) {
+    public Answer update(Long answerId, AnswerRequest request) {
         Answer answer = answerReader.getById(answerId);
 
         answer.updataContent(request.content());

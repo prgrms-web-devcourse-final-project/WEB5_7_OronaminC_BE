@@ -1,6 +1,7 @@
 package com.oronaminc.join.answer.service;
 
 import static com.oronaminc.join.global.exception.ErrorCode.NOT_FOUND_ROOM;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -10,8 +11,9 @@ import static org.mockito.BDDMockito.willThrow;
 
 import com.oronaminc.join.answer.dao.AnswerRepository;
 import com.oronaminc.join.answer.domain.Answer;
-import com.oronaminc.join.answer.dto.AnswerCreateRequest;
+import com.oronaminc.join.answer.dto.AnswerRequest;
 import com.oronaminc.join.answer.dto.AnswerGetResponse;
+import com.oronaminc.join.answer.util.PermissionValidator;
 import com.oronaminc.join.emoji.domain.Emoji;
 import com.oronaminc.join.emoji.domain.TargetType;
 import com.oronaminc.join.emoji.service.EmojiReader;
@@ -22,9 +24,11 @@ import com.oronaminc.join.member.domain.MemberType;
 import com.oronaminc.join.member.service.MemberReader;
 import com.oronaminc.join.participant.domain.Participant;
 import com.oronaminc.join.participant.domain.ParticipantType;
+import com.oronaminc.join.participant.service.ParticipantReader;
 import com.oronaminc.join.participant.service.ParticipantService;
 import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.service.QuestionReader;
+import com.oronaminc.join.question.service.QuestionService;
 import com.oronaminc.join.room.domain.Room;
 import com.oronaminc.join.room.domain.RoomStatus;
 import com.oronaminc.join.room.service.RoomReader;
@@ -63,7 +67,7 @@ public class AnswerServiceTests {
     private Room mockRoom;
     private Question mockQuestion;
     private Participant mockParticipant;
-    private AnswerCreateRequest request;
+    private AnswerRequest request;
     private Emoji mockEmoji;
 
     @BeforeEach
@@ -103,7 +107,7 @@ public class AnswerServiceTests {
             .participantType(ParticipantType.TEAM)
             .build();
 
-        request = new AnswerCreateRequest("답변입니다.");
+        request = new AnswerRequest("답변입니다.");
     }
 
     @Test
@@ -179,6 +183,26 @@ public class AnswerServiceTests {
         assertThat(response.writer().nickname()).isEqualTo(mockMember.getNickname());
     }
 
+    @Test
+    @DisplayName("답변 수정 - 작성자 본인이면 수정에 성공한다")
+    void updateAnswer_success() {
+        // given
+        Answer answer = Answer.builder()
+            .id(1L)
+            .member(mockMember)
+            .question(mockQuestion)
+            .content("기존 내용")
+            .build();
+
+        given(answerReader.getById(1L)).willReturn(answer);
+        AnswerRequest request = new AnswerRequest("수정된 내용");
+
+        // when
+        Answer result = answerService.update(answer.getId(), request);
+
+        // then
+        assertThat(result.getContent()).isEqualTo("수정된 내용");
+    }
 
 
     @Test

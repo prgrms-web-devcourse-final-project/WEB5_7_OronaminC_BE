@@ -1,6 +1,5 @@
 package com.oronaminc.join.answer.domain;
 
-import com.oronaminc.join.answer.dto.AnswerCreateRequest;
 import com.oronaminc.join.global.entity.BaseEntity;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.question.domain.Question;

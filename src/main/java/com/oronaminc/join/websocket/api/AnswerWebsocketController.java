@@ -3,9 +3,9 @@ package com.oronaminc.join.websocket.api;
 import static com.oronaminc.join.global.exception.ErrorCode.UNAUTHORIZED_MEMBER;
 
 import com.oronaminc.join.answer.domain.Answer;
-import com.oronaminc.join.answer.dto.AnswerCreateRequest;
 import com.oronaminc.join.answer.dto.AnswerCreateResponse;
 import com.oronaminc.join.answer.dto.AnswerDeleteResponse;
+import com.oronaminc.join.answer.dto.AnswerRequest;
 import com.oronaminc.join.answer.dto.AnswerUpdateResponse;
 import com.oronaminc.join.answer.mapper.AnswerMapper;
 import com.oronaminc.join.answer.service.AnswerService;
@@ -34,7 +34,7 @@ public class AnswerWebsocketController {
     public AnswerCreateResponse create(
         @DestinationVariable Long roomId,
         @DestinationVariable Long questionId,
-        @Payload @Valid AnswerCreateRequest request,
+        @Payload @Valid AnswerRequest request,
         Principal principal
     ) {
         Long memberId = getMemberId(principal);
@@ -52,7 +52,7 @@ public class AnswerWebsocketController {
     @SendTo("/topic/rooms/{roomId}/answers")
     public AnswerUpdateResponse update(
         @DestinationVariable Long answerId,
-        @Payload @Valid AnswerCreateRequest request,
+        @Payload @Valid AnswerRequest request,
         Principal principal
     ) {
 
@@ -60,7 +60,7 @@ public class AnswerWebsocketController {
 
         permissionValidator.validateAnswerUpdatePermission(answerId, memberId);
 
-        Answer answer = answerService.update(answerId,request);
+        Answer answer = answerService.update(answerId, request);
 
         return AnswerMapper.toAnswerUpdateResponse(answer);
     }
