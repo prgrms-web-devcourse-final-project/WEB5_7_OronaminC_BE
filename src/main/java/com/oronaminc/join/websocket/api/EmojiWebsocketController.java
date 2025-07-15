@@ -3,6 +3,10 @@ package com.oronaminc.join.websocket.api;
 import com.oronaminc.join.emoji.dto.EmojiRequest;
 import com.oronaminc.join.emoji.dto.EmojiResponse;
 import com.oronaminc.join.emoji.service.EmojiFacade;
+import com.oronaminc.join.global.exception.ErrorCode;
+import com.oronaminc.join.global.exception.ErrorException;
+import com.oronaminc.join.global.service.RateLimitService;
+import io.github.bucket4j.Bucket;
 import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -16,6 +20,7 @@ import org.springframework.stereotype.Controller;
 public class EmojiWebsocketController {
 
     private final EmojiFacade emojiFacade;
+    private final RateLimitService rateLimitService;
 
     @MessageMapping("/rooms/{roomId}/emojis/create")
     @SendTo("/topic/rooms/{roomId}/emojis")
@@ -25,6 +30,11 @@ public class EmojiWebsocketController {
         Principal principal
     ) {
         Long memberId = Long.valueOf(principal.getName());
+
+        Bucket bucket = rateLimitService.getBucket(memberId, emojiRequest);
+        if (!bucket.tryConsume(1)) {
+            throw new ErrorException(ErrorCode.TOO_MANY_REQUESTS_EMOJI);
+        }
 
         return emojiFacade.createEmoji(memberId, emojiRequest);
     }
@@ -37,6 +47,11 @@ public class EmojiWebsocketController {
         Principal principal
     ) {
         Long memberId = Long.valueOf(principal.getName());
+
+        Bucket bucket = rateLimitService.getBucket(memberId, emojiRequest);
+        if (!bucket.tryConsume(1)) {
+            throw new ErrorException(ErrorCode.TOO_MANY_REQUESTS_EMOJI);
+        }
 
         return emojiFacade.deleteEmoji(memberId, emojiRequest);
     }

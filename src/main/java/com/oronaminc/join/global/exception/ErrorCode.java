@@ -5,6 +5,7 @@ import static com.oronaminc.join.global.exception.ErrorStatus.CONFLICT;
 import static com.oronaminc.join.global.exception.ErrorStatus.FORBIDDEN;
 import static com.oronaminc.join.global.exception.ErrorStatus.INTERNAL_SERVER_ERROR;
 import static com.oronaminc.join.global.exception.ErrorStatus.NOT_FOUND;
+import static com.oronaminc.join.global.exception.ErrorStatus.TOO_MANY_REQUESTS;
 import static com.oronaminc.join.global.exception.ErrorStatus.UNAUTHORIZED;
 
 import lombok.AllArgsConstructor;
@@ -49,7 +50,8 @@ public enum ErrorCode {
     SOCKET_VALIDATION_ERROR("SOCKET-1001", "입력값이 유효하지 않습니다.", BAD_REQUEST),
 
     CONFLICT_EMOJI("EMOJI-001", "공감 처리 중 충돌이 발생했습니다.", CONFLICT),
-    NOT_FOUND_EMOJI("EMOJI-002", "해당 공감 ", NOT_FOUND);
+    NOT_FOUND_EMOJI("EMOJI-002", "해당 공감 ", NOT_FOUND),
+    TOO_MANY_REQUESTS_EMOJI("EMOJI-003", "잠시 후 다시 시도해주세요.", TOO_MANY_REQUESTS);
 
     private final String code;
     private final String message;
