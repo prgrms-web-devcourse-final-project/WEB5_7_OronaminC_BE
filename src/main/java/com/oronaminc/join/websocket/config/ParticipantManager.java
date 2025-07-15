@@ -35,4 +35,10 @@ public class ParticipantManager {
             participants.add(memberId);
         }
     }
+
+    public void removeMember(Long memberId) {
+        for (Set<Long> participants : roomParticipants.values()) {
+            participants.remove(memberId);
+        }
+    }
 }

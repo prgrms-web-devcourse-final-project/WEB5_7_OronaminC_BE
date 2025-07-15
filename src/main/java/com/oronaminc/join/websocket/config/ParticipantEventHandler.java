@@ -11,12 +11,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 import com.oronaminc.join.global.exception.ErrorException;
+import com.oronaminc.join.room.dto.WebSocketExitEvent;
 
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class SessionEventHandler {
+public class ParticipantEventHandler {
     private final ParticipantManager participantManager;
 
     private static final String ROOM_PREFIX = "/topic/rooms/";
@@ -39,6 +40,11 @@ public class SessionEventHandler {
         if (!isRoomJoinPath(destination)) {
             validateParticipantRoomJoin(roomId, memberId);
         }
+    }
+
+    @EventListener
+    public void handleUnsubscribe(WebSocketExitEvent event) {
+        participantManager.removeMember(event.memberId());
     }
 
     private boolean isRoomJoinPath(String destination) {
