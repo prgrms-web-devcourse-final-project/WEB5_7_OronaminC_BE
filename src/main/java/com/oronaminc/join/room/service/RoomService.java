@@ -1,17 +1,18 @@
 package com.oronaminc.join.room.service;
 
+import static com.oronaminc.join.global.exception.ErrorCode.*;
+
 import java.util.List;
-import com.oronaminc.join.infra.service.S3Service;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import static com.oronaminc.join.global.exception.ErrorCode.*;
 
 import com.oronaminc.join.document.domain.Document;
 import com.oronaminc.join.document.service.DocumentReader;
 import com.oronaminc.join.document.service.DocumentService;
 import com.oronaminc.join.emoji.service.EmojiService;
 import com.oronaminc.join.global.exception.ErrorException;
+import com.oronaminc.join.infra.service.S3Service;
 import com.oronaminc.join.participant.domain.Participant;
 import com.oronaminc.join.participant.domain.ParticipantType;
 import com.oronaminc.join.participant.service.ParticipantService;
@@ -134,6 +135,10 @@ public class RoomService {
         Room room = roomReader.getById(roomId);
         List<Participant> team = participantService.getTeam(roomId);
         return RoomMapper.toRoomUpdateInfoResponse(room, team);
+    }
+
+    public Integer getRoomParticipantLimit(Long roomId) {
+        return roomReader.getById(roomId).getParticipantLimit();
     }
 
     private String generateCode() {

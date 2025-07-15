@@ -23,6 +23,9 @@ public enum ErrorCode {
     NOT_FOUND_PARTICIPANT("PARTICIPANT-001", "발표방에 존재하지 않는 회원입니다.", NOT_FOUND),
     UNAUTHORIZED_TEAM_GUEST("PARTICIPANT-002", "게스트는 팀이 될 수 없습니다.", UNAUTHORIZED),
     UNAUTHORIZED_UPDATE_AND_DELETE("PARTICIPANT-003", "발표방 수정 및 삭제 권한이 없습니다.", UNAUTHORIZED),
+    UNAUTHORIZED_LIMIT_PARTICIPANT("PARTICIPANT-004", "인원이 가득 차 참가할 수 없습니다.", UNAUTHORIZED),
+    UNAUTHORIZED_NOT_JOIN_ROOM("PARTICIPANT-005", "발표방에 참여하지 않았습니다. 먼저 참여해주세요.", UNAUTHORIZED),
+
 
     FILE_UPLOAD_FAILED("FILE-001", "파일 업로드에 실패하였습니다.", INTERNAL_SERVER_ERROR),
     NOT_FOUND_FILE("FILE-002", "존재하지 않는 파일입니다.", NOT_FOUND),
@@ -42,7 +45,10 @@ public enum ErrorCode {
 
     SOCKET_ERROR("SOCKET-3000", "웹소켓 연결 중 서버 오류가 발생했습니다.", INTERNAL_SERVER_ERROR),
     SOCKET_RUNTIME_ERROR("SOCKET-2000", "처리되지 않은 오류가 발생했습니다", INTERNAL_SERVER_ERROR),
-    SOCKET_VALIDATION_ERROR("SOCKET-1001", "입력값이 유효하지 않습니다.", BAD_REQUEST);
+    SOCKET_VALIDATION_ERROR("SOCKET-1001", "입력값이 유효하지 않습니다.", BAD_REQUEST),
+    SOCKET_BAD_REQUEST_PATH("SOCKET-1002", "경로가 유효하지 않습니다.", BAD_REQUEST),
+    SOCKET_BAD_REQUEST_MEMBER("SOCKET-1003", "회원이 유효하지 않습니다.", BAD_REQUEST)
+    ;
 
     private final String code;
     private final String message;
