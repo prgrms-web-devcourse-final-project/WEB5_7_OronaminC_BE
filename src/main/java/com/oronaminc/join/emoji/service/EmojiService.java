@@ -6,10 +6,11 @@ import com.oronaminc.join.emoji.domain.Emoji;
 import com.oronaminc.join.emoji.domain.TargetType;
 import com.oronaminc.join.emoji.dto.EmojiRequest;
 import com.oronaminc.join.emoji.dto.EmojiResponse;
+import com.oronaminc.join.global.exception.ErrorCode;
+import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.member.service.MemberReader;
 import com.oronaminc.join.question.service.QuestionReader;
 import com.oronaminc.join.room.service.RoomReader;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,12 +38,8 @@ public class EmojiService {
         TargetType targetType = emojiRequest.targetType();
         Long targetId = emojiRequest.targetId();
 
-        Optional<Emoji> findEmoji = emojiReader.findByMemberIdAndTargetIdAndTargetType(
-            memberId, targetId, targetType);
-
-        if (findEmoji.isPresent()) {
-            emojiCount = getEmojiCount(targetType, targetId);
-            return new EmojiResponse("CREATE", targetType, targetId, emojiCount);
+        if (emojiReader.existsByMemberIdAndTargetIdAndTargetType(memberId, targetId, targetType)) {
+            throw new ErrorException(ErrorCode.ALREADY_EXISTS_EMOJI);
         }
 
         emojiRepository.save(Emoji.create(memberReader.getById(memberId), targetType, targetId));
@@ -59,15 +56,10 @@ public class EmojiService {
         TargetType targetType = emojiRequest.targetType();
         Long targetId = emojiRequest.targetId();
 
-        Optional<Emoji> findEmoji = emojiReader.findByMemberIdAndTargetIdAndTargetType(
-            memberId, targetId, targetType);
-
-        if (findEmoji.isEmpty()) {
-            emojiCount = getEmojiCount(targetType, targetId);
-            return new EmojiResponse("DELETE", targetType, targetId, emojiCount);
-        }
-
-        emojiRepository.delete(findEmoji.get());
+        emojiRepository.delete(
+            emojiReader.findEmojiByMemberIdAndTargetIdAndTargetType(memberId, targetId,
+                targetType)
+        );
         emojiCount = decrementEmojiCount(targetType, targetId);
 
         return new EmojiResponse("DELETE", targetType, targetId, emojiCount);

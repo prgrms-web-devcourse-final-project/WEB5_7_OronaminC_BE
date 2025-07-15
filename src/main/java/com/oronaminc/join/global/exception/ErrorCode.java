@@ -50,8 +50,9 @@ public enum ErrorCode {
     SOCKET_VALIDATION_ERROR("SOCKET-1001", "입력값이 유효하지 않습니다.", BAD_REQUEST),
 
     CONFLICT_EMOJI("EMOJI-001", "공감 처리 중 충돌이 발생했습니다.", CONFLICT),
-    NOT_FOUND_EMOJI("EMOJI-002", "해당 공감 ", NOT_FOUND),
-    TOO_MANY_REQUESTS_EMOJI("EMOJI-003", "잠시 후 다시 시도해주세요.", TOO_MANY_REQUESTS);
+    NOT_FOUND_EMOJI("EMOJI-002", "해당 이모지가 존재하지 않습니다.", NOT_FOUND),
+    TOO_MANY_REQUESTS_EMOJI("EMOJI-003", "잠시 후 다시 시도해주세요.", TOO_MANY_REQUESTS),
+    ALREADY_EXISTS_EMOJI("EMOJI-004", "이미 해당 이모지가 존재합니다.", CONFLICT);
 
     private final String code;
     private final String message;

@@ -1,6 +1,7 @@
 package com.oronaminc.join.emoji.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -11,13 +12,14 @@ import com.oronaminc.join.emoji.domain.Emoji;
 import com.oronaminc.join.emoji.domain.TargetType;
 import com.oronaminc.join.emoji.dto.EmojiRequest;
 import com.oronaminc.join.emoji.dto.EmojiResponse;
+import com.oronaminc.join.global.exception.ErrorCode;
+import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.service.MemberReader;
 import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.service.QuestionReader;
 import com.oronaminc.join.room.domain.Room;
 import com.oronaminc.join.room.service.RoomReader;
-import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -70,8 +72,8 @@ class EmojiServiceTests {
             .targetId(targetId)
             .build();
 
-        when(emojiReader.findByMemberIdAndTargetIdAndTargetType(memberId, targetId,
-            targetType)).thenReturn(Optional.empty());
+        when(emojiReader.existsByMemberIdAndTargetIdAndTargetType(memberId, targetId,
+            targetType)).thenReturn(false);
         when(memberReader.getById(memberId)).thenReturn(member);
         when(emojiRepository.save(any(Emoji.class))).thenReturn(findEmoji);
         when(roomReader.getById(targetId)).thenReturn(room);
@@ -108,8 +110,8 @@ class EmojiServiceTests {
             .targetId(targetId)
             .build();
 
-        when(emojiReader.findByMemberIdAndTargetIdAndTargetType(memberId, targetId,
-            targetType)).thenReturn(Optional.empty());
+        when(emojiReader.existsByMemberIdAndTargetIdAndTargetType(memberId, targetId,
+            targetType)).thenReturn(false);
         when(memberReader.getById(memberId)).thenReturn(member);
         when(emojiRepository.save(any(Emoji.class))).thenReturn(findEmoji);
         when(questionReader.getById(targetId)).thenReturn(question);
@@ -146,8 +148,8 @@ class EmojiServiceTests {
             .targetId(targetId)
             .build();
 
-        when(emojiReader.findByMemberIdAndTargetIdAndTargetType(memberId, targetId,
-            targetType)).thenReturn(Optional.empty());
+        when(emojiReader.existsByMemberIdAndTargetIdAndTargetType(memberId, targetId,
+            targetType)).thenReturn(false);
         when(memberReader.getById(memberId)).thenReturn(member);
         when(emojiRepository.save(any(Emoji.class))).thenReturn(findEmoji);
         when(answerReader.getById(targetId)).thenReturn(answer);
@@ -184,19 +186,16 @@ class EmojiServiceTests {
             .targetId(targetId)
             .build();
 
-        when(emojiReader.findByMemberIdAndTargetIdAndTargetType(memberId, targetId,
-            targetType)).thenReturn(Optional.of(findEmoji));
-        when(roomReader.getById(targetId)).thenReturn(room);
+        when(emojiReader.existsByMemberIdAndTargetIdAndTargetType(memberId, targetId,
+            targetType)).thenReturn(true);
 
         // when
-        EmojiResponse response = emojiService.createEmoji(memberId,
-            new EmojiRequest(targetType, targetId));
-
         // then
-        assertThat(response.event()).isEqualTo("CREATE");
-        assertThat(response.targetType()).isEqualTo(targetType);
-        assertThat(response.targetId()).isEqualTo(targetId);
-        assertThat(response.emojiCount()).isEqualTo(emojiCount);
+        assertThatThrownBy(
+            () -> {
+                emojiService.createEmoji(memberId, new EmojiRequest(targetType, targetId));
+            }
+        ).isInstanceOf(ErrorException.class);
 
     }
 
@@ -220,8 +219,8 @@ class EmojiServiceTests {
             .targetId(targetId)
             .build();
 
-        when(emojiReader.findByMemberIdAndTargetIdAndTargetType(memberId, targetId,
-            targetType)).thenReturn(Optional.of(findEmoji));
+        when(emojiReader.findEmojiByMemberIdAndTargetIdAndTargetType(memberId, targetId,
+            targetType)).thenReturn(findEmoji);
         when(roomReader.getById(targetId)).thenReturn(room);
 
         // when
@@ -256,8 +255,8 @@ class EmojiServiceTests {
             .targetId(targetId)
             .build();
 
-        when(emojiReader.findByMemberIdAndTargetIdAndTargetType(memberId, targetId,
-            targetType)).thenReturn(Optional.of(findEmoji));
+        when(emojiReader.findEmojiByMemberIdAndTargetIdAndTargetType(memberId, targetId,
+            targetType)).thenReturn(findEmoji);
         when(questionReader.getById(targetId)).thenReturn(question);
 
         // when
@@ -292,8 +291,8 @@ class EmojiServiceTests {
             .targetId(targetId)
             .build();
 
-        when(emojiReader.findByMemberIdAndTargetIdAndTargetType(memberId, targetId,
-            targetType)).thenReturn(Optional.of(findEmoji));
+        when(emojiReader.findEmojiByMemberIdAndTargetIdAndTargetType(memberId, targetId,
+            targetType)).thenReturn(findEmoji);
         when(answerReader.getById(targetId)).thenReturn(answer);
 
         // when
@@ -328,19 +327,16 @@ class EmojiServiceTests {
             .targetId(targetId)
             .build();
 
-        when(emojiReader.findByMemberIdAndTargetIdAndTargetType(memberId, targetId,
-            targetType)).thenReturn(Optional.empty());
-        when(roomReader.getById(targetId)).thenReturn(room);
+        when(emojiReader.findEmojiByMemberIdAndTargetIdAndTargetType(memberId, targetId,
+            targetType)).thenThrow(new ErrorException(ErrorCode.NOT_FOUND_EMOJI));
 
         // when
-        EmojiResponse response = emojiService.deleteEmoji(memberId,
-            new EmojiRequest(targetType, targetId));
-
         // then
-        assertThat(response.event()).isEqualTo("DELETE");
-        assertThat(response.targetType()).isEqualTo(targetType);
-        assertThat(response.targetId()).isEqualTo(targetId);
-        assertThat(response.emojiCount()).isEqualTo(emojiCount);
+        assertThatThrownBy(
+            () -> {
+                emojiService.deleteEmoji(memberId, new EmojiRequest(targetType, targetId));
+            }
+        ).isInstanceOf(ErrorException.class);
 
     }
 
