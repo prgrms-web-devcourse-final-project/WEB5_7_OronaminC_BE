@@ -1,11 +1,14 @@
 package com.oronaminc.join.room.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.oronaminc.join.answer.domain.Answer;
 import com.oronaminc.join.answer.service.AnswerReader;
-import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.infra.service.S3Service;
 import com.oronaminc.join.participant.service.ParticipantReader;
+import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.service.QuestionReader;
 import com.oronaminc.join.room.dto.*;
 import org.springframework.stereotype.Service;
@@ -159,9 +162,38 @@ public class RoomService {
         Long totalQuestions = questionReader.countByRoomId(roomId);
         Long totalAnswerByQuestion = answerReader.countAnsweredQuestionsByRoomId(roomId);
         Double answerRate = calculateAnswerRate(totalQuestions, totalAnswerByQuestion);
-        List<TopQnADto> top3QnA = questionReader.findTop3QnA(roomId);
+        List<TopQnADto> topQnA = getTopQnA(roomId);
 
-        return RoomMapper.toReportResponse(room, totalView,totalQuestions, answerRate, top3QnA);
+
+        return RoomMapper.toReportResponse(room, totalView,totalQuestions, answerRate, topQnA);
+    }
+
+    private List<TopQnADto> getTopQnA(Long roomId) {
+        // top3 질문 리스트
+        List<Question> top3Question = questionReader.findTop3Question(roomId);
+
+        // top3 질문 id
+        List<Long> questionIds = top3Question.stream()
+                .map(Question::getId)
+                .toList();
+
+        // top3에 질문의 답변 조회
+        List<Answer> answerByQuestionIds = answerReader.getAnswerByQuestionIds(questionIds);
+
+        // 답변을 질문 ID 기준으로 그룹화
+        Map<Long, List<String>> answersByQuestionId = answerByQuestionIds.stream()
+                .collect(Collectors.groupingBy(
+                        a -> a.getQuestion().getId(),
+                        Collectors.mapping(Answer::getContent, Collectors.toList())
+                ));
+
+        return top3Question.stream()
+                .map( q -> new TopQnADto(
+                        q.getContent(),
+                        q.getEmojiCount(),
+                        answersByQuestionId.getOrDefault(q.getId(), List.of())
+                ))
+                .toList();
     }
 
     private Double calculateAnswerRate(Long totalQuestions, Long totalAnswerByQuestion) {
