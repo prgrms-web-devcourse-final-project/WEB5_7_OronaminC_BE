@@ -37,4 +37,8 @@ public class AnswerReader {
         return findById(answerId)
             .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_ANSWER));
     }
+
+    public Long countAnsweredQuestionsByRoomId(Long roomId) {
+        return answerRepository.countAnsweredQuestionsByRoomId(roomId);
+    }
 }

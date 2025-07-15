@@ -66,4 +66,8 @@ public class ParticipantReader {
         participantRepository.deleteByRoomId(roomId);
     }
 
+    public Long countTotalView(Long roomId) {
+        return participantRepository.countParticipantsStayedOver30Seconds(roomId);
+    }
+
 }

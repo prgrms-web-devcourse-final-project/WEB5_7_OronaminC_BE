@@ -8,10 +8,7 @@ import com.oronaminc.join.participant.domain.Participant;
 import com.oronaminc.join.room.domain.Room;
 import com.oronaminc.join.room.domain.RoomStatus;
 import com.oronaminc.join.room.domain.RoomType;
-import com.oronaminc.join.room.dto.CreateRoomRequest;
-import com.oronaminc.join.room.dto.CreateRoomResponse;
-import com.oronaminc.join.room.dto.RoomDetailResponse;
-import com.oronaminc.join.room.dto.RoomUpdateInfoResponse;
+import com.oronaminc.join.room.dto.*;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -64,6 +61,18 @@ public class RoomMapper {
                 .endDate(room.getEndedAt().toLocalDate())
                 .participantLimit(room.getParticipantLimit())
                 .teamEmail(team.stream().map(teamParticipant -> teamParticipant.getMember().getEmail()).toList())
+                .build();
+    }
+
+    public static ReportResponse toReportResponse(Room room, Long totalView,Long totalQuestions, Double answerRate, List<TopQnADto> top3QnA) {
+        return ReportResponse.builder()
+                .roomId(room.getId())
+                .title(room.getTitle())
+                .totalView(totalView)
+                .totalQuestions(totalQuestions)
+                .answerRate(answerRate)
+                .totalEmojis(room.getEmojiCount())
+                .topQnA(top3QnA)
                 .build();
     }
 }
