@@ -4,7 +4,7 @@ package com.oronaminc.join.question.util;
 import com.oronaminc.join.global.dto.WriterDto;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.question.domain.Question;
-import com.oronaminc.join.question.dto.QuestionCreateRequest;
+import com.oronaminc.join.question.dto.QuestionRequest;
 import com.oronaminc.join.question.dto.QuestionCreateResponse;
 import com.oronaminc.join.question.dto.QuestionDeleteResponse;
 import com.oronaminc.join.question.dto.QuestionFlatResponse;
@@ -19,7 +19,7 @@ import org.springframework.data.domain.Slice;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class QuestionMapper {
 
-    public static Question toQuestion(Room room, Member member, QuestionCreateRequest request) {
+    public static Question toQuestion(Room room, Member member, QuestionRequest request) {
         return Question.create(room, member, request);
     }
 
