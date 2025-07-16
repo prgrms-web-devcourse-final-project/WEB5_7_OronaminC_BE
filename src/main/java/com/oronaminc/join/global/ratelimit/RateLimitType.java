@@ -9,8 +9,8 @@ public enum RateLimitType {
     QUESTION(
         "QUESTION:{}:{}",
         Bandwidth.builder()
-            .capacity(5)
-            .refillGreedy(5, Duration.ofSeconds(15))
+            .capacity(3)
+            .refillIntervally(3, Duration.ofSeconds(15))
             .build()
     ),
     EMOJI(
