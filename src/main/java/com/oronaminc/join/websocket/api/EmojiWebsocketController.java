@@ -5,7 +5,8 @@ import com.oronaminc.join.emoji.dto.EmojiResponse;
 import com.oronaminc.join.emoji.service.EmojiFacade;
 import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
-import com.oronaminc.join.global.service.RateLimitService;
+import com.oronaminc.join.global.ratelimit.RateLimitService;
+import com.oronaminc.join.global.ratelimit.RateLimitType;
 import io.github.bucket4j.Bucket;
 import jakarta.validation.Valid;
 import java.security.Principal;
@@ -32,7 +33,9 @@ public class EmojiWebsocketController {
     ) {
         Long memberId = Long.valueOf(principal.getName());
 
-        Bucket bucket = rateLimitService.getEmojiBucket(memberId, emojiRequest);
+        Bucket bucket = rateLimitService.getBucket(RateLimitType.EMOJI, memberId,
+            emojiRequest.targetType(), emojiRequest.targetId());
+
         if (!bucket.tryConsume(1)) {
             throw new ErrorException(ErrorCode.TOO_MANY_REQUESTS_EMOJI);
         }
@@ -49,7 +52,8 @@ public class EmojiWebsocketController {
     ) {
         Long memberId = Long.valueOf(principal.getName());
 
-        Bucket bucket = rateLimitService.getEmojiBucket(memberId, emojiRequest);
+        Bucket bucket = rateLimitService.getBucket(RateLimitType.EMOJI, memberId,
+            emojiRequest.targetType(), emojiRequest.targetId());
         if (!bucket.tryConsume(1)) {
             throw new ErrorException(ErrorCode.TOO_MANY_REQUESTS_EMOJI);
         }
