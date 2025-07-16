@@ -19,10 +19,17 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
     void deleteByQuestionIn(List<Question> questions);
 
     @Query("""
-        select count(a)
+        select count(distinct a.question.id)
         from Answer a
         where a.question.room.id = :roomId
     """)
     Long countAnsweredQuestionsByRoomId(@Param("roomId") Long roomId);
+
+    @Query("""
+        select a
+        from Answer a
+        where a.question.id in :questionIds
+    """)
+    List<Answer> findAllByQuestionIds(@Param("questionIds") List<Long> questionIds);
 
 }

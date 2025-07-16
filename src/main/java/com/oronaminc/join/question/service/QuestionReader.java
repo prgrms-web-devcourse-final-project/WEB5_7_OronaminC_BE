@@ -60,7 +60,7 @@ public class QuestionReader {
         return questionRepository.countByRoomId(roomId);
     }
 
-    public List<TopQnADto> findTop3QnA(Long roomId) {
-        return questionRepository.findTop3QnAByRoomId(roomId, PageRequest.of(0, 3));
+    public List<Question> findTop3Question(Long roomId) {
+        return questionRepository.findTop3QuestionByRoomId(roomId, PageRequest.of(0,3));
     }
 }
