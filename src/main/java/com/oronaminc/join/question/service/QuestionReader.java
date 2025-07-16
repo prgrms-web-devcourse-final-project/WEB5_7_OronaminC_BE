@@ -3,7 +3,6 @@ package com.oronaminc.join.question.service;
 import java.util.List;
 import java.util.Optional;
 
-import com.oronaminc.join.room.dto.TopQnADto;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;

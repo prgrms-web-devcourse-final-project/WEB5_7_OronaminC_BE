@@ -37,7 +37,7 @@ import com.oronaminc.join.room.dto.RoomJoinResponse;
 import com.oronaminc.join.room.dto.RoomUpdateInfoResponse;
 import com.oronaminc.join.room.dto.RoomUpdateRequest;
 import com.oronaminc.join.room.dto.RoomUpdateStatusRequest;
-import com.oronaminc.join.room.dto.TopQnADto;
+import com.oronaminc.join.room.dto.TopQnAResponse;
 import com.oronaminc.join.room.util.CodeGenerator;
 import com.oronaminc.join.room.util.RoomMapper;
 import com.oronaminc.join.websocket.config.ParticipantManager;
@@ -45,7 +45,7 @@ import com.oronaminc.join.websocket.config.ParticipantManager;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class RoomService {
 
@@ -53,17 +53,18 @@ public class RoomService {
     private final ParticipantService participantService;
     private final DocumentService documentService;
     private final QuestionService questionService;
-    private final DocumentReader documentReader;
     private final EmojiService emojiService;
     private final S3Service s3Service;
-    private final RoomReader roomReader;
-    private final AnswerReader answerReader;
     private final ParticipantReader participantReader;
+    private final DocumentReader documentReader;
     private final QuestionReader questionReader;
+    private final AnswerReader answerReader;
+    private final RoomReader roomReader;
     private final ParticipantManager participantManager;
 
     private static final int CODE_LENGTH = 6;
 
+    @Transactional
     public CreateRoomResponse createRoom(CreateRoomRequest createRoomRequest,
             String presenterEmail) {
         String code = this.generateCode();
@@ -76,6 +77,7 @@ public class RoomService {
         return RoomMapper.toCreateRoomResponse(room);
     }
 
+    @Transactional
     public JoinRoomResponse joinRoom(Long memberId, JoinRoomRequest joinRoomRequest) {
         Room room = roomReader.getBySecretCode(joinRoomRequest.secretCode());
         if (room.getRoomStatus().equals(RoomStatus.BEFORE_START)) {
@@ -99,6 +101,7 @@ public class RoomService {
         return RoomMapper.toRoomDetailResponse(room, presenter, team, presignedUrl, memberId, participantCount);
     }
 
+    @Transactional
     public void updateRoom(Long memberId, Long roomId, RoomUpdateRequest updateRoomRequest) {
         participantService.validatePresenter(roomId, memberId);
 
@@ -114,6 +117,7 @@ public class RoomService {
         participantService.updateTeam(room, updateRoomRequest.teamEmail());
     }
 
+    @Transactional
     public void deleteRoom(Long memberId, Long roomId) {
         participantService.validatePresenter(roomId, memberId);
 
@@ -133,6 +137,7 @@ public class RoomService {
         roomRepository.deleteById(roomId);
     }
 
+    @Transactional
     public void updateRoomStatus(Long memberId, Long roomId,
             RoomUpdateStatusRequest roomUpdateStatusRequest) {
         participantService.validatePresenter(roomId, memberId);
@@ -146,6 +151,7 @@ public class RoomService {
         room.updateStatus(updateStatus);
     }
 
+    @Transactional
     public RoomUpdateInfoResponse getRoomUpdateInfo(Long memberId, Long roomId) {
         participantService.validatePresenter(roomId, memberId);
         Room room = roomReader.getById(roomId);
@@ -175,12 +181,12 @@ public class RoomService {
         Long totalQuestions = questionReader.countByRoomId(roomId);
         Long totalAnswerByQuestion = answerReader.countAnsweredQuestionsByRoomId(roomId);
         Double answerRate = calculateAnswerRate(totalQuestions, totalAnswerByQuestion);
-        List<TopQnADto> topQnA = getTopQnA(roomId);
+        List<TopQnAResponse> topQnA = getTopQnA(roomId);
 
         return RoomMapper.toReportResponse(room, totalView, totalQuestions, answerRate, topQnA);
     }
 
-    private List<TopQnADto> getTopQnA(Long roomId) {
+    private List<TopQnAResponse> getTopQnA(Long roomId) {
         // top3 질문 리스트
         List<Question> top3Question = questionReader.findTop3Question(roomId);
 
@@ -200,7 +206,7 @@ public class RoomService {
                 ));
 
         return top3Question.stream()
-                .map(q -> new TopQnADto(
+                .map(q -> new TopQnAResponse(
                         q.getContent(),
                         q.getEmojiCount(),
                         answersByQuestionId.getOrDefault(q.getId(), List.of())

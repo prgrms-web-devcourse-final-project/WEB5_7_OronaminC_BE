@@ -1,8 +1,8 @@
 package com.oronaminc.join.room.dto;
 
-import lombok.Builder;
-
 import java.util.List;
+
+import lombok.Builder;
 
 @Builder
 public record ReportResponse(
@@ -12,6 +12,6 @@ public record ReportResponse(
         Long totalQuestions,
         Double answerRate,
         Long totalEmojis,
-        List<TopQnADto> topQnA
+        List<TopQnAResponse> topQnA
 ) {
 }
