@@ -1,5 +1,6 @@
 package com.oronaminc.join.question.service;
 
+import com.oronaminc.join.question.domain.QuestionSort;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,17 +39,10 @@ public class QuestionReader {
         return this.findByIdAndRoomId(questionId, roomId)
                 .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_ROOM_QUESTION));
     }
-
-    public List<QuestionFlatResponse> findByCreatedAt(Long lastId, Long memberId, Long roomId, Pageable pageable) {
-        return questionRepository.findByCreatedAt(lastId, memberId, roomId, pageable);
-    }
-
-    public List<QuestionFlatResponse> findByEmojiCount(Long lastId, Long lastEmojiCount, Long memberId, Long roomId, Pageable pageable) {
-        return questionRepository.findByEmojiCount(lastId, lastEmojiCount, memberId, roomId, pageable);
-    }
-
-    public List<QuestionFlatResponse> findByMyQuestion(Long lastId, Long memberId, Long roomId, Pageable pageable) {
-        return questionRepository.findByMyQuestion(lastId, memberId, roomId, pageable);
+    public List<QuestionFlatResponse> findQuestionsOrderBy(Long lastId, Long lastEmojiId,
+        Long lastEmojiCount, Long memberId, Long roomId, QuestionSort sortType, Pageable pageable) {
+        return questionRepository.findQuestionsOrderBy(lastId, lastEmojiId,
+            lastEmojiCount, memberId, roomId, sortType, pageable);
     }
 
     public List<Question> findByRoomId(Long roomId) {
