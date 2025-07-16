@@ -33,14 +33,13 @@ public class RoomMapper {
         return new CreateRoomResponse(room.getId(), room.getSecretCode());
     }
 
-    public static RoomDetailResponse toRoomDetailResponse(Room room, Participant presenter, List<Participant> team, String presignedUrl, Long memberId) {
+    public static RoomDetailResponse toRoomDetailResponse(Room room, Participant presenter, List<Participant> team, Long memberId) {
         return RoomDetailResponse.builder()
                 .title(room.getTitle())
                 .description(room.getDescription())
                 .name(presenter.getMember().getNickname())
                 .team(team.stream().map(participant -> participant.getMember().getNickname()).toList())
                 .roomCode(room.getSecretCode())
-                .presignedUrl(presignedUrl)
                 .participantCount(0)
                 .participantLimit(room.getParticipantLimit())
                 .emojiCount(room.getEmojiCount())

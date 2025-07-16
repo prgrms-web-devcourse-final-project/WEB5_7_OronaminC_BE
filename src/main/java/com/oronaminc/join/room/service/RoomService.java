@@ -42,9 +42,7 @@ public class RoomService {
     private final ParticipantService participantService;
     private final DocumentService documentService;
     private final QuestionService questionService;
-    private final DocumentReader documentReader;
     private final EmojiService emojiService;
-    private final S3Service s3Service;
     private final RoomReader roomReader;
     private final AnswerReader answerReader;
     private final ParticipantReader participantReader;
@@ -59,7 +57,6 @@ public class RoomService {
         Room room = RoomMapper.toRoom(createRoomRequest, code);
         roomRepository.save(room);
 
-        documentService.saveDocument(createRoomRequest.documentUrl(), room);
         participantService.savePresenterAndTeam(presenterEmail, createRoomRequest.teamEmail(), room);
 
         return RoomMapper.toCreateRoomResponse(room);
@@ -79,24 +76,19 @@ public class RoomService {
 
         Participant presenter = participantService.getPresenter(roomId);
         List<Participant> team = participantService.getTeam(roomId);
-        Document document = documentReader.getByRoomId(roomId);
 
-        String presignedUrl = s3Service.generatePresignedUrl(document.getFileUrl());
-
-        return RoomMapper.toRoomDetailResponse(room, presenter, team, presignedUrl, memberId);
+        return RoomMapper.toRoomDetailResponse(room, presenter, team, memberId);
     }
 
     public void updateRoom(Long memberId, Long roomId, RoomUpdateRequest updateRoomRequest) {
         participantService.validatePresenter(roomId, memberId);
 
         Room room = roomReader.getById(roomId);
-        Document document = documentReader.getByRoomId(roomId);
 
         if (room.getRoomStatus().equals(RoomStatus.STARTED)) {
             throw new ErrorException(BAD_REQUEST_ROOM_STARTED);
         }
 
-        document.update(updateRoomRequest.documentUrl());
         room.update(updateRoomRequest);
         participantService.updateTeam(room, updateRoomRequest.teamEmail());
     }
@@ -105,7 +97,6 @@ public class RoomService {
         participantService.validatePresenter(roomId, memberId);
 
         Room room = roomReader.getById(roomId);
-        Document document = documentReader.getByRoomId(roomId);
 
         if (room.getRoomStatus().equals(RoomStatus.STARTED)) {
             throw new ErrorException(BAD_REQUEST_ROOM_STARTED);
@@ -114,8 +105,6 @@ public class RoomService {
         participantService.deleteParticipantByRoomId(roomId);
         questionService.deleteByRoomId(roomId);
         emojiService.deleteByRoomEmoji(roomId);
-        // S3 버킷 내 파일 삭제
-        s3Service.deleteFile(document.getFileUrl());
         documentService.deleteByRoomId(roomId);
         roomRepository.deleteById(roomId);
     }

@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 
-public record DocumentRequest(
+public record DocumentS3UploadRequest(
 
         @NotBlank
         String fileName,

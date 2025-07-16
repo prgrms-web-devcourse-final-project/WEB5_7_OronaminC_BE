@@ -1,8 +1,7 @@
 package com.oronaminc.join.document.api;
 
 
-import com.oronaminc.join.document.dto.DocumentRequest;
-import com.oronaminc.join.document.dto.DocumentResponse;
+import com.oronaminc.join.document.dto.*;
 import com.oronaminc.join.document.service.DocumentService;
 import com.oronaminc.join.member.security.MemberDetails;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,13 +29,50 @@ public class DocumentController {
                     @ApiResponse(responseCode = "403", description = "회원 권한이 없는 접근")
             }
     )
-    @PostMapping("/presigned-url")
+    @PostMapping("/presigned-url/upload")
     @ResponseStatus(HttpStatus.OK)
-    public DocumentResponse generatePresignedUrl(
-            @Valid @RequestBody DocumentRequest documentRequest,
+    public DocumentS3UploadResponse generatePresignedUrl(
+            @Valid @RequestBody DocumentS3UploadRequest documentRequest,
             @AuthenticationPrincipal MemberDetails memberDetails
     ) {
         String memberRole = memberDetails.getRole();
-        return documentService.generatePresignedUrl(documentRequest, memberRole);
+        return documentService.generateUploadPresignedUrl(documentRequest, memberRole);
+    }
+
+    @PostMapping("/{roomId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public DocumentCreateResponse saveDocument(
+        @PathVariable Long roomId,
+        @Valid @RequestBody DocumentCreateRequest documentCreateRequest,
+        @AuthenticationPrincipal MemberDetails memberDetails
+    ) {
+        return documentService.saveDocument(roomId, documentCreateRequest, memberDetails.getRole());
+    }
+
+    @GetMapping("/{roomId}")
+    @ResponseStatus(HttpStatus.OK)
+    public DocumentGetResponse getDocument(
+            @PathVariable Long roomId
+    ) {
+        return documentService.getDocument(roomId);
+    }
+
+    @PatchMapping("/{roomId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateDocument(
+            @PathVariable Long roomId,
+            @Valid @RequestBody DocumentUpdateRequest documentUpdateRequest,
+            @AuthenticationPrincipal MemberDetails memberDetails
+    ) {
+        documentService.updateDocument(roomId, documentUpdateRequest, memberDetails.getId());
+    }
+
+    @DeleteMapping("/{roomId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteDocument(
+            @PathVariable Long roomId,
+            @AuthenticationPrincipal MemberDetails memberDetails
+    ) {
+        documentService.deleteDocument(roomId, memberDetails.getId());
     }
 }

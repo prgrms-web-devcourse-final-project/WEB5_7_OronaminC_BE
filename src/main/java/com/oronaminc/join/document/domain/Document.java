@@ -31,7 +31,6 @@ public class Document {
 
     private String fileUrl;
     private String fileName;
-    private Long fileSize;
 
     public void update(String fileUrl) {
         this.fileUrl = fileUrl;

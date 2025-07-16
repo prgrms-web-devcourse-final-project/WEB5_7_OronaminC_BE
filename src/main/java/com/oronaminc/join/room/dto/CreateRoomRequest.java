@@ -32,10 +32,6 @@ public record CreateRoomRequest(
         @Schema(description = "발표방 참여 제한 인원수", example = "16")
         Integer participantLimit,
 
-        @NotBlank
-        @Schema(description = "발표방 업로드 자료", example = "url")
-        String documentUrl,
-
         @NotNull
         @Size(max = 5)
         @Schema(description = "발표방 추가한 팀원 목록", example = "{팀원1@example.com, 팀원2@example.com}")
