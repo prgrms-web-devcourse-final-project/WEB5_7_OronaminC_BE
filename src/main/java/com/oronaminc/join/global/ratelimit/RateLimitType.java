@@ -6,8 +6,8 @@ import java.time.Duration;
 import lombok.Getter;
 
 public enum RateLimitType {
-    QUESTION(
-        "QUESTION:{}:{}",
+    CREATE_QUESTION(
+        "CREATE_QUESTION:{}:{}",
         Bandwidth.builder()
             .capacity(3)
             .refillIntervally(3, Duration.ofSeconds(15))

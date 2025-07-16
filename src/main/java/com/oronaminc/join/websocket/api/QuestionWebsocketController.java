@@ -39,7 +39,7 @@ public class QuestionWebsocketController {
     ) {
         Long memberId = Long.valueOf(principal.getName());
 
-        Bucket bucket = rateLimitService.getBucket(RateLimitType.QUESTION, roomId, memberId);
+        Bucket bucket = rateLimitService.getBucket(RateLimitType.CREATE_QUESTION, roomId, memberId);
 
         if (!bucket.tryConsume(1)) {
             throw new ErrorException(ErrorCode.TOO_MANY_REQUESTS_QUESTION);
