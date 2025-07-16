@@ -40,7 +40,7 @@ import com.oronaminc.join.room.dto.RoomUpdateStatusRequest;
 import com.oronaminc.join.room.dto.TopQnAResponse;
 import com.oronaminc.join.room.util.CodeGenerator;
 import com.oronaminc.join.room.util.RoomMapper;
-import com.oronaminc.join.websocket.config.ParticipantManager;
+import com.oronaminc.join.websocket.session.ParticipantManager;
 
 import lombok.RequiredArgsConstructor;
 

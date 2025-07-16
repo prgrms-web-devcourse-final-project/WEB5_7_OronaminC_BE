@@ -1,4 +1,4 @@
-package com.oronaminc.join.websocket.config;
+package com.oronaminc.join.websocket.session;
 
 import static com.oronaminc.join.global.exception.ErrorCode.*;
 
