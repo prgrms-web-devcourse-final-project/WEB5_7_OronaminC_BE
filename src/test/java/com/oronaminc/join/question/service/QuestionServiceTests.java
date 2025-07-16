@@ -37,6 +37,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -204,12 +205,13 @@ class QuestionServiceTests {
         Long roomId = 1L;
         Long memberId = 1L;
         int size = 1;
+        Pageable pageable = PageRequest.of(0, size + 1);
 
         List<QuestionFlatResponse> mockList = List.of(mockQ1, mockQ2);
 
         given(memberReader.getById(memberId)).willReturn(mockMember);
         given(roomReader.getById(roomId)).willReturn(mockRoom);
-        given(questionReader.findByCreatedAt(null, memberId, roomId, PageRequest.of(0, size + 1)))
+        given(questionReader.findQuestionsOrderBy(null, null, memberId, roomId, QuestionSort.CREATEDAT, pageable))
             .willReturn(mockList);
 
         Slice<QuestionAssembleResponse> result = questionService.getQuestions(
@@ -227,13 +229,13 @@ class QuestionServiceTests {
         Long roomId = 1L;
         Long memberId = 1L;
         int size = 1;
+        Pageable pageable = PageRequest.of(0, size + 1);
 
         List<QuestionFlatResponse> mockList = List.of(mockQ1, mockQ2);
 
         given(memberReader.getById(memberId)).willReturn(mockMember);
         given(roomReader.getById(roomId)).willReturn(mockRoom);
-        given(questionReader.findByEmojiCount(null, null, memberId, roomId,
-            PageRequest.of(0, size + 1)))
+        given(questionReader.findQuestionsOrderBy(null, null, memberId, roomId, QuestionSort.EMOJI, pageable))
             .willReturn(mockList);
 
         Slice<QuestionAssembleResponse> result = questionService.getQuestions(QuestionSort.EMOJI,
@@ -250,12 +252,13 @@ class QuestionServiceTests {
         Long roomId = 1L;
         Long memberId = 1L;
         int size = 1;
+        Pageable pageable = PageRequest.of(0, size + 1);
 
         List<QuestionFlatResponse> mockList = List.of(mockQ1, mockQ2);
 
         given(memberReader.getById(memberId)).willReturn(mockMember);
         given(roomReader.getById(roomId)).willReturn(mockRoom);
-        given(questionReader.findByMyQuestion(null, memberId, roomId, PageRequest.of(0, size + 1)))
+        given(questionReader.findQuestionsOrderBy(null, null, memberId, roomId, QuestionSort.MYQUESTION, pageable))
             .willReturn(mockList);
 
         Slice<QuestionAssembleResponse> result = questionService.getQuestions(
