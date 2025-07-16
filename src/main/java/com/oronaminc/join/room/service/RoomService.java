@@ -78,7 +78,7 @@ public class RoomService {
 
     public JoinRoomResponse joinRoom(Long memberId, JoinRoomRequest joinRoomRequest) {
         Room room = roomReader.getBySecretCode(joinRoomRequest.secretCode());
-        if (room.getRoomStatus().equals(RoomStatus.STARTED)) {
+        if (room.getRoomStatus().equals(RoomStatus.BEFORE_START)) {
             throw new ErrorException(UNAUTHORIZED_JOIN_ROOM);
         }
         participantService.saveParticipantById(memberId, room, ParticipantType.GUEST);
