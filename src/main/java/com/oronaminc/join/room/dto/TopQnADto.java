@@ -1,8 +1,10 @@
 package com.oronaminc.join.room.dto;
 
+import java.util.List;
+
 public record TopQnADto(
         String question,
         Long emojiCount,
-        String answers
+        List<String> answers
 ) {
 }
