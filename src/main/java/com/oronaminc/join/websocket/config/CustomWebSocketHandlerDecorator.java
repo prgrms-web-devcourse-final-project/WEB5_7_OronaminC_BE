@@ -9,14 +9,15 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.WebSocketHandlerDecorator;
 
-import com.oronaminc.join.room.dto.WebSocketExitEvent;
+import com.oronaminc.join.room.dto.RoomExitEvent;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CustomWebSocketHandlerDecorator extends WebSocketHandlerDecorator {
-    // 연결된 세션 관리
+    private static final String ATTRIBUTES_ROOM_ID_KEY = "roomId";
 
+    // 연결된 세션 관리
     private final WebsocketSessionManager sessionManager;
     private final ApplicationEventPublisher publisher;
 
@@ -40,10 +41,22 @@ public class CustomWebSocketHandlerDecorator extends WebSocketHandlerDecorator {
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus)
             throws Exception {
         // 세션 연결 종료되면 map에서 제거
-        Principal principal = Objects.requireNonNull(session.getPrincipal());
-        publisher.publishEvent(new WebSocketExitEvent(Long.valueOf(principal.getName())));
+        exitRoomPublishEvent(session);
         sessionManager.removeSession(session.getId());
         super.afterConnectionClosed(session, closeStatus);
+    }
+
+    private void exitRoomPublishEvent(WebSocketSession session) {
+        Principal principal = Objects.requireNonNull(session.getPrincipal());
+        Long memberId = Long.valueOf(principal.getName());
+
+        Object value = session.getAttributes().get(ATTRIBUTES_ROOM_ID_KEY);
+        if (value == null) {
+            return;
+        }
+        Long roomId = (Long) value;
+
+        publisher.publishEvent(new RoomExitEvent(memberId, roomId));
     }
 
 }

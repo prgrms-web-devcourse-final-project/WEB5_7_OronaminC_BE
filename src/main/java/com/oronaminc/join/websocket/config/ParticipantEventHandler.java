@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 import com.oronaminc.join.global.exception.ErrorException;
-import com.oronaminc.join.room.dto.WebSocketExitEvent;
+import com.oronaminc.join.room.dto.RoomExitEvent;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,9 +33,12 @@ public class ParticipantEventHandler {
             throw new ErrorException(SOCKET_BAD_REQUEST_PATH);
         }
 
+        if (!destination.startsWith(ROOM_PREFIX)) {
+            return;
+        }
+
         Long memberId = parseMemberId(principal);
         Long roomId = parseRoomId(destination);
-
 
         if (!isRoomJoinPath(destination)) {
             validateParticipantRoomJoin(roomId, memberId);
@@ -43,8 +46,8 @@ public class ParticipantEventHandler {
     }
 
     @EventListener
-    public void handleUnsubscribe(WebSocketExitEvent event) {
-        participantManager.removeMember(event.memberId());
+    public void handleUnsubscribe(RoomExitEvent event) {
+        participantManager.removeParticipant(event.memberId(), event.roomId());
     }
 
     private boolean isRoomJoinPath(String destination) {

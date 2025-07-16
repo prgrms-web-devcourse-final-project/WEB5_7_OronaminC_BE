@@ -36,9 +36,7 @@ public class ParticipantManager {
         }
     }
 
-    public void removeMember(Long memberId) {
-        for (Set<Long> participants : roomParticipants.values()) {
-            participants.remove(memberId);
-        }
+    public void removeParticipant(Long memberId, Long roomId) {
+        roomParticipants.get(roomId).remove(memberId);
     }
 }
