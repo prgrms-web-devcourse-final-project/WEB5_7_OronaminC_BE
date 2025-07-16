@@ -1,20 +1,12 @@
 package com.oronaminc.join.question.service;
 
+import com.oronaminc.join.answer.service.AnswerService;
 import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
-import com.oronaminc.join.participant.service.ParticipantReader;
-import java.util.List;
-
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.oronaminc.join.answer.service.AnswerService;
 import com.oronaminc.join.global.util.SliceUtil;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.service.MemberReader;
+import com.oronaminc.join.participant.service.ParticipantReader;
 import com.oronaminc.join.participant.service.ParticipantService;
 import com.oronaminc.join.question.dao.QuestionRepository;
 import com.oronaminc.join.question.domain.Question;
@@ -25,8 +17,13 @@ import com.oronaminc.join.question.dto.QuestionFlatResponse;
 import com.oronaminc.join.question.util.QuestionMapper;
 import com.oronaminc.join.room.domain.Room;
 import com.oronaminc.join.room.service.RoomReader;
-
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
@@ -81,7 +78,8 @@ public class QuestionService {
     }
 
     @Transactional
-    public Question update(Long memberId, Long roomId, Long questionId, QuestionCreateRequest request) {
+    public Question update(Long memberId, Long roomId, Long questionId,
+        QuestionCreateRequest request) {
         Question question = questionReader.getByIdAndRoomId(questionId, roomId);
 
         // 참여자가 아님
@@ -110,7 +108,7 @@ public class QuestionService {
 
         // 관리자가 아님 && 작성자도 아님
         if (!participantReader.existsPresenterOrTeamByMemberId(roomId, memberId)
-        && !question.getMember().getId().equals(memberId)) {
+            && !question.getMember().getId().equals(memberId)) {
             throw new ErrorException(ErrorCode.UNAUTHORIZED_DELETE_QUESTION);
         }
 

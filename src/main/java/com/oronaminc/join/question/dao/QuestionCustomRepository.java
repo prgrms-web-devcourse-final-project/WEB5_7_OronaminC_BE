@@ -4,7 +4,6 @@ import com.oronaminc.join.question.domain.QuestionSort;
 import com.oronaminc.join.question.dto.QuestionFlatResponse;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 
 public interface QuestionCustomRepository {
 

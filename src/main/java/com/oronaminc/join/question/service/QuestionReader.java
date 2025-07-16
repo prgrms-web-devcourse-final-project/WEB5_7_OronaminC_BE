@@ -1,28 +1,24 @@
 package com.oronaminc.join.question.service;
 
-import com.oronaminc.join.question.dao.QuestionCustomRepository;
-import com.oronaminc.join.question.domain.QuestionSort;
-import java.util.List;
-import java.util.Optional;
-
-import com.oronaminc.join.room.dto.TopQnADto;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
-
 import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.question.dao.QuestionRepository;
 import com.oronaminc.join.question.domain.Question;
+import com.oronaminc.join.question.domain.QuestionSort;
 import com.oronaminc.join.question.dto.QuestionFlatResponse;
-
+import com.oronaminc.join.room.dto.TopQnADto;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class QuestionReader {
+
     private final QuestionRepository questionRepository;
-    private final QuestionCustomRepository questionCustomRepository;
 
     public Optional<Question> findById(Long questionId) {
         return questionRepository.findById(questionId);
@@ -30,7 +26,7 @@ public class QuestionReader {
 
     public Question getById(Long questionId) {
         return this.findById(questionId)
-                .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_QUESTION));
+            .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_QUESTION));
     }
 
     public Optional<Question> findByIdAndRoomId(Long questionId, Long roomId) {
@@ -39,12 +35,13 @@ public class QuestionReader {
 
     public Question getByIdAndRoomId(Long questionId, Long roomId) {
         return this.findByIdAndRoomId(questionId, roomId)
-                .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_ROOM_QUESTION));
+            .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_ROOM_QUESTION));
     }
+
     public List<QuestionFlatResponse> findQuestionsOrderBy(Long lastId, Long lastEmojiCount,
         Long memberId, Long roomId, QuestionSort sortType, Pageable pageable) {
-        return questionCustomRepository.findQuestionsOrderBy(lastId, lastEmojiCount,
-             memberId, roomId, sortType, pageable);
+        return questionRepository.findQuestionsOrderBy(lastId, lastEmojiCount,
+            memberId, roomId, sortType, pageable);
     }
 
     public List<Question> findByRoomId(Long roomId) {
@@ -59,9 +56,11 @@ public class QuestionReader {
         return !questionRepository.findByRoomId(roomId).isEmpty();
     }
 
-    public Long countByRoomId(Long roomId) { return questionRepository.countByRoomId(roomId);}
+    public Long countByRoomId(Long roomId) {
+        return questionRepository.countByRoomId(roomId);
+    }
 
     public List<TopQnADto> findTop3QnA(Long roomId) {
-        return questionRepository.findTop3QnAByRoomId(roomId, PageRequest.of(0,3));
+        return questionRepository.findTop3QnAByRoomId(roomId, PageRequest.of(0, 3));
     }
 }

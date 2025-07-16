@@ -5,10 +5,6 @@ import static com.oronaminc.join.emoji.domain.QEmoji.emoji;
 import static com.oronaminc.join.member.domain.QMember.member;
 import static com.oronaminc.join.question.domain.QQuestion.question;
 
-import com.oronaminc.join.answer.domain.QAnswer;
-import com.oronaminc.join.emoji.domain.QEmoji;
-import com.oronaminc.join.member.domain.QMember;
-import com.oronaminc.join.question.domain.QQuestion;
 import com.oronaminc.join.question.domain.QuestionSort;
 import com.oronaminc.join.question.dto.QuestionFlatResponse;
 import com.querydsl.core.BooleanBuilder;
@@ -21,10 +17,10 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class QuestionCustomRepositoryImpl implements QuestionCustomRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
