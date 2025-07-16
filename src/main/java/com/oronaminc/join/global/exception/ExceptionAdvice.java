@@ -1,5 +1,7 @@
 package com.oronaminc.join.global.exception;
 
+import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,7 @@ public class ExceptionAdvice {
             case ALREADY_EXISTS, BAD_REQUEST -> HttpStatus.BAD_REQUEST;
             case UNAUTHORIZED -> HttpStatus.UNAUTHORIZED;
             case FORBIDDEN -> HttpStatus.FORBIDDEN;
+            case TOO_MANY_REQUESTS -> TOO_MANY_REQUESTS;
         };
 
         return ResponseEntity.status(httpStatus)
@@ -50,11 +53,13 @@ public class ExceptionAdvice {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(
+        MethodArgumentNotValidException ex) {
 
         log.error("Method argument not valid", ex);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse("400", ex.getBindingResult().getAllErrors().get(0).getDefaultMessage()));
+            .body(new ErrorResponse("400",
+                ex.getBindingResult().getAllErrors().get(0).getDefaultMessage()));
     }
 }

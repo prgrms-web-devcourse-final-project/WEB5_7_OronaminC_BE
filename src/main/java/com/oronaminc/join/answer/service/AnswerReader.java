@@ -41,4 +41,8 @@ public class AnswerReader {
     public Long countAnsweredQuestionsByRoomId(Long roomId) {
         return answerRepository.countAnsweredQuestionsByRoomId(roomId);
     }
+
+    public List<Answer> getAnswerByQuestionIds(List<Long> questionIds) {
+        return answerRepository.findAllByQuestionIds(questionIds);
+    }
 }
