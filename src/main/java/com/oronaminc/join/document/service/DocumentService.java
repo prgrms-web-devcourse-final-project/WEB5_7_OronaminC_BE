@@ -1,6 +1,9 @@
 package com.oronaminc.join.document.service;
 
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.oronaminc.join.document.dao.DocumentRepository;
 import com.oronaminc.join.document.dto.DocumentRequest;
@@ -11,12 +14,8 @@ import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.infra.service.S3Service;
 import com.oronaminc.join.member.domain.MemberType;
 import com.oronaminc.join.room.domain.Room;
-import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
-
-import java.util.UUID;
-
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +24,7 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
     private final S3Service s3Service;
 
+    @Transactional
     public void deleteByRoomId(Long roomId) {
         documentRepository.deleteByRoomId(roomId);
     }

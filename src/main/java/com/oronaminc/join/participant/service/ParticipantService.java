@@ -87,6 +87,7 @@ public class ParticipantService {
         }
     }
 
+    @Transactional
     public void deleteParticipantByRoomId(Long roomId) {
         participantRepository.deleteByRoomId(roomId);
     }
