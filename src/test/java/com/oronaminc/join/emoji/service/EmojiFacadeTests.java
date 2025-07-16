@@ -3,6 +3,7 @@ package com.oronaminc.join.emoji.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.oronaminc.join.answer.service.AnswerReader;
+import com.oronaminc.join.config.TestQueryDslConfig;
 import com.oronaminc.join.emoji.dao.EmojiRepository;
 import com.oronaminc.join.emoji.domain.Emoji;
 import com.oronaminc.join.emoji.domain.TargetType;
@@ -32,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @DataJpaTest
 @Import({EmojiFacade.class, EmojiService.class, MemberReader.class, EmojiReader.class,
-    RoomReader.class, QuestionReader.class, AnswerReader.class})
+    RoomReader.class, QuestionReader.class, AnswerReader.class, TestQueryDslConfig.class})
 @ActiveProfiles("test")
 class EmojiFacadeTests {
 

@@ -30,4 +30,8 @@ public class WebsocketSessionManager {
 
     }
 
+    public void addAttribute(String sessionId, String attributeName, Object attributeValue) {
+        WebSocketSession session = sessions.get(sessionId);
+        session.getAttributes().put(attributeName, attributeValue);
+    }
 }

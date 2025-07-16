@@ -1,19 +1,22 @@
 package com.oronaminc.join.websocket.api;
 
-import com.oronaminc.join.global.exception.ErrorCode;
-import com.oronaminc.join.global.exception.ErrorException;
-import com.oronaminc.join.global.exception.ErrorResponse;
-import com.oronaminc.join.websocket.config.WebsocketSessionManager;
 import java.io.IOException;
 import java.net.SocketException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+
+import com.oronaminc.join.global.exception.ErrorCode;
+import com.oronaminc.join.global.exception.ErrorException;
+import com.oronaminc.join.global.exception.ErrorResponse;
+import com.oronaminc.join.websocket.config.WebsocketSessionManager;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ControllerAdvice
@@ -45,6 +48,7 @@ public class WebSocketExceptionHandler {
 
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
         log.info("에러를 보낼 세션 ID: {}", accessor.getSessionId());
+        log.info("에러: {} - {}", e.getErrorCode(), e.getMessage());
 
         return new ErrorResponse(e.getErrorCode());
     }

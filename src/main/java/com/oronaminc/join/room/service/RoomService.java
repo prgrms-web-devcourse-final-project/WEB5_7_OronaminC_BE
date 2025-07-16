@@ -1,35 +1,43 @@
 package com.oronaminc.join.room.service;
 
+import static com.oronaminc.join.global.exception.ErrorCode.*;
+
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.oronaminc.join.answer.domain.Answer;
-import com.oronaminc.join.answer.service.AnswerReader;
-import com.oronaminc.join.infra.service.S3Service;
-import com.oronaminc.join.participant.service.ParticipantReader;
-import com.oronaminc.join.question.domain.Question;
-import com.oronaminc.join.question.service.QuestionReader;
-import com.oronaminc.join.room.dto.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.oronaminc.join.global.exception.ErrorCode.*;
-
-import com.oronaminc.join.document.domain.Document;
-import com.oronaminc.join.document.service.DocumentReader;
+import com.oronaminc.join.answer.domain.Answer;
+import com.oronaminc.join.answer.service.AnswerReader;
 import com.oronaminc.join.document.service.DocumentService;
 import com.oronaminc.join.emoji.service.EmojiService;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.participant.domain.Participant;
 import com.oronaminc.join.participant.domain.ParticipantType;
+import com.oronaminc.join.participant.service.ParticipantReader;
 import com.oronaminc.join.participant.service.ParticipantService;
+import com.oronaminc.join.question.domain.Question;
+import com.oronaminc.join.question.service.QuestionReader;
 import com.oronaminc.join.question.service.QuestionService;
 import com.oronaminc.join.room.dao.RoomRepository;
 import com.oronaminc.join.room.domain.Room;
 import com.oronaminc.join.room.domain.RoomStatus;
+import com.oronaminc.join.room.dto.CreateRoomRequest;
+import com.oronaminc.join.room.dto.CreateRoomResponse;
+import com.oronaminc.join.room.dto.JoinRoomRequest;
+import com.oronaminc.join.room.dto.JoinRoomResponse;
+import com.oronaminc.join.room.dto.ReportResponse;
+import com.oronaminc.join.room.dto.RoomDetailResponse;
+import com.oronaminc.join.room.dto.RoomJoinResponse;
+import com.oronaminc.join.room.dto.RoomUpdateInfoResponse;
+import com.oronaminc.join.room.dto.RoomUpdateRequest;
+import com.oronaminc.join.room.dto.RoomUpdateStatusRequest;
+import com.oronaminc.join.room.dto.TopQnADto;
 import com.oronaminc.join.room.util.CodeGenerator;
 import com.oronaminc.join.room.util.RoomMapper;
+import com.oronaminc.join.websocket.config.ParticipantManager;
 
 import lombok.RequiredArgsConstructor;
 
@@ -46,13 +54,13 @@ public class RoomService {
     private final RoomReader roomReader;
     private final AnswerReader answerReader;
     private final ParticipantReader participantReader;
-
+    private final QuestionReader questionReader;
+    private final ParticipantManager participantManager;
 
     private static final int CODE_LENGTH = 6;
-    private final QuestionReader questionReader;
 
     public CreateRoomResponse createRoom(CreateRoomRequest createRoomRequest,
-        String presenterEmail) {
+            String presenterEmail) {
         String code = this.generateCode();
         Room room = RoomMapper.toRoom(createRoomRequest, code);
         roomRepository.save(room);
@@ -64,7 +72,9 @@ public class RoomService {
 
     public JoinRoomResponse joinRoom(Long memberId, JoinRoomRequest joinRoomRequest) {
         Room room = roomReader.getBySecretCode(joinRoomRequest.secretCode());
-
+        if (room.getRoomStatus().equals(RoomStatus.STARTED)) {
+            throw new ErrorException(UNAUTHORIZED_JOIN_ROOM);
+        }
         participantService.saveParticipantById(memberId, room, ParticipantType.GUEST);
         return new JoinRoomResponse(room.getId());
     }
@@ -77,7 +87,10 @@ public class RoomService {
         Participant presenter = participantService.getPresenter(roomId);
         List<Participant> team = participantService.getTeam(roomId);
 
-        return RoomMapper.toRoomDetailResponse(room, presenter, team, memberId);
+        int participantCount = participantManager.getRoomParticipants(roomId).size();
+
+        return RoomMapper.toRoomDetailResponse(room, presenter, team, memberId, participantCount);
+
     }
 
     public void updateRoom(Long memberId, Long roomId, RoomUpdateRequest updateRoomRequest) {
@@ -110,7 +123,7 @@ public class RoomService {
     }
 
     public void updateRoomStatus(Long memberId, Long roomId,
-        RoomUpdateStatusRequest roomUpdateStatusRequest) {
+            RoomUpdateStatusRequest roomUpdateStatusRequest) {
         participantService.validatePresenter(roomId, memberId);
         Room room = roomReader.getById(roomId);
 
@@ -153,8 +166,7 @@ public class RoomService {
         Double answerRate = calculateAnswerRate(totalQuestions, totalAnswerByQuestion);
         List<TopQnADto> topQnA = getTopQnA(roomId);
 
-
-        return RoomMapper.toReportResponse(room, totalView,totalQuestions, answerRate, topQnA);
+        return RoomMapper.toReportResponse(room, totalView, totalQuestions, answerRate, topQnA);
     }
 
     private List<TopQnADto> getTopQnA(Long roomId) {
@@ -177,7 +189,7 @@ public class RoomService {
                 ));
 
         return top3Question.stream()
-                .map( q -> new TopQnADto(
+                .map(q -> new TopQnADto(
                         q.getContent(),
                         q.getEmojiCount(),
                         answersByQuestionId.getOrDefault(q.getId(), List.of())
@@ -188,7 +200,18 @@ public class RoomService {
     private Double calculateAnswerRate(Long totalQuestions, Long totalAnswerByQuestion) {
         return (totalQuestions == 0)
                 ? 0.0
-                : ((double) totalAnswerByQuestion / totalQuestions) * 100;
+                : ((double)totalAnswerByQuestion / totalQuestions) * 100;
 
+    }
+
+    public RoomJoinResponse subscribeRoom(Long roomId, Long memberId) {
+        participantService.validateParticipant(memberId, roomId);
+        Room room = roomReader.getById(roomId);
+        if (!room.getRoomStatus().canSubscribeRoom) {
+            throw new ErrorException(UNAUTHORIZED_SUBSCRIBE_ROOM);
+        }
+        Integer limit = room.getParticipantLimit();
+        participantManager.addParticipant(roomId, memberId, limit);
+        return new RoomJoinResponse(participantManager.getRoomParticipants(roomId).size());
     }
 }
