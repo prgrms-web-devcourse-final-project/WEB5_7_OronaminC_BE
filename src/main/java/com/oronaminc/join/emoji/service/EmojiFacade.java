@@ -14,19 +14,34 @@ public class EmojiFacade {
 
     private final EmojiService emojiService;
 
-    public EmojiResponse toggleEmoji(Long memberId, EmojiRequest emojiRequest) {
+    public EmojiResponse createEmoji(Long memberId, EmojiRequest emojiRequest) {
         for (int i = 0; i < 10; i++) {
             try {
-                return emojiService.toggleEmoji(memberId, emojiRequest);
+                return emojiService.createEmoji(memberId, emojiRequest);
             } catch (ObjectOptimisticLockingFailureException e) {
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException ex) {
-                    throw new ErrorException(ErrorCode.EMOJI_CONFLICT);
+                    throw new ErrorException(ErrorCode.CONFLICT_EMOJI);
                 }
             }
         }
-        throw new ErrorException(ErrorCode.EMOJI_CONFLICT);
+        throw new ErrorException(ErrorCode.CONFLICT_EMOJI);
+    }
+
+    public EmojiResponse deleteEmoji(Long memberId, EmojiRequest emojiRequest) {
+        for (int i = 0; i < 10; i++) {
+            try {
+                return emojiService.deleteEmoji(memberId, emojiRequest);
+            } catch (ObjectOptimisticLockingFailureException e) {
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException ex) {
+                    throw new ErrorException(ErrorCode.CONFLICT_EMOJI);
+                }
+            }
+        }
+        throw new ErrorException(ErrorCode.CONFLICT_EMOJI);
     }
 
 }

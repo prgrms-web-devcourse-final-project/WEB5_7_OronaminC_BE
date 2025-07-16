@@ -5,6 +5,7 @@ import static com.oronaminc.join.global.exception.ErrorStatus.CONFLICT;
 import static com.oronaminc.join.global.exception.ErrorStatus.FORBIDDEN;
 import static com.oronaminc.join.global.exception.ErrorStatus.INTERNAL_SERVER_ERROR;
 import static com.oronaminc.join.global.exception.ErrorStatus.NOT_FOUND;
+import static com.oronaminc.join.global.exception.ErrorStatus.TOO_MANY_REQUESTS;
 import static com.oronaminc.join.global.exception.ErrorStatus.UNAUTHORIZED;
 
 import lombok.AllArgsConstructor;
@@ -24,7 +25,7 @@ public enum ErrorCode {
     NOT_FOUND_PARTICIPANT("PARTICIPANT-001", "발표방에 존재하지 않는 회원입니다.", NOT_FOUND),
     UNAUTHORIZED_TEAM_GUEST("PARTICIPANT-002", "게스트는 팀이 될 수 없습니다.", UNAUTHORIZED),
     UNAUTHORIZED_UPDATE_AND_DELETE("PARTICIPANT-003", "발표방 수정 및 삭제 권한이 없습니다.", UNAUTHORIZED),
-    UNAUTHORIZED_REPORT_READ("PARTICIPANT-004","결과 리포트 조회 권한이 없습니다.", UNAUTHORIZED),
+    UNAUTHORIZED_REPORT_READ("PARTICIPANT-004", "결과 리포트 조회 권한이 없습니다.", UNAUTHORIZED),
 
     FILE_UPLOAD_FAILED("FILE-001", "파일 업로드에 실패하였습니다.", INTERNAL_SERVER_ERROR),
     NOT_FOUND_FILE("FILE-002", "존재하지 않는 파일입니다.", NOT_FOUND),
@@ -48,7 +49,10 @@ public enum ErrorCode {
     SOCKET_RUNTIME_ERROR("SOCKET-2000", "처리되지 않은 오류가 발생했습니다", INTERNAL_SERVER_ERROR),
     SOCKET_VALIDATION_ERROR("SOCKET-1001", "입력값이 유효하지 않습니다.", BAD_REQUEST),
 
-    EMOJI_CONFLICT("EMOJI-001", "공감 처리 중 충돌이 발생했습니다.", CONFLICT);
+    CONFLICT_EMOJI("EMOJI-001", "공감 처리 중 충돌이 발생했습니다.", CONFLICT),
+    NOT_FOUND_EMOJI("EMOJI-002", "해당 이모지가 존재하지 않습니다.", NOT_FOUND),
+    TOO_MANY_REQUESTS_EMOJI("EMOJI-003", "잠시 후 다시 시도해주세요.", TOO_MANY_REQUESTS),
+    ALREADY_EXISTS_EMOJI("EMOJI-004", "이미 해당 이모지가 존재합니다.", CONFLICT);
 
     private final String code;
     private final String message;
