@@ -23,19 +23,17 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Repository;
 
-@Repository
 @AllArgsConstructor
 public class QuestionCustomRepositoryImpl implements QuestionCustomRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<QuestionFlatResponse> findQuestionsOrderBy(Long lastId, Long lastEmojiId,
-        Long lastEmojiCount, Long memberId, Long roomId, QuestionSort sortType, Pageable pageable) {
+    public List<QuestionFlatResponse> findQuestionsOrderBy(Long lastId, Long lastEmojiCount,
+        Long memberId, Long roomId, QuestionSort sortType, Pageable pageable) {
 
-        Predicate where = createPredicate(lastId, lastEmojiId, lastEmojiCount, memberId, roomId,
+        Predicate where = createPredicate(lastId, lastEmojiCount, memberId, roomId,
             sortType);
 
         JPAQuery<QuestionFlatResponse> query = jpaQueryFactory
@@ -61,8 +59,8 @@ public class QuestionCustomRepositoryImpl implements QuestionCustomRepository {
             .fetch();
     }
 
-    private Predicate createPredicate(Long lastId, Long lastEmojiId,
-        Long lastEmojiCount, Long memberId, Long roomId, QuestionSort sortType) {
+    private Predicate createPredicate(Long lastId, Long lastEmojiCount,
+        Long memberId, Long roomId, QuestionSort sortType) {
 
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(question.room.id.eq(roomId));
@@ -74,7 +72,7 @@ public class QuestionCustomRepositoryImpl implements QuestionCustomRepository {
                 }
             }
             case EMOJI -> {
-                if (lastEmojiId != null) {
+                if (lastEmojiCount != null) {
                     builder.and(
                         question.emojiCount.lt(lastEmojiCount)
                             .or(question.emojiCount.eq(lastEmojiCount).and(question.id.lt(lastId)))

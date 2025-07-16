@@ -70,14 +70,9 @@ public class QuestionService {
 
         Pageable pageable = PageRequest.of(0, size + 1);
 
-        List<QuestionFlatResponse> questions = switch (sort) {
-            case QuestionSort.CREATEDAT -> questionReader.findByCreatedAt(lastId,
-                memberId, roomId, pageable);
-            case QuestionSort.EMOJI -> questionReader.findByEmojiCount(lastId,
-                lastEmojiCount, memberId, roomId, pageable);
-            case QuestionSort.MYQUESTION -> questionReader.findByMyQuestion(lastId,
-                memberId, roomId, pageable);
-        };
+        List<QuestionFlatResponse> questions = questionReader.findQuestionsOrderBy(lastId,
+            lastEmojiCount, memberId, roomId, sort,
+            pageable);
 
         List<QuestionAssembleResponse> assembledList = questions.stream()
             .map(QuestionMapper::toQuestionListResponse).toList();

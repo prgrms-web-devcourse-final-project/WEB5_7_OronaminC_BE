@@ -1,5 +1,6 @@
 package com.oronaminc.join.question.service;
 
+import com.oronaminc.join.question.dao.QuestionCustomRepository;
 import com.oronaminc.join.question.domain.QuestionSort;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class QuestionReader {
     private final QuestionRepository questionRepository;
+    private final QuestionCustomRepository questionCustomRepository;
 
     public Optional<Question> findById(Long questionId) {
         return questionRepository.findById(questionId);
@@ -39,10 +41,10 @@ public class QuestionReader {
         return this.findByIdAndRoomId(questionId, roomId)
                 .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_ROOM_QUESTION));
     }
-    public List<QuestionFlatResponse> findQuestionsOrderBy(Long lastId, Long lastEmojiId,
-        Long lastEmojiCount, Long memberId, Long roomId, QuestionSort sortType, Pageable pageable) {
-        return questionRepository.findQuestionsOrderBy(lastId, lastEmojiId,
-            lastEmojiCount, memberId, roomId, sortType, pageable);
+    public List<QuestionFlatResponse> findQuestionsOrderBy(Long lastId, Long lastEmojiCount,
+        Long memberId, Long roomId, QuestionSort sortType, Pageable pageable) {
+        return questionCustomRepository.findQuestionsOrderBy(lastId, lastEmojiCount,
+             memberId, roomId, sortType, pageable);
     }
 
     public List<Question> findByRoomId(Long roomId) {

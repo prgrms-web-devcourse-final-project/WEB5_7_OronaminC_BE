@@ -8,6 +8,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface QuestionCustomRepository {
 
-    List<QuestionFlatResponse> findQuestionsOrderBy(Long lastId, Long lastEmojiId,
-        Long lastEmojiCount, Long memberId, Long roomId, QuestionSort sortType, Pageable pageable);
+    List<QuestionFlatResponse> findQuestionsOrderBy(Long lastId, Long lastEmojiCount,
+        Long memberId, Long roomId, QuestionSort sortType, Pageable pageable);
 }
