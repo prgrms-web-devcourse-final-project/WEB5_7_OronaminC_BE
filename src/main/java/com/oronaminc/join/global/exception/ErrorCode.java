@@ -44,6 +44,8 @@ public enum ErrorCode {
     NOT_FOUND_EXIST_ANSWER("ANSWER-002", "해당 질문에 대한 답변이 존재하지 않습니다.", NOT_FOUND),
     NOT_FOUND_ANSWER("ANSWER-003", "답변이 존재하지 않습니다.", NOT_FOUND),
     BADREQUEST_DUPLICATION_ANSWER("ANSWER-004", "이미 답변한 질문입니다.", BAD_REQUEST),
+    UNAUTHORIZED_EDIT_ANSWER("ANSWER-005", "작성자가 아니면 해당 댓글을 수정할 수 없습니다.", UNAUTHORIZED),
+    UNAUTHORIZED_DELETE_ANSWER("ANSWER-006", "작성자 혹은 팀원, 발표자가 아니면 해당 댓글을 삭제할 수 없습니다.", UNAUTHORIZED),
 
 
     ACCESS_DENIED_SESSION("SESSION-1201", "접근 권한이 없습니다.", FORBIDDEN),
