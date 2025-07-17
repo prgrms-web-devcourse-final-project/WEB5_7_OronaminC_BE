@@ -25,11 +25,9 @@ public class DocumentEventHandler {
         try {
             s3Service.moveObject(event.objectKey(), newKey);
 
-            log.info("✅ S3 파일 이동 성공: {} → {}", event.objectKey(), newKey);
+            log.debug("✅ S3 파일 이동 성공: {} → {}", event.objectKey(), newKey);
         } catch (Exception e) {
-            log.info("원본 키: {}", event.objectKey());
-            log.info("디코딩 키: {}", URLDecoder.decode(event.objectKey(), StandardCharsets.UTF_8));
-            log.info("❌ S3 파일 이동 실패: {} → {}, 이유: {}", event.objectKey(), newKey, e.getMessage(), e);
+            log.debug("❌ S3 파일 이동 실패: {} → {}, 이유: {}", event.objectKey(), newKey, e.getMessage(), e);
         }
     }
 }
