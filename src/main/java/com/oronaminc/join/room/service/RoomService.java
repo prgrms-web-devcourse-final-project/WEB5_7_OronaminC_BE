@@ -70,8 +70,8 @@ public class RoomService {
         Room room = RoomMapper.toRoom(createRoomRequest, code);
         roomRepository.save(room);
 
-        documentService.saveDocument(createRoomRequest.documentUrl(), room);
         participantService.savePresenterAndTeam(presenterEmail, createRoomRequest.teamEmail(), room);
+        documentService.saveDocument(createRoomRequest.documentUrl(), room);
 
         return RoomMapper.toCreateRoomResponse(room);
     }

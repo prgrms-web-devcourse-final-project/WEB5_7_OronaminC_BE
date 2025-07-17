@@ -1,5 +1,7 @@
 package com.oronaminc.join.document.service;
 
+import com.oronaminc.join.document.event.DocumentCreateEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import com.oronaminc.join.document.dao.DocumentRepository;
@@ -15,6 +17,8 @@ import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 
@@ -24,6 +28,7 @@ public class DocumentService {
 
     private final DocumentRepository documentRepository;
     private final S3Service s3Service;
+    private final ApplicationEventPublisher publisher;
 
     public void deleteByRoomId(Long roomId) {
         documentRepository.deleteByRoomId(roomId);
@@ -34,8 +39,16 @@ public class DocumentService {
             throw new ErrorException(ErrorCode.UNAUTHORIZED_MEMBER);
         }
 
+        String OriginalFileName = request.fileName();
+        String extension = "";
+
+        int dotIndex = OriginalFileName.lastIndexOf('.');
+        if (dotIndex != -1) {
+            extension = OriginalFileName.substring(dotIndex);
+        }
+
         String uuid = UUID.randomUUID().toString();
-        String objectKey = "documents/" + uuid + "_" + request.fileName();
+        String objectKey = "temp/" + uuid + extension;
         String presignedUrl = s3Service.generatePresignedUrl(objectKey);
 
         return new DocumentResponse(presignedUrl, objectKey);
@@ -44,8 +57,13 @@ public class DocumentService {
     @Transactional
     public void saveDocument(String objectKey, Room room) {
         String fileName = objectKey.replaceAll("^.*/","");
+        String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8);
 
-        documentRepository.save(DocumentMapper.toDocument(objectKey, fileName, room));
+        String oldKey = "temp/" + encodedFileName;
+        String newKey = "documents/" + encodedFileName;
+
+        documentRepository.save(DocumentMapper.toDocument(newKey, fileName, room));
+        publisher.publishEvent(new DocumentCreateEvent(oldKey, fileName));
     }
 
 }
