@@ -20,7 +20,7 @@ import com.oronaminc.join.question.dao.QuestionRepository;
 import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.domain.QuestionSort;
 import com.oronaminc.join.question.dto.QuestionAssembleResponse;
-import com.oronaminc.join.question.dto.QuestionCreateRequest;
+import com.oronaminc.join.question.dto.QuestionRequest;
 import com.oronaminc.join.question.dto.QuestionFlatResponse;
 import com.oronaminc.join.question.util.QuestionMapper;
 import com.oronaminc.join.room.domain.Room;
@@ -42,7 +42,7 @@ public class QuestionService {
     private final ParticipantReader participantReader;
 
     @Transactional
-    public Question create(Long roomId, Long memberId, QuestionCreateRequest requestDto) {
+    public Question create(Long roomId, Long memberId, QuestionRequest requestDto) {
 
         Member member = memberReader.getById(memberId);
 
@@ -81,8 +81,7 @@ public class QuestionService {
     }
 
     @Transactional
-    public Question update(Long memberId, Long roomId, Long questionId,
-        QuestionCreateRequest request) {
+    public Question update(Long memberId, Long roomId, Long questionId, QuestionRequest request) {
         Question question = questionReader.getByIdAndRoomId(questionId, roomId);
 
         // 참여자가 아님

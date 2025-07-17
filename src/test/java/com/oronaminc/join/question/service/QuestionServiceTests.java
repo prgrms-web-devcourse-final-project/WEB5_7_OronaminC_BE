@@ -21,8 +21,8 @@ import com.oronaminc.join.question.dao.QuestionRepository;
 import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.domain.QuestionSort;
 import com.oronaminc.join.question.dto.QuestionAssembleResponse;
-import com.oronaminc.join.question.dto.QuestionCreateRequest;
 import com.oronaminc.join.question.dto.QuestionFlatResponse;
+import com.oronaminc.join.question.dto.QuestionRequest;
 import com.oronaminc.join.room.domain.Room;
 import com.oronaminc.join.room.domain.RoomStatus;
 import com.oronaminc.join.room.service.RoomReader;
@@ -66,7 +66,7 @@ class QuestionServiceTests {
 
     private Room mockRoom;
     private Member mockMember;
-    private QuestionCreateRequest request;
+    private QuestionRequest request;
     private QuestionFlatResponse mockQ1;
     private QuestionFlatResponse mockQ2;
 
@@ -93,7 +93,7 @@ class QuestionServiceTests {
             .roomStatus(RoomStatus.STARTED)
             .build();
 
-        request = new QuestionCreateRequest("질문입니다");
+        request = new QuestionRequest("질문입니다");
 
         mockQ1 = QuestionFlatResponse.builder()
             .questionId(1L)
