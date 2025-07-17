@@ -21,7 +21,7 @@ public class ErrorException extends RuntimeException {
         return new ErrorException(errorCode, errorMessage);
     }
 
-    public String createMessage(String message, Object... args) {
+    public static String createMessage(String message, Object... args) {
         return StringUtil.format(message, args);
     }
 

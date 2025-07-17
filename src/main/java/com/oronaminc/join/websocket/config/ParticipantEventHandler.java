@@ -2,6 +2,7 @@ package com.oronaminc.join.websocket.config;
 
 import static com.oronaminc.join.global.exception.ErrorCode.*;
 
+import com.oronaminc.join.global.exception.ErrorCode;
 import java.security.Principal;
 import java.util.Set;
 
@@ -30,7 +31,7 @@ public class ParticipantEventHandler {
         Principal principal = accessor.getUser();
 
         if (destination == null) {
-            throw new ErrorException(SOCKET_BAD_REQUEST_PATH);
+            throw new ErrorException(STOMP_INVALID_DESTINATION);
         }
 
         if (!destination.startsWith(ROOM_PREFIX)) {
@@ -66,7 +67,7 @@ public class ParticipantEventHandler {
             String[] parts = destination.split("/");
             return Long.valueOf(parts[3]);
         } catch (Exception e) {
-            throw new ErrorException(SOCKET_BAD_REQUEST_PATH);
+            throw new ErrorException(STOMP_INVALID_DESTINATION);
         }
     }
 

@@ -11,6 +11,7 @@ import com.oronaminc.join.answer.mapper.AnswerMapper;
 import com.oronaminc.join.answer.service.AnswerService;
 import com.oronaminc.join.answer.util.PermissionValidator;
 import com.oronaminc.join.global.exception.ErrorException;
+import com.oronaminc.join.websocket.common.EventType;
 import jakarta.validation.Valid;
 import java.security.Principal;
 import lombok.RequiredArgsConstructor;
@@ -79,7 +80,7 @@ public class AnswerWebsocketController {
 
         answerService.delete(answerId);
 
-        return new AnswerDeleteResponse(answerId, "DELETE");
+        return new AnswerDeleteResponse(answerId, EventType.DELETE);
     }
 
     private Long getMemberId(Principal principal) {
