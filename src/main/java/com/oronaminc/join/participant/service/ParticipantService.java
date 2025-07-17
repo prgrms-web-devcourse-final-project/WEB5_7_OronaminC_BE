@@ -20,13 +20,14 @@ import com.oronaminc.join.room.domain.Room;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@Transactional
+@Transactional(readOnly=true)
 @RequiredArgsConstructor
 public class ParticipantService {
     private final ParticipantRepository participantRepository;
     private final ParticipantReader participantReader;
     private final MemberReader memberReader;
 
+    @Transactional
     public void savePresenterAndTeam(String presenterEmail, List<String> teamEmail, Room room) {
         saveMemberParticipantByEmail(presenterEmail, room, ParticipantType.PRESENTER);
         for (String email : teamEmail) {
@@ -34,6 +35,7 @@ public class ParticipantService {
         }
     }
 
+    @Transactional
     public void saveMemberParticipantByEmail(String email, Room room, ParticipantType participantType) {
         Member participantMember = memberReader.getByEmail(email);
         if (participantMember.getMemberType().equals(MemberType.GUEST)) {
@@ -42,7 +44,8 @@ public class ParticipantService {
         Participant participant = ParticipantMapper.toParticipant(participantMember, room, participantType);
         participantRepository.save(participant);
     }
-    
+
+    @Transactional
     public void saveParticipantById(Long memberId, Room room, ParticipantType participantType) {
         Member participantMember = memberReader.getById(memberId);
         if (participantReader.existsByRoomIdAndMemberId(room.getId(), participantMember.getId())) {
@@ -67,6 +70,7 @@ public class ParticipantService {
         return participantReader.findAllByRoomIdAndParticipantType(roomId, ParticipantType.TEAM);
     }
 
+    @Transactional
     public void updateTeam(Room room, List<String> emails) {
         List<Participant> team = this.getTeam(room.getId());
         for (Participant participant : team) {
@@ -90,5 +94,11 @@ public class ParticipantService {
     @Transactional
     public void deleteParticipantByRoomId(Long roomId) {
         participantRepository.deleteByRoomId(roomId);
+    }
+
+    @Transactional
+    public void updateExitAt(Long roomId, Long memberId) {
+        Participant participant = participantReader.getByRoomIdAndMemberId(roomId, memberId);
+        participant.updateExitAt();
     }
 }

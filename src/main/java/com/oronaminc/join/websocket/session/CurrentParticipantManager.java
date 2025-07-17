@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import com.oronaminc.join.global.exception.ErrorException;
 
 @Component
-public class ParticipantManager {
+public class CurrentParticipantManager {
     private final Map<Long, Set<Long>> roomParticipants = new ConcurrentHashMap<>();
 
     public Set<Long> getRoomParticipants(Long roomId) {

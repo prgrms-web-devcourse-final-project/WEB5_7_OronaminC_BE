@@ -1,4 +1,4 @@
-package com.oronaminc.join.room.service;
+package com.oronaminc.join.room.event;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -7,7 +7,6 @@ import com.oronaminc.join.document.service.DocumentService;
 import com.oronaminc.join.emoji.service.EmojiService;
 import com.oronaminc.join.participant.service.ParticipantService;
 import com.oronaminc.join.question.service.QuestionService;
-import com.oronaminc.join.room.dto.RoomDeleteEvent;
 
 import lombok.RequiredArgsConstructor;
 

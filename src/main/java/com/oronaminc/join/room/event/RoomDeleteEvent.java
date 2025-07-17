@@ -1,4 +1,4 @@
-package com.oronaminc.join.room.dto;
+package com.oronaminc.join.room.event;
 
 public record RoomDeleteEvent(
         Long roomId

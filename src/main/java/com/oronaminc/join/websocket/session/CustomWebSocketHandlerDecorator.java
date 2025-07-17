@@ -9,7 +9,7 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.WebSocketHandlerDecorator;
 
-import com.oronaminc.join.room.dto.RoomExitEvent;
+import com.oronaminc.join.room.event.RoomExitEvent;
 
 import lombok.extern.slf4j.Slf4j;
 
