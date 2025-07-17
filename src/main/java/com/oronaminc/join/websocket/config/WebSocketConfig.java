@@ -11,6 +11,11 @@ import org.springframework.web.socket.config.annotation.WebSocketTransportRegist
 import org.springframework.web.socket.handler.WebSocketHandlerDecoratorFactory;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
+import com.oronaminc.join.websocket.handshake.CustomHandshakeHandler;
+import com.oronaminc.join.websocket.session.CustomWebSocketHandlerDecorator;
+import com.oronaminc.join.websocket.session.WebsocketSessionManager;
+import com.oronaminc.join.websocket.stomp.StompErrorHandler;
+
 import lombok.RequiredArgsConstructor;
 
 @Configuration

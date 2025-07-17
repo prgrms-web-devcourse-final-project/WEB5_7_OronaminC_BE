@@ -11,7 +11,7 @@ import org.springframework.stereotype.Controller;
 
 import com.oronaminc.join.room.dto.RoomJoinResponse;
 import com.oronaminc.join.room.service.RoomService;
-import com.oronaminc.join.websocket.config.WebsocketSessionManager;
+import com.oronaminc.join.websocket.session.WebsocketSessionManager;
 
 import lombok.RequiredArgsConstructor;
 
