@@ -42,9 +42,7 @@ public class QuestionService {
     public Question create(Long roomId, Long memberId, QuestionRequest requestDto) {
 
         Member member = memberReader.getById(memberId);
-
         Room room = roomReader.getById(roomId);
-
         participantService.validateParticipant(memberId, roomId);
 
         Question question = QuestionMapper.toQuestion(room, member, requestDto);
@@ -116,7 +114,6 @@ public class QuestionService {
 
         return question.getId();
     }
-
 
     @Transactional
     public void deleteByRoomId(Long roomId) {

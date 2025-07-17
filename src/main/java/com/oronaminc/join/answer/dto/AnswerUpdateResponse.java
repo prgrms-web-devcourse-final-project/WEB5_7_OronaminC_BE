@@ -1,5 +1,6 @@
 package com.oronaminc.join.answer.dto;
 
+import com.oronaminc.join.websocket.common.EventType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
@@ -8,7 +9,7 @@ import lombok.Builder;
 public record AnswerUpdateResponse(
     Long answerId,
     @Schema(description = "수정 이벤트", example = "UPDATE")
-    String event,
+    EventType event,
     @Schema(description = "수정된 내용", example = "수정된 답변입니다.")
     String content
 
