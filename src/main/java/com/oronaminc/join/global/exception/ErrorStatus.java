@@ -1,0 +1,12 @@
+package com.oronaminc.join.global.exception;
+
+public enum ErrorStatus {
+    NOT_FOUND,
+    CONFLICT,
+    INTERNAL_SERVER_ERROR,
+    ALREADY_EXISTS,
+    BAD_REQUEST,
+    UNAUTHORIZED,
+    FORBIDDEN,
+    TOO_MANY_REQUESTS
+}
