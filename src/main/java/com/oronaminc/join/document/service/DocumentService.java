@@ -1,6 +1,7 @@
 package com.oronaminc.join.document.service;
 
 
+import com.oronaminc.join.document.domain.Document;
 import com.oronaminc.join.document.event.DocumentCreateEvent;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -21,9 +22,6 @@ import com.oronaminc.join.room.domain.Room;
 
 import lombok.RequiredArgsConstructor;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +30,7 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
     private final S3Service s3Service;
     private final ApplicationEventPublisher publisher;
+    private final DocumentReader documentReader;
 
     @Transactional
     public void deleteByRoomId(Long roomId) {
@@ -61,13 +60,25 @@ public class DocumentService {
     @Transactional
     public void saveDocument(String objectKey, Room room) {
         String fileName = objectKey.replaceAll("^.*/","");
-        String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8);
 
-        String oldKey = "temp/" + encodedFileName;
-        String newKey = "documents/" + encodedFileName;
+        String newKey = "documents/" + fileName;
 
         documentRepository.save(DocumentMapper.toDocument(newKey, fileName, room));
-        publisher.publishEvent(new DocumentCreateEvent(oldKey, fileName));
+        publisher.publishEvent(new DocumentCreateEvent(objectKey, fileName));
+    }
+
+    @Transactional
+    public void updateDocument(String objectKey, Long roomId) {
+        Document document = documentReader.getByRoomId(roomId);
+        String fileName = objectKey.replaceAll("^.*/","");
+
+        String oldKey = document.getFileUrl();
+        String newKey = "documents/" + fileName;
+
+        document.update(newKey);
+
+        s3Service.deleteFile(oldKey);
+        publisher.publishEvent(new DocumentCreateEvent(objectKey, fileName));
     }
 
 }

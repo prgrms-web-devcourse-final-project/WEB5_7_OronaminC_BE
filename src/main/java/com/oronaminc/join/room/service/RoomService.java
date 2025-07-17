@@ -111,9 +111,9 @@ public class RoomService {
             throw new ErrorException(BAD_REQUEST_ROOM_STARTED);
         }
 
-        document.update(updateRoomRequest.documentUrl());
         room.update(updateRoomRequest);
         participantService.updateTeam(room, updateRoomRequest.teamEmail());
+        documentService.updateDocument(updateRoomRequest.documentUrl(), roomId);
     }
 
     @Transactional
