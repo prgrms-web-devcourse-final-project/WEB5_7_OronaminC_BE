@@ -1,5 +1,7 @@
 package com.oronaminc.join.member.security;
 
+import static com.oronaminc.join.member.util.MemberMapper.*;
+
 import java.util.Map;
 import java.util.Optional;
 
@@ -12,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.oronaminc.join.member.dao.MemberRepository;
 import com.oronaminc.join.member.domain.Member;
-import com.oronaminc.join.member.domain.MemberType;
 import com.oronaminc.join.member.dto.GuestLoginRequest;
 import com.oronaminc.join.member.service.MemberReader;
 
@@ -39,45 +40,19 @@ public class AuthService extends DefaultOAuth2UserService {
 
         Optional<Member> optionalMember = memberReader.findByEmail(kakaoAccount.get("email").toString());
 
-        Member member = optionalMember.orElseGet(
-                () -> memberRepository.save(
-                        Member.builder()
-                                .email(kakaoAccount.get("email").toString())
-                                .nickname(profile.get("nickname").toString())
-                                .profileImage(profile.get("profile_image_url").toString())
-                                .memberType(MemberType.MEMBER)
-                                .build()
-                )
-        );
+        Member member = optionalMember.orElseGet(() -> memberRepository.save(toKakaoMember(kakaoAccount, profile)));
 
-        return MemberDetails.builder()
-                .id(member.getId())
-                .name(member.getEmail())
-                .nickname(member.getNickname())
-                .role(member.getMemberType())
-                .build();
+        return toOAuth2MemberDetails(member);
     }
 
     @Transactional
     public MemberDetails loadGuest(GuestLoginRequest guestLoginRequest) {
-        Member guest = Member.builder()
-                .email(null)
-                .nickname(guestLoginRequest.nickname())
-                .profileImage(null)
-                .memberType(MemberType.GUEST)
-                .build();
+        Member guest = toGuestMember(guestLoginRequest);
 
         memberRepository.save(guest);
+        guest.registerGuest();
 
-        // 1. 비회원 MemberDetails 생성
-        MemberDetails memberDetails = MemberDetails.builder()
-                .id(guest.getId())
-                .name("GUEST_" + guest.getId())
-                .nickname(guest.getNickname())
-                .role(MemberType.GUEST)
-                .build();
-
-        return memberDetails;
+        return toGuestMemberDetails(guest);
     }
 
 }

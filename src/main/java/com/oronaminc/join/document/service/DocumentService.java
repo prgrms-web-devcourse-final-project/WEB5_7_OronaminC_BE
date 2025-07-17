@@ -1,8 +1,13 @@
 package com.oronaminc.join.document.service;
 
+
 import com.oronaminc.join.document.event.DocumentCreateEvent;
 import org.springframework.context.ApplicationEventPublisher;
+
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.oronaminc.join.document.dao.DocumentRepository;
 import com.oronaminc.join.document.dto.DocumentRequest;
@@ -13,13 +18,11 @@ import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.infra.service.S3Service;
 import com.oronaminc.join.member.domain.MemberType;
 import com.oronaminc.join.room.domain.Room;
-import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
 
 
 @Service
@@ -30,6 +33,7 @@ public class DocumentService {
     private final S3Service s3Service;
     private final ApplicationEventPublisher publisher;
 
+    @Transactional
     public void deleteByRoomId(Long roomId) {
         documentRepository.deleteByRoomId(roomId);
     }
