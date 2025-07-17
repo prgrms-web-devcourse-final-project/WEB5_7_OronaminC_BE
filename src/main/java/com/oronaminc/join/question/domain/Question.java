@@ -2,7 +2,7 @@ package com.oronaminc.join.question.domain;
 
 import com.oronaminc.join.global.entity.BaseEntity;
 import com.oronaminc.join.member.domain.Member;
-import com.oronaminc.join.question.dto.QuestionCreateRequest;
+import com.oronaminc.join.question.dto.QuestionRequest;
 import com.oronaminc.join.room.domain.Room;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -50,7 +50,7 @@ public class Question extends BaseEntity {
     @Version
     private Integer version;
 
-    public static Question create(Room room, Member member, QuestionCreateRequest requestDto) {
+    public static Question create(Room room, Member member, QuestionRequest requestDto) {
         return Question.builder()
             .room(room)
             .member(member)

@@ -1,14 +1,18 @@
 package com.oronaminc.join.websocket.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.oronaminc.join.member.security.MemberDetails;
+import com.oronaminc.join.global.exception.ErrorCode;
+import com.oronaminc.join.global.exception.ErrorException;
+import com.oronaminc.join.global.ratelimit.RateLimitService;
+import com.oronaminc.join.global.ratelimit.RateLimitType;
 import com.oronaminc.join.question.domain.Question;
-import com.oronaminc.join.question.dto.QuestionCreateRequest;
 import com.oronaminc.join.question.dto.QuestionCreateResponse;
 import com.oronaminc.join.question.dto.QuestionDeleteResponse;
+import com.oronaminc.join.question.dto.QuestionRequest;
 import com.oronaminc.join.question.dto.QuestionUpdateResponse;
-import com.oronaminc.join.question.util.QuestionMapper;
 import com.oronaminc.join.question.service.QuestionService;
+import com.oronaminc.join.question.util.QuestionMapper;
+import io.github.bucket4j.Bucket;
+import jakarta.validation.Valid;
 import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +20,6 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
 @Slf4j
@@ -25,17 +28,22 @@ import org.springframework.stereotype.Controller;
 public class QuestionWebsocketController {
 
     private final QuestionService questionService;
-    private final ObjectMapper objectMapper;
+    private final RateLimitService rateLimitService;
 
     @MessageMapping("/rooms/{roomId}/questions/create")
     @SendTo("/topic/rooms/{roomId}/questions")
-    public QuestionCreateResponse create(
+    public QuestionCreateResponse createQuestion(
         @DestinationVariable Long roomId,
-        @Payload QuestionCreateRequest request,
+        @Payload @Valid QuestionRequest request,
         Principal principal
     ) {
-
         Long memberId = Long.valueOf(principal.getName());
+
+        Bucket bucket = rateLimitService.getBucket(RateLimitType.CREATE_QUESTION, roomId, memberId);
+
+        if (!bucket.tryConsume(1)) {
+            throw new ErrorException(ErrorCode.TOO_MANY_REQUESTS_QUESTION);
+        }
 
         Question question = questionService.create(roomId, memberId, request);
 
@@ -46,13 +54,12 @@ public class QuestionWebsocketController {
 
     @MessageMapping("/rooms/{roomId}/questions/{questionId}/update")
     @SendTo("/topic/rooms/{roomId}/questions")
-    public QuestionUpdateResponse update(
+    public QuestionUpdateResponse updateQuestion(
         @DestinationVariable Long roomId,
         @DestinationVariable Long questionId,
-        @Payload QuestionCreateRequest request,
+        @Payload @Valid QuestionRequest request,
         Principal principal
     ) {
-
         Long memberId = Long.valueOf(principal.getName());
 
         Question updated = questionService.update(memberId, roomId, questionId, request);
@@ -62,12 +69,11 @@ public class QuestionWebsocketController {
 
     @MessageMapping("rooms/{roomId}/questions/{questionId}/delete")
     @SendTo("/topic/rooms/{roomId}/questions")
-    public QuestionDeleteResponse delete(
+    public QuestionDeleteResponse deleteQuestion(
         @DestinationVariable Long roomId,
         @DestinationVariable Long questionId,
         Principal principal
     ) {
-
         Long memberId = Long.valueOf(principal.getName());
 
         Long deletedId = questionService.delete(memberId, roomId, questionId);

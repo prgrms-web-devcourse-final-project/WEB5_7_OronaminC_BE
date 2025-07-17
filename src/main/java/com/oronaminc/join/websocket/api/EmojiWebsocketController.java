@@ -47,7 +47,7 @@ public class EmojiWebsocketController {
     @SendTo("/topic/rooms/{roomId}/emojis")
     public EmojiResponse deleteEmoji(
         @DestinationVariable Long roomId,
-        @Payload EmojiRequest emojiRequest,
+        @Payload @Valid EmojiRequest emojiRequest,
         Principal principal
     ) {
         Long memberId = Long.valueOf(principal.getName());
