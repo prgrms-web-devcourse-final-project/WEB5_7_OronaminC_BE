@@ -4,7 +4,6 @@ import com.oronaminc.join.question.domain.Question;
 import java.util.Optional;
 import java.util.List;
 
-import com.oronaminc.join.room.dto.TopQnADto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

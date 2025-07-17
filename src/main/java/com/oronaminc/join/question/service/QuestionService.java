@@ -1,5 +1,13 @@
 package com.oronaminc.join.question.service;
 
+import java.util.List;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.oronaminc.join.answer.service.AnswerService;
 import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
@@ -17,13 +25,8 @@ import com.oronaminc.join.question.dto.QuestionFlatResponse;
 import com.oronaminc.join.question.util.QuestionMapper;
 import com.oronaminc.join.room.domain.Room;
 import com.oronaminc.join.room.service.RoomReader;
-import java.util.List;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
@@ -116,7 +119,6 @@ public class QuestionService {
 
         return question.getId();
     }
-
 
     @Transactional
     public void deleteByRoomId(Long roomId) {

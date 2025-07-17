@@ -1,18 +1,20 @@
 package com.oronaminc.join.question.service;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
+
 import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.question.dao.QuestionRepository;
 import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.domain.QuestionSort;
 import com.oronaminc.join.question.dto.QuestionFlatResponse;
-import com.oronaminc.join.room.dto.TopQnADto;
-import java.util.List;
-import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor

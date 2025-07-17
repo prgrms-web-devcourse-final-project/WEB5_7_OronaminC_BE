@@ -1,4 +1,4 @@
-package com.oronaminc.join.websocket.config;
+package com.oronaminc.join.websocket.session;
 
 import java.io.IOException;
 import java.util.Map;
