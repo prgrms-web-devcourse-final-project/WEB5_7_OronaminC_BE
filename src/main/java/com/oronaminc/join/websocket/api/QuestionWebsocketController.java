@@ -1,18 +1,18 @@
 package com.oronaminc.join.websocket.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.global.ratelimit.RateLimitService;
 import com.oronaminc.join.global.ratelimit.RateLimitType;
 import com.oronaminc.join.question.domain.Question;
-import com.oronaminc.join.question.dto.QuestionRequest;
 import com.oronaminc.join.question.dto.QuestionCreateResponse;
 import com.oronaminc.join.question.dto.QuestionDeleteResponse;
+import com.oronaminc.join.question.dto.QuestionRequest;
 import com.oronaminc.join.question.dto.QuestionUpdateResponse;
-import com.oronaminc.join.question.util.QuestionMapper;
 import com.oronaminc.join.question.service.QuestionService;
+import com.oronaminc.join.question.util.QuestionMapper;
 import io.github.bucket4j.Bucket;
+import jakarta.validation.Valid;
 import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,7 @@ public class QuestionWebsocketController {
     @SendTo("/topic/rooms/{roomId}/questions")
     public QuestionCreateResponse createQuestion(
         @DestinationVariable Long roomId,
-        @Payload QuestionRequest request,
+        @Valid @Payload QuestionRequest request,
         Principal principal
     ) {
         Long memberId = Long.valueOf(principal.getName());
@@ -57,7 +57,7 @@ public class QuestionWebsocketController {
     public QuestionUpdateResponse updateQuestion(
         @DestinationVariable Long roomId,
         @DestinationVariable Long questionId,
-        @Payload QuestionRequest request,
+        @Valid @Payload QuestionRequest request,
         Principal principal
     ) {
         Long memberId = Long.valueOf(principal.getName());

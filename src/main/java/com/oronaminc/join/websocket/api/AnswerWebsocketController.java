@@ -10,6 +10,7 @@ import com.oronaminc.join.member.dao.MemberRepository;
 import com.oronaminc.join.participant.dao.ParticipantRepository;
 import com.oronaminc.join.question.dao.QuestionRepository;
 import com.oronaminc.join.room.dao.RoomRepository;
+import jakarta.validation.Valid;
 import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +33,7 @@ public class AnswerWebsocketController {
     public AnswerCreateResponse create(
         @DestinationVariable Long roomId,
         @DestinationVariable Long questionId,
-        @Payload AnswerCreateRequest request,
+        @Valid @Payload AnswerCreateRequest request,
         Principal principal
     ) {
         Long memberId = Long.valueOf(principal.getName());
