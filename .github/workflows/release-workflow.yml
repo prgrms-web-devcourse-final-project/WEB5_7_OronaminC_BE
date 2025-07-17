@@ -3,7 +3,7 @@ name: OromaminC Backend Service Release
 on:
   push:
     branches:
-      - main
+      - release
 
 env:
   REGISTRY: ghcr.io
