@@ -4,12 +4,11 @@ import static com.oronaminc.join.global.exception.ErrorCode.BADREQUEST_DUPLICATI
 
 import com.oronaminc.join.answer.dao.AnswerRepository;
 import com.oronaminc.join.answer.domain.Answer;
-import com.oronaminc.join.answer.dto.AnswerCreateRequest;
+import com.oronaminc.join.answer.dto.AnswerRequest;
 import com.oronaminc.join.answer.dto.AnswerGetResponse;
 import com.oronaminc.join.answer.mapper.AnswerMapper;
 import com.oronaminc.join.emoji.domain.TargetType;
 import com.oronaminc.join.emoji.service.EmojiReader;
-import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.service.MemberReader;
@@ -38,7 +37,7 @@ public class AnswerService {
 
     @Transactional
     public Answer create(Long roomId, Long memberId, Long questionId,
-        AnswerCreateRequest requestDto) {
+        AnswerRequest request) {
 
         Member member = memberReader.getById(memberId);
         Room room = roomReader.getById(roomId);
@@ -50,7 +49,7 @@ public class AnswerService {
             throw new ErrorException(BADREQUEST_DUPLICATION_ANSWER);
         }
 
-        Answer answer = AnswerMapper.toEntity(question, member, requestDto);
+        Answer answer = AnswerMapper.toEntity(question, member, request);
 
         answerRepository.save(answer);
 
@@ -71,12 +70,28 @@ public class AnswerService {
         return AnswerMapper.toAnswerGetResponse(answer, emojiCount, isEmojied);
     }
 
+    @Transactional
+    public Answer update(Long answerId, AnswerRequest request) {
+        Answer answer = answerReader.getById(answerId);
+
+        answer.updataContent(request.content());
+
+        return answer;
+    }
+
+    @Transactional
+    public void delete(Long answerId) {
+        Answer answer = answerReader.getById(answerId);
+        answerRepository.delete(answer);
+    }
+
+    @Transactional
     public void deleteByQuestion(Long questionId) {
         answerRepository.deleteByQuestionId(questionId);
     }
 
+    @Transactional
     public void deleteByQuestionList(List<Question> questions) {
         answerRepository.deleteByQuestionIn(questions);
     }
-
 }

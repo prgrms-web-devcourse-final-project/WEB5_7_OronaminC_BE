@@ -34,7 +34,7 @@ public class QuestionWebsocketController {
     @SendTo("/topic/rooms/{roomId}/questions")
     public QuestionCreateResponse createQuestion(
         @DestinationVariable Long roomId,
-        @Valid @Payload QuestionRequest request,
+        @Payload @Valid QuestionRequest request,
         Principal principal
     ) {
         Long memberId = Long.valueOf(principal.getName());
@@ -57,7 +57,7 @@ public class QuestionWebsocketController {
     public QuestionUpdateResponse updateQuestion(
         @DestinationVariable Long roomId,
         @DestinationVariable Long questionId,
-        @Valid @Payload QuestionRequest request,
+        @Payload @Valid QuestionRequest request,
         Principal principal
     ) {
         Long memberId = Long.valueOf(principal.getName());

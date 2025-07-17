@@ -1,6 +1,5 @@
 package com.oronaminc.join.answer.domain;
 
-import com.oronaminc.join.answer.dto.AnswerCreateRequest;
 import com.oronaminc.join.global.entity.BaseEntity;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.question.domain.Question;
@@ -58,6 +57,10 @@ public class Answer extends BaseEntity {
             .content(content)
             .emojiCount(0L)
             .build();
+    }
+
+    public void updataContent(String content) {
+        this.content = content;
     }
 
     public Long incrementEmojiCount() {

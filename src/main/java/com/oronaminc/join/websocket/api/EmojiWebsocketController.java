@@ -28,7 +28,7 @@ public class EmojiWebsocketController {
     @SendTo("/topic/rooms/{roomId}/emojis")
     public EmojiResponse createEmoji(
         @DestinationVariable Long roomId,
-        @Valid @Payload EmojiRequest emojiRequest,
+        @Payload @Valid EmojiRequest emojiRequest,
         Principal principal
     ) {
         Long memberId = Long.valueOf(principal.getName());
@@ -47,7 +47,7 @@ public class EmojiWebsocketController {
     @SendTo("/topic/rooms/{roomId}/emojis")
     public EmojiResponse deleteEmoji(
         @DestinationVariable Long roomId,
-        @Valid @Payload EmojiRequest emojiRequest,
+        @Payload @Valid EmojiRequest emojiRequest,
         Principal principal
     ) {
         Long memberId = Long.valueOf(principal.getName());
