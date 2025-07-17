@@ -12,7 +12,7 @@ import com.oronaminc.join.room.dto.CreateRoomResponse;
 import com.oronaminc.join.room.dto.ReportResponse;
 import com.oronaminc.join.room.dto.RoomDetailResponse;
 import com.oronaminc.join.room.dto.RoomUpdateInfoResponse;
-import com.oronaminc.join.room.dto.TopQnADto;
+import com.oronaminc.join.room.dto.TopQnAResponse;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -68,7 +68,7 @@ public class RoomMapper {
                 .build();
     }
 
-    public static ReportResponse toReportResponse(Room room, Long totalView,Long totalQuestions, Double answerRate, List<TopQnADto> top3QnA) {
+    public static ReportResponse toReportResponse(Room room, Long totalView,Long totalQuestions, Double answerRate, List<TopQnAResponse> top3QnA) {
         return ReportResponse.builder()
                 .roomId(room.getId())
                 .title(room.getTitle())

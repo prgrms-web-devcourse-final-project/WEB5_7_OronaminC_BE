@@ -1,4 +1,4 @@
-package com.oronaminc.join.websocket.config;
+package com.oronaminc.join.websocket.session;
 
 import static com.oronaminc.join.global.exception.ErrorCode.*;
 
@@ -12,14 +12,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 import com.oronaminc.join.global.exception.ErrorException;
-import com.oronaminc.join.room.dto.RoomExitEvent;
+import com.oronaminc.join.room.event.RoomExitEvent;
 
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class ParticipantEventHandler {
-    private final ParticipantManager participantManager;
+public class CurrentParticipantEventHandler {
+    private final CurrentParticipantManager currentParticipantManager;
 
     private static final String ROOM_PREFIX = "/topic/rooms/";
     private static final String JOIN_SUFFIX = "/join";
@@ -48,7 +48,7 @@ public class ParticipantEventHandler {
 
     @EventListener
     public void handleUnsubscribe(RoomExitEvent event) {
-        participantManager.removeParticipant(event.memberId(), event.roomId());
+        currentParticipantManager.removeParticipant(event.memberId(), event.roomId());
     }
 
     private boolean isRoomJoinPath(String destination) {
@@ -56,7 +56,7 @@ public class ParticipantEventHandler {
     }
 
     private void validateParticipantRoomJoin(Long roomId, Long memberId) {
-        Set<Long> participants = participantManager.getRoomParticipants(roomId);
+        Set<Long> participants = currentParticipantManager.getRoomParticipants(roomId);
         if (participants == null || !participants.contains(memberId)) {
             throw new ErrorException(UNAUTHORIZED_NOT_JOIN_ROOM);
         }

@@ -1,24 +1,24 @@
-package com.oronaminc.join.websocket.config;
+package com.oronaminc.join.websocket.handshake;
 
-import com.oronaminc.join.global.exception.ErrorCode;
-import com.oronaminc.join.global.exception.ErrorException;
-import com.oronaminc.join.member.domain.Member;
-import com.oronaminc.join.member.security.MemberDetails;
-import com.oronaminc.join.member.service.MemberReader;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import java.security.Principal;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
+
+import com.oronaminc.join.global.exception.ErrorCode;
+import com.oronaminc.join.global.exception.ErrorException;
+import com.oronaminc.join.member.security.MemberDetails;
+import com.oronaminc.join.websocket.stomp.StompPrincipal;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor

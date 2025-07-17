@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.global.exception.ErrorResponse;
-import com.oronaminc.join.websocket.config.WebsocketSessionManager;
+import com.oronaminc.join.websocket.session.WebsocketSessionManager;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
