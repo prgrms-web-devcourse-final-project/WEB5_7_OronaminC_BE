@@ -81,7 +81,8 @@ public class QuestionService {
 
         // 참여자가 아님
         if (!participantReader.existsByRoomIdAndMemberId(roomId, memberId)) {
-            throw new ErrorException(ErrorCode.NOT_FOUND_PARTICIPANT);
+            throw ErrorException.of(ErrorCode.NOT_FOUND_PARTICIPANT,
+                "{}번 발표방에는 {}번 회원이 잠가 중이지 않습니다.", roomId, memberId);
         }
 
         // 작성자가 아님
