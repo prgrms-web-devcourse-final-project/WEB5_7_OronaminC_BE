@@ -1,15 +1,13 @@
 package com.oronaminc.join.infra.service;
 
+import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
-import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
@@ -53,6 +51,7 @@ public class S3Service {
             }
         } catch (S3Exception e) {
             log.error("S3Exception: {}", e.getMessage(), e);
+            throw new ErrorException(ErrorCode.DELETE_FILE_FAILED);
         }
     }
 
@@ -67,5 +66,22 @@ public class S3Service {
             log.error("S3Exception: {}",e.getMessage(), e);
             return false;
         }
+    }
+
+    public void moveObject(String objectKey, String destinationKey) {
+        CopyObjectRequest copyRequest = CopyObjectRequest.builder()
+                .sourceBucket(bucket)
+                .sourceKey(objectKey)
+                .destinationBucket(bucket)
+                .destinationKey(destinationKey)
+                .build();
+        s3Client.copyObject(copyRequest);
+
+        DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
+                .bucket(bucket)
+                .key(objectKey)
+                .build();
+
+        s3Client.deleteObject(deleteRequest);
     }
 }
