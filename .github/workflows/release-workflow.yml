@@ -85,7 +85,7 @@ jobs:
 
     steps:
       - name: EC2에 SSH로 접속 후 배포
-        uses: appleboy/ssh-action@v1.0.0
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
