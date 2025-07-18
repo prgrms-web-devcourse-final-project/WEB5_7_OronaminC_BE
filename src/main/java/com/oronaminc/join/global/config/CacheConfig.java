@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Scheduler;
 
 @EnableCaching
 @Configuration
@@ -25,6 +26,7 @@ public class CacheConfig {
                         Caffeine.newBuilder()
                                 .expireAfterWrite(cache.expireAfterWrite, TimeUnit.SECONDS)
                                 .maximumSize(cache.maximumSize)
+                                .scheduler(Scheduler.systemScheduler())
                                 .build()
                     )
                 )
