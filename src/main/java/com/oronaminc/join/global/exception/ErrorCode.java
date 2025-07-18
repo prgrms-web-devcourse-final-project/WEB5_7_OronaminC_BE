@@ -34,6 +34,9 @@ public enum ErrorCode {
 
     FILE_UPLOAD_FAILED("FILE-001", "파일 업로드에 실패하였습니다.", INTERNAL_SERVER_ERROR),
     NOT_FOUND_FILE("FILE-002", "존재하지 않는 파일입니다.", NOT_FOUND),
+    MOVEMENT_FILE_FAILED("FILE-003", "파일 이동이 실패하였습니다.", INTERNAL_SERVER_ERROR),
+    DELETE_FILE_FAILED("FILE-004", "파일 삭제에 실패하였습니다.", INTERNAL_SERVER_ERROR),
+
 
     NOT_FOUND_ROOM_QUESTION("QUESTION-001", "질문을 해당 방에서 찾을 수 없습니다.", NOT_FOUND),
     NOT_FOUND_QUESTION("QUESTION-002", "질문을 찾을 수 없습니다.", NOT_FOUND),

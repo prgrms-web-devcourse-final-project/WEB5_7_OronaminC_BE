@@ -105,7 +105,6 @@ public class RoomService {
         participantService.validatePresenter(roomId, memberId);
 
         Room room = roomReader.getById(roomId);
-        Document document = documentReader.getByRoomId(roomId);
 
         if (room.getRoomStatus().equals(RoomStatus.STARTED)) {
             throw new ErrorException(BAD_REQUEST_ROOM_STARTED);

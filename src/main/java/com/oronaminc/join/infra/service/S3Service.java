@@ -1,5 +1,6 @@
 package com.oronaminc.join.infra.service;
 
+import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +51,7 @@ public class S3Service {
             }
         } catch (S3Exception e) {
             log.error("S3Exception: {}", e.getMessage(), e);
+            throw new ErrorException(ErrorCode.DELETE_FILE_FAILED);
         }
     }
 
