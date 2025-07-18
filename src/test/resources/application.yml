@@ -9,4 +9,19 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
 
+cloud:
+  aws:
+    region:
+      static: ap-northeast-2
+    s3:
+      bucket: test-bucket
+    stack:
+      auto: false
+    credentials:
+      access-key: dummy
+      secret-key: dummy
