@@ -73,8 +73,8 @@ public class RoomService {
         Room room = RoomMapper.toRoom(createRoomRequest, code);
         roomRepository.save(room);
 
-        documentService.saveDocument(createRoomRequest.documentUrl(), room);
         participantService.savePresenterAndTeam(presenterEmail, createRoomRequest.teamEmail(), room);
+        documentService.saveDocument(createRoomRequest.documentUrl(), room);
 
         return RoomMapper.toCreateRoomResponse(room);
     }
@@ -109,15 +109,14 @@ public class RoomService {
         participantService.validatePresenter(roomId, memberId);
 
         Room room = roomReader.getById(roomId);
-        Document document = documentReader.getByRoomId(roomId);
 
         if (room.getRoomStatus().equals(RoomStatus.STARTED)) {
             throw new ErrorException(BAD_REQUEST_ROOM_STARTED);
         }
 
-        document.update(updateRoomRequest.documentUrl());
         room.update(updateRoomRequest);
         participantService.updateTeam(room, updateRoomRequest.teamEmail());
+        documentService.updateDocument(updateRoomRequest.documentUrl(), roomId);
     }
 
     @Transactional

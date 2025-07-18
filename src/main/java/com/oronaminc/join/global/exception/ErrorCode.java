@@ -34,6 +34,9 @@ public enum ErrorCode {
 
     FILE_UPLOAD_FAILED("FILE-001", "파일 업로드에 실패하였습니다.", INTERNAL_SERVER_ERROR),
     NOT_FOUND_FILE("FILE-002", "존재하지 않는 파일입니다.", NOT_FOUND),
+    MOVEMENT_FILE_FAILED("FILE-003", "파일 이동이 실패하였습니다.", INTERNAL_SERVER_ERROR),
+    DELETE_FILE_FAILED("FILE-004", "파일 삭제에 실패하였습니다.", INTERNAL_SERVER_ERROR),
+
 
     NOT_FOUND_ROOM_QUESTION("QUESTION-001", "질문을 해당 방에서 찾을 수 없습니다.", NOT_FOUND),
     NOT_FOUND_QUESTION("QUESTION-002", "질문을 찾을 수 없습니다.", NOT_FOUND),
@@ -41,12 +44,12 @@ public enum ErrorCode {
     UNAUTHORIZED_DELETE_QUESTION("QUESTION-004", "작성자 및 관리자만 질문을 삭제할 수 있습니다.", UNAUTHORIZED),
     TOO_MANY_REQUESTS_QUESTION("QUESTION-005", "잠시 후 다시 시도해주세요.", TOO_MANY_REQUESTS),
 
-    UNAUTHORIZED_ROLE_ANSWER("ANSWER-001", "팀원 또는 발표자만 댓글을 작성할 수 있습니다.", UNAUTHORIZED),
+    UNAUTHORIZED_ROLE_ANSWER("ANSWER-001", "질문 작성자 또는 팀원과 발표자만 댓글을 작성할 수 있습니다.", UNAUTHORIZED),
     NOT_FOUND_EXIST_ANSWER("ANSWER-002", "해당 질문에 대한 답변이 존재하지 않습니다.", NOT_FOUND),
     NOT_FOUND_ANSWER("ANSWER-003", "답변이 존재하지 않습니다.", NOT_FOUND),
-    BADREQUEST_DUPLICATION_ANSWER("ANSWER-004", "이미 답변한 질문입니다.", BAD_REQUEST),
-    UNAUTHORIZED_EDIT_ANSWER("ANSWER-005", "작성자가 아니면 해당 댓글을 수정할 수 없습니다.", UNAUTHORIZED),
-    UNAUTHORIZED_DELETE_ANSWER("ANSWER-006", "작성자 혹은 팀원, 발표자가 아니면 해당 댓글을 삭제할 수 없습니다.", UNAUTHORIZED),
+    UNAUTHORIZED_EDIT_ANSWER("ANSWER-004", "작성자가 아니면 해당 댓글을 수정할 수 없습니다.", UNAUTHORIZED),
+    UNAUTHORIZED_DELETE_ANSWER("ANSWER-005", "작성자 혹은 팀원, 발표자가 아니면 해당 댓글을 삭제할 수 없습니다.", UNAUTHORIZED),
+    TOO_MANY_REQUESTS_ANSWER("ANSWER-006", "잠시 후 다시 시도해주세요.", UNAUTHORIZED),
 
 
     ACCESS_DENIED_SESSION("SESSION-1201", "접근 권한이 없습니다.", FORBIDDEN),

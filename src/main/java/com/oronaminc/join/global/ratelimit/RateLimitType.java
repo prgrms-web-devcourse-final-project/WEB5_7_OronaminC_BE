@@ -19,6 +19,14 @@ public enum RateLimitType {
             .capacity(3)
             .refillIntervally(3, Duration.ofSeconds(1))
             .build()
+    ),
+
+    CREATE_ANSWER(
+        "CREATE_ANSWER:{}:{}:{}",
+        Bandwidth.builder()
+            .capacity(5)
+            .refillIntervally(5, Duration.ofSeconds(10))
+        .build()
     );
 
     private final String format;

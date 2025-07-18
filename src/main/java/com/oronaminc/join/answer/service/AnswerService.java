@@ -1,15 +1,14 @@
 package com.oronaminc.join.answer.service;
 
-import static com.oronaminc.join.global.exception.ErrorCode.BADREQUEST_DUPLICATION_ANSWER;
 
 import com.oronaminc.join.answer.dao.AnswerRepository;
 import com.oronaminc.join.answer.domain.Answer;
-import com.oronaminc.join.answer.dto.AnswerRequest;
 import com.oronaminc.join.answer.dto.AnswerGetResponse;
+import com.oronaminc.join.answer.dto.AnswerRequest;
 import com.oronaminc.join.answer.mapper.AnswerMapper;
+import com.oronaminc.join.answer.util.PermissionValidator;
 import com.oronaminc.join.emoji.domain.TargetType;
 import com.oronaminc.join.emoji.service.EmojiReader;
-import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.service.MemberReader;
 import com.oronaminc.join.participant.service.ParticipantService;
@@ -28,12 +27,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class AnswerService {
 
     private final AnswerRepository answerRepository;
-    private final ParticipantService participantService;
     private final QuestionReader questionReader;
     private final MemberReader memberReader;
     private final AnswerReader answerReader;
     private final RoomReader roomReader;
     private final EmojiReader emojiReader;
+    private final PermissionValidator permissionValidator;
 
     @Transactional
     public Answer create(Long roomId, Long memberId, Long questionId,
@@ -41,19 +40,12 @@ public class AnswerService {
 
         Member member = memberReader.getById(memberId);
         Room room = roomReader.getById(roomId);
-        Question question = questionReader.getByIdAndRoomId(questionId, roomId);
-
-        participantService.validateParticipant(member.getId(), room.getId());
-
-        if (answerReader.existsByQuestionIdAndMemberId(question.getId(), member.getId())) {
-            throw new ErrorException(BADREQUEST_DUPLICATION_ANSWER);
-        }
-
+        Question question = questionReader.getByIdAndRoomId(questionId, room.getId());
+        permissionValidator.validateAnswerCreatePermission(room.getId(), member.getId(), question);
         Answer answer = AnswerMapper.toEntity(question, member, request);
 
-        answerRepository.save(answer);
+        return answerRepository.save(answer);
 
-        return answer;
     }
 
     @Transactional
@@ -71,8 +63,8 @@ public class AnswerService {
     }
 
     @Transactional
-    public Answer update(Long answerId, AnswerRequest request) {
-        Answer answer = answerReader.getById(answerId);
+    public Answer update(Long answerId, Long memberId, AnswerRequest request) {
+        Answer answer = permissionValidator.validateAnswerUpdatePermission(answerId, memberId);
 
         answer.updataContent(request.content());
 
@@ -80,8 +72,8 @@ public class AnswerService {
     }
 
     @Transactional
-    public void delete(Long answerId) {
-        Answer answer = answerReader.getById(answerId);
+    public void delete(Long answerId, Long memberId) {
+        Answer answer = permissionValidator.validateAnswerDeletePermission(answerId, memberId);
         answerRepository.delete(answer);
     }
 
