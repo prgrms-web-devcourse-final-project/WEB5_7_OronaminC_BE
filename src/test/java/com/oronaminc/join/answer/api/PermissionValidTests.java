@@ -65,13 +65,13 @@ public class PermissionValidTests {
     }
 
     @Test
-    @DisplayName("TEAM or PRESENTER가 아닌 GUEST가 답변시 예외 발생")
-    void validateAnswerPermission_fail_not_team_or_presenter() {
+    @DisplayName("TEAM or PRESENTER or 작성자가 아닌 참여자가 답변시 예외 발생")
+    void validateAnswerPermission_fail_not_team_or_presenter_orWriter() {
         // given
         given(participantReader.getByRoomIdAndMemberId(1L, 1L)).willReturn(participant);
 
         // when & then
-        assertThatThrownBy(() -> permissionValidator.validateAnswerPermission(1L, 1L))
+        assertThatThrownBy(() -> permissionValidator.validateAnswerCreatePermission(1L, 1L, question))
             .isInstanceOf(ErrorException.class)
             .hasFieldOrPropertyWithValue("errorCode", ErrorCode.UNAUTHORIZED_ROLE_ANSWER);
     }
@@ -84,7 +84,7 @@ public class PermissionValidTests {
             .willThrow(new ErrorException(ErrorCode.NOT_FOUND_PARTICIPANT));
 
         // when & then
-        assertThatThrownBy(() -> permissionValidator.validateAnswerPermission(1L, 1L))
+        assertThatThrownBy(() -> permissionValidator.validateAnswerCreatePermission(1L, 1L, question))
             .isInstanceOf(ErrorException.class)
             .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_PARTICIPANT);
     }
