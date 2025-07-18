@@ -77,3 +77,22 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    name: EC2 자동 배포
+    runs-on: ubuntu-latest
+    needs: build-image
+
+    steps:
+      - name: EC2에 SSH로 접속 후 배포
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ secrets.EC2_PORT }}
+          script: |
+            cd ${{ secrets.EC2_DEPLOY_DIR }}
+            docker compose pull
+            docker compose down
+            docker compose up -d
