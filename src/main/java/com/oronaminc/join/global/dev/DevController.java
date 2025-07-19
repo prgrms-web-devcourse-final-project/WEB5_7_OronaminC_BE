@@ -18,11 +18,13 @@ import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.domain.MemberType;
 import com.oronaminc.join.member.security.MemberDetails;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 @RestController
+@Tag(name = "개발용 API")
 @RequestMapping("/dev")
 @RequiredArgsConstructor
 public class DevController {
