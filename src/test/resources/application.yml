@@ -10,3 +10,14 @@ spring:
     hibernate:
       ddl-auto: create
 
+cloud:
+  aws:
+    region:
+      static: ap-northeast-2
+    s3:
+      bucket: test-bucket
+    stack:
+      auto: false
+    credentials:
+      access-key: dummy
+      secret-key: dummy
