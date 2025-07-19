@@ -49,16 +49,4 @@ public class SecurityConfig {
                 .logout(withDefaults())
                 .build();
     }
-    //
-    // @Bean
-    // public WebSecurityCustomizer webSecurityCustomizer() {
-    //     return web -> web.ignoring()
-    //             .requestMatchers(
-    //                     "/public/**",
-    //                     "/favicon.ico",
-    //                     "/swagger-ui/**",
-    //                     "/v3/api-docs/**"
-    //             );
-    // }
-
 }
