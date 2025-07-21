@@ -37,6 +37,6 @@ public class DocumentController {
             @AuthenticationPrincipal MemberDetails memberDetails
     ) {
         String memberRole = memberDetails.getRole();
-        return documentService.generatePresignedUrl(documentRequest, memberRole);
+        return documentService.generateUploadPresignedUrl(documentRequest, memberRole);
     }
 }
