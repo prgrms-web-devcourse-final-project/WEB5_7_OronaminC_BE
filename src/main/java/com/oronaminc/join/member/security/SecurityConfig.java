@@ -23,6 +23,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
+                .cors(withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/auth/guest",
@@ -48,5 +49,23 @@ public class SecurityConfig {
                         .userService(authService)))
                 .logout(withDefaults())
                 .build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(
+                Arrays.asList(
+                        "http://localhost:8080",
+                        "http://localhost:3000"
+                )
+        );
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
