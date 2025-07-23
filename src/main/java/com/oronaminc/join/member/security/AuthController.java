@@ -1,10 +1,5 @@
 package com.oronaminc.join.member.security;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.tags.Tags;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -24,8 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.oronaminc.join.member.dto.GuestLoginRequest;
 import com.oronaminc.join.member.dto.GuestLoginResponse;
+import com.oronaminc.join.member.dto.KakaoLoginRequest;
 import com.oronaminc.join.member.dto.SessionInfoResponse;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -39,6 +38,29 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
+
+    @PostMapping("/kakao")
+    @ResponseStatus(HttpStatus.OK)
+    public Long kakaoLogin(
+            @RequestBody KakaoLoginRequest kakaoLoginRequest,
+            HttpServletRequest request
+    ) {
+        MemberDetails memberDetails = authService.kakaoLogin(kakaoLoginRequest.code());
+
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                memberDetails, null, List.of(new SimpleGrantedAuthority(memberDetails.getRole()))
+        );
+
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
+
+        return memberDetails.getId();
+    }
 
     @Operation(
         summary = "비회원 로그인",
