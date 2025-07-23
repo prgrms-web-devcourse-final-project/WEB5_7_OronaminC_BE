@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.oronaminc.join.member.dto.GuestLoginRequest;
 import com.oronaminc.join.member.dto.GuestLoginResponse;
 import com.oronaminc.join.member.dto.KakaoLoginRequest;
+import com.oronaminc.join.member.dto.KakaoLoginResponse;
 import com.oronaminc.join.member.dto.SessionInfoResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,9 +40,13 @@ import lombok.RequiredArgsConstructor;
 public class AuthController {
     private final AuthService authService;
 
+    @Operation(
+            summary = "카카오 로그인",
+            description = "redirect url 에 포함된 파라미터의 code와 state를 입력해주세요. 이후 모든 요청에 세션 인증이 적용됩니다."
+    )
     @PostMapping("/kakao")
     @ResponseStatus(HttpStatus.OK)
-    public Long kakaoLogin(
+    public KakaoLoginResponse kakaoLogin(
             @RequestBody KakaoLoginRequest kakaoLoginRequest,
             HttpServletRequest request
     ) {
@@ -59,7 +64,7 @@ public class AuthController {
 
         request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
 
-        return memberDetails.getId();
+        return new KakaoLoginResponse(memberDetails.getId());
     }
 
     @Operation(
