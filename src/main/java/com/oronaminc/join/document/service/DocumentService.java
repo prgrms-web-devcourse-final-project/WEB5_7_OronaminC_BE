@@ -37,7 +37,7 @@ public class DocumentService {
         documentRepository.deleteByRoomId(roomId);
     }
 
-    public DocumentResponse generatePresignedUrl(DocumentRequest request, String memberRole) {
+    public DocumentResponse generateUploadPresignedUrl(DocumentRequest request, String memberRole) {
         if (!memberRole.equals(MemberType.MEMBER.name())) {
             throw new ErrorException(ErrorCode.UNAUTHORIZED_MEMBER);
         }
@@ -52,7 +52,7 @@ public class DocumentService {
 
         String uuid = UUID.randomUUID().toString();
         String objectKey = "temp/" + uuid + extension;
-        String presignedUrl = s3Service.generatePresignedUrl(objectKey);
+        String presignedUrl = s3Service.generateUploadPresignedUrl(objectKey);
 
         return new DocumentResponse(presignedUrl, objectKey);
     }
