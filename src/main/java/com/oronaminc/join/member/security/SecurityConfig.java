@@ -27,6 +27,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/auth/guest",
+                                "/api/auth/kakao",
                                 "/login"
                         )
                         .anonymous()
