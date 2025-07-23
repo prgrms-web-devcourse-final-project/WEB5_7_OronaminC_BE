@@ -98,7 +98,7 @@ public class RoomService {
         List<Participant> team = participantService.getTeam(roomId);
         Document document = documentReader.getByRoomId(roomId);
         int participantCount = currentParticipantManager.getRoomParticipants(roomId).size();
-        String presignedUrl = s3Service.generatePresignedUrl(document.getFileUrl());
+        String presignedUrl = s3Service.generateGetPresignedUrl(document.getFileUrl());
 
         return RoomMapper.toRoomDetailResponse(room, presenter, team, presignedUrl, memberId, participantCount);
     }

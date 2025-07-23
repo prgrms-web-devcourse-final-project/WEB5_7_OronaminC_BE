@@ -11,6 +11,8 @@ import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.time.Duration;
 
@@ -25,7 +27,8 @@ public class S3Service {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    public String generatePresignedUrl(String key) {
+    // 조회용
+    public String generateGetPresignedUrl(String key) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucket)
                 .key(key)
@@ -37,6 +40,24 @@ public class S3Service {
                 .build();
 
         PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(presignRequest);
+
+        return presignedRequest.url().toString();
+    }
+
+    // 업로드용
+    public String generateUploadPresignedUrl(String key) {
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucket)
+                .contentType("application/pdf")
+                .key(key)
+                .build();
+
+        PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(3))
+                .putObjectRequest(putObjectRequest)
+                .build();
+
+        PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(presignRequest);
 
         return presignedRequest.url().toString();
     }
