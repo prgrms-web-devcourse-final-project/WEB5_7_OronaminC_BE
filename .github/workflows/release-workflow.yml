@@ -78,6 +78,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            SPRING_PROFILES_ACTIVE=dev
 
   deploy:
     name: EC2 자동 배포

@@ -23,17 +23,36 @@ public class CurrentParticipantManager {
         roomParticipants.computeIfAbsent(roomId, k -> ConcurrentHashMap.newKeySet());
     }
 
+    // public void addParticipant(Long roomId, Long memberId, int limit) {
+    //     Set<Long> participants = getRoomParticipants(roomId);
+    //
+    //     if (participants.contains(memberId)) return;
+    //
+    //     synchronized (participants) {
+    //         if (participants.size() >= limit) {
+    //             throw new ErrorException(UNAUTHORIZED_LIMIT_PARTICIPANT);
+    //         }
+    //         participants.add(memberId);
+    //     }
+    // }
+
     public void addParticipant(Long roomId, Long memberId, int limit) {
-        Set<Long> participants = getRoomParticipants(roomId);
+        roomParticipants.compute(roomId, (id, participants) -> {
+            participants = getRoomParticipants(roomId);
 
-        if (participants.contains(memberId)) return;
+            // 중복 참가자일 경우 그대로 반환 (변화 없음)
+            if (participants.contains(memberId)) {
+                return participants;
+            }
 
-        synchronized (participants) {
+            // 인원 초과 시 예외 발생
             if (participants.size() >= limit) {
                 throw new ErrorException(UNAUTHORIZED_LIMIT_PARTICIPANT);
             }
+
             participants.add(memberId);
-        }
+            return participants;
+        });
     }
 
     public void removeParticipant(Long memberId, Long roomId) {
