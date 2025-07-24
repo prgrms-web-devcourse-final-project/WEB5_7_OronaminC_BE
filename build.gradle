@@ -63,6 +63,7 @@ dependencies {
     // caffeine
     implementation 'com.github.ben-manes.caffeine:caffeine'
 
+    implementation 'org.springframework.retry:spring-retry:2.0.12'
 }
 
 tasks.named('test') {
