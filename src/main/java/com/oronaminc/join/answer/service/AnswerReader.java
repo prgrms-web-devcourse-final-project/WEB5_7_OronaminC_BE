@@ -1,31 +1,34 @@
 package com.oronaminc.join.answer.service;
 
-import static com.oronaminc.join.global.exception.ErrorCode.*;
-
-import com.oronaminc.join.global.exception.ErrorCode;
-import com.oronaminc.join.room.domain.Room;
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.stereotype.Component;
-
 import com.oronaminc.join.answer.dao.AnswerRepository;
 import com.oronaminc.join.answer.domain.Answer;
+import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
-
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class AnswerReader {
-    private final AnswerRepository answerRepository;
 
-    public boolean existsByQuestionIdAndMemberId(Long questionId, Long memberId) {
-        return answerRepository.existsByQuestionIdAndMemberId(questionId, memberId);
-    }
+    private final AnswerRepository answerRepository;
 
     public Optional<Answer> findById(Long answerId) {
         return answerRepository.findById(answerId);
+    }
+
+    public List<Answer> getFirstPageByQuestionId(Long questionId, Pageable pageable) {
+        return answerRepository.findFirstPageByQuestionId(questionId, pageable);
+    }
+
+    public List<Answer> getAnswerByQuestionIdWithCursor(Long questionId,
+        LocalDateTime lastCreatedAt, Long lastId, Pageable pageable) {
+        return answerRepository.findByQuestionIdWithCursor(questionId, lastCreatedAt, lastId,
+            pageable);
     }
 
     public Answer getByQuestionId(Long questionId) {

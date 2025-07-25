@@ -9,15 +9,20 @@ import com.oronaminc.join.answer.mapper.AnswerMapper;
 import com.oronaminc.join.answer.util.PermissionValidator;
 import com.oronaminc.join.emoji.domain.TargetType;
 import com.oronaminc.join.emoji.service.EmojiReader;
+import com.oronaminc.join.global.util.SliceUtil;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.service.MemberReader;
-import com.oronaminc.join.participant.service.ParticipantService;
 import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.service.QuestionReader;
 import com.oronaminc.join.room.domain.Room;
 import com.oronaminc.join.room.service.RoomReader;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,18 +53,43 @@ public class AnswerService {
 
     }
 
-    @Transactional
-    public AnswerGetResponse getAnswer(Long roomId, Long questionId, Long memberId) {
-        Member member = memberReader.getById(memberId);
+    @Transactional(readOnly = true)
+    public Slice<AnswerGetResponse> getAnswers(
+        Long roomId,
+        Long questionId,
+        Long memberId,
+        Long lastId,
+        LocalDateTime lastCreatedAt,
+        int size
+    ) {
+        memberReader.getById(memberId);
         roomReader.getById(roomId);
         questionReader.getByIdAndRoomId(questionId, roomId);
-        Answer answer = answerReader.getByQuestionId(questionId);
+        answerReader.getByQuestionId(questionId);
 
-        Long emojiCount = answer.getEmojiCount();
-        boolean isEmojied = emojiReader.findByMemberIdAndTargetIdAndTargetType(member.getId(),
-            answer.getId(), TargetType.ANSWER).isPresent();
+        Pageable pageable = PageRequest.of(0, size + 1);
 
-        return AnswerMapper.toAnswerGetResponse(answer, emojiCount, isEmojied);
+        List<Answer> answers = (lastCreatedAt == null || lastId == null)
+            ? answerReader.getFirstPageByQuestionId(questionId, pageable)
+            : answerReader.getAnswerByQuestionIdWithCursor(questionId, lastCreatedAt, lastId,
+                pageable);
+
+        // 공감 여부 일괄 조회
+        List<Long> answerIds = answers.stream().map(Answer::getId).toList();
+
+        Set<Long> emojiedAnswerIds = memberId != null
+            ? emojiReader.findTargetIdsByMemberAndTargetTypeInBatch(memberId, TargetType.ANSWER, answerIds)
+            : Set.of();
+
+        List<AnswerGetResponse> responseList = answers.stream()
+            .map(answer -> {
+                boolean isEmojied = emojiedAnswerIds.contains(answer.getId());
+                return AnswerMapper.toAnswerGetResponse(answer, isEmojied);
+            })
+            .toList();
+
+        return SliceUtil.toSlice(responseList, PageRequest.of(0, size));
+
     }
 
     @Transactional
