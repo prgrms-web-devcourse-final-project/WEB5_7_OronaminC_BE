@@ -90,7 +90,8 @@ public class QuestionService {
 
         // 작성자가 아님
         if (!question.getMember().getId().equals(memberId)) {
-            throw new ErrorException(ErrorCode.UNAUTHORIZED_EDIT_QUESTION);
+            throw ErrorException.of(ErrorCode.UNAUTHORIZED_EDIT_QUESTION,
+                "{}번 회원은 {}번 질문을 수정할 권한이 없습니다.", memberId, questionId);
         }
 
         question.updateContent(request.content());
@@ -104,13 +105,15 @@ public class QuestionService {
 
         // 참여자가 아님
         if (!participantReader.existsByRoomIdAndMemberId(roomId, memberId)) {
-            throw new ErrorException(ErrorCode.NOT_FOUND_PARTICIPANT);
+            throw ErrorException.of(ErrorCode.NOT_FOUND_PARTICIPANT,
+                "{}번 발표방에는 {}번 회원이 잠가 중이지 않습니다.", roomId, memberId);
         }
 
         // 관리자가 아님 && 작성자도 아님
         if (!participantReader.existsPresenterOrTeamByMemberId(roomId, memberId)
             && !question.getMember().getId().equals(memberId)) {
-            throw new ErrorException(ErrorCode.UNAUTHORIZED_DELETE_QUESTION);
+            throw ErrorException.of(ErrorCode.UNAUTHORIZED_DELETE_QUESTION,
+                "{}번 회원은 {}번 질문을 삭제할 권한이 없습니다.", memberId, questionId);
         }
 
         answerService.deleteByQuestion(questionId);
