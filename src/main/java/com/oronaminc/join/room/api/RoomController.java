@@ -63,7 +63,7 @@ public class RoomController {
             description = "비밀코드를 통해 해당 발표방에 참가자로 등록합니다. 시작 전 상태이면 참가할 수 없습니다.",
             security = @SecurityRequirement(name = "sessionAuth")
     )
-    @GetMapping("/code")
+    @PostMapping("/code")
     @ResponseStatus(HttpStatus.OK)
     public JoinRoomResponse joinRoom(
             @RequestBody JoinRoomRequest joinRoomRequest,

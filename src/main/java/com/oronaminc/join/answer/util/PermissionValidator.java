@@ -1,8 +1,6 @@
 package com.oronaminc.join.answer.util;
 
-import static com.oronaminc.join.global.exception.ErrorCode.UNAUTHORIZED_DELETE_ANSWER;
 import static com.oronaminc.join.global.exception.ErrorCode.UNAUTHORIZED_EDIT_ANSWER;
-import static com.oronaminc.join.global.exception.ErrorCode.UNAUTHORIZED_ROLE_ANSWER;
 
 import com.oronaminc.join.answer.domain.Answer;
 import com.oronaminc.join.answer.service.AnswerReader;
@@ -22,40 +20,40 @@ public class PermissionValidator {
     private final ParticipantReader participantReader;
     private final AnswerReader answerReader;
 
-    public void validateAnswerPermission(Long roomId, Long memberId) {
-        // TODO: 생성시 조건 ( null 이면 안됨, " " 안됨, 팀원이나 발표자, 질문 작성자 본인만 생성가능 )
-        Participant participant = participantReader.getByRoomIdAndMemberId(roomId, memberId);
-        ParticipantType type = participant.getParticipantType();
-
-        if (type == ParticipantType.GUEST) {
-            throw new ErrorException(UNAUTHORIZED_ROLE_ANSWER);
-        }
+    public void validateAnswerCreatePermission(Long roomId, Long memberId, Question question) {
+        validatePermission(roomId, memberId, question, PermissionType.CREATE);
     }
 
-    public void validateAnswerUpdatePermission(Long answerId, Long memberId) {
+    public Answer validateAnswerUpdatePermission(Long answerId, Long memberId) {
         Answer answer = answerReader.getById(answerId);
 
         if (!answer.getMember().getId().equals(memberId)) {
             throw new ErrorException(UNAUTHORIZED_EDIT_ANSWER);
         }
+
+        return answer;
     }
 
-    public void validateAnswerDeletePermission(Long answerId, Long memberId) {
+    public Answer validateAnswerDeletePermission(Long answerId, Long memberId) {
         Answer answer = answerReader.getById(answerId);
-
         Room room = answer.getQuestion().getRoom();
         Question question = answer.getQuestion();
 
-        Participant participant = participantReader.getByRoomIdAndMemberId(room.getId(), memberId);
-        ParticipantType type = participant.getParticipantType();
+        validatePermission(room.getId(), memberId, question, PermissionType.DELETE);
 
+        return answer;
+    }
+
+    private void validatePermission(Long roomId, Long memberId, Question question,
+        PermissionType permissionType) {
+        Participant participant = participantReader.getByRoomIdAndMemberId(roomId, memberId);
+        ParticipantType type = participant.getParticipantType();
         boolean isQuestionWriter = question.getMember().getId().equals(memberId);
 
         if (!(isQuestionWriter || type == ParticipantType.TEAM
             || type == ParticipantType.PRESENTER)) {
-            throw new ErrorException(UNAUTHORIZED_DELETE_ANSWER);
+            throw new ErrorException(permissionType.toErrorCode());
         }
-
     }
 
 }

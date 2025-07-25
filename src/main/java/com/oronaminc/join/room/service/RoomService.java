@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,21 +65,23 @@ public class RoomService {
     private static final int CODE_LENGTH = 6;
 
     @Transactional
-    public CreateRoomResponse createRoom(CreateRoomRequest createRoomRequest,
-            String presenterEmail) {
+    public CreateRoomResponse createRoom(
+            CreateRoomRequest createRoomRequest,
+            String presenterEmail
+    ) {
         String code = this.generateCode();
         Room room = RoomMapper.toRoom(createRoomRequest, code);
         roomRepository.save(room);
 
-        documentService.saveDocument(createRoomRequest.documentUrl(), room);
         participantService.savePresenterAndTeam(presenterEmail, createRoomRequest.teamEmail(), room);
+        documentService.saveDocument(createRoomRequest.documentUrl(), room);
 
         return RoomMapper.toCreateRoomResponse(room);
     }
 
     @Transactional
     public JoinRoomResponse joinRoom(Long memberId, JoinRoomRequest joinRoomRequest) {
-        Room room = roomReader.getBySecretCode(joinRoomRequest.secretCode());
+        Room room = roomReader.getCacheBySecretCode(joinRoomRequest.secretCode());
         if (room.getRoomStatus().equals(RoomStatus.BEFORE_START)) {
             throw new ErrorException(UNAUTHORIZED_JOIN_ROOM);
         }
@@ -89,34 +92,35 @@ public class RoomService {
     public RoomDetailResponse getRoomDetail(Long memberId, Long roomId) {
         participantService.validateParticipant(memberId, roomId);
 
-        Room room = roomReader.getById(roomId);
+        Room room = roomReader.getCacheById(roomId);
 
         Participant presenter = participantService.getPresenter(roomId);
         List<Participant> team = participantService.getTeam(roomId);
         Document document = documentReader.getByRoomId(roomId);
         int participantCount = currentParticipantManager.getRoomParticipants(roomId).size();
-        String presignedUrl = s3Service.generatePresignedUrl(document.getFileUrl());
+        String presignedUrl = s3Service.generateGetPresignedUrl(document.getFileUrl());
 
         return RoomMapper.toRoomDetailResponse(room, presenter, team, presignedUrl, memberId, participantCount);
     }
 
     @Transactional
+    @CacheEvict(cacheNames = "roomById", key = "#roomId")
     public void updateRoom(Long memberId, Long roomId, RoomUpdateRequest updateRoomRequest) {
         participantService.validatePresenter(roomId, memberId);
 
         Room room = roomReader.getById(roomId);
-        Document document = documentReader.getByRoomId(roomId);
 
         if (room.getRoomStatus().equals(RoomStatus.STARTED)) {
             throw new ErrorException(BAD_REQUEST_ROOM_STARTED);
         }
 
-        document.update(updateRoomRequest.documentUrl());
         room.update(updateRoomRequest);
         participantService.updateTeam(room, updateRoomRequest.teamEmail());
+        documentService.updateDocument(updateRoomRequest.documentUrl(), roomId);
     }
 
     @Transactional
+    @CacheEvict(cacheNames = "roomById", key = "#roomId")
     public void deleteRoom(Long memberId, Long roomId) {
         participantService.validatePresenter(roomId, memberId);
 
@@ -133,6 +137,7 @@ public class RoomService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = "roomById", key = "#roomId")
     public void updateRoomStatus(Long memberId, Long roomId,
             RoomUpdateStatusRequest roomUpdateStatusRequest) {
         participantService.validatePresenter(roomId, memberId);
@@ -149,7 +154,7 @@ public class RoomService {
     @Transactional
     public RoomUpdateInfoResponse getRoomUpdateInfo(Long memberId, Long roomId) {
         participantService.validatePresenter(roomId, memberId);
-        Room room = roomReader.getById(roomId);
+        Room room = roomReader.getCacheById(roomId);
         List<Participant> team = participantService.getTeam(roomId);
         return RoomMapper.toRoomUpdateInfoResponse(room, team);
     }
@@ -171,7 +176,7 @@ public class RoomService {
             throw new ErrorException(UNAUTHORIZED_REPORT_READ);
         }
 
-        Room room = roomReader.getById(roomId);
+        Room room = roomReader.getCacheById(roomId);
         Long totalView = participantReader.countTotalView(roomId);
         Long totalQuestions = questionReader.countByRoomId(roomId);
         Long totalAnswerByQuestion = answerReader.countAnsweredQuestionsByRoomId(roomId);
@@ -218,7 +223,7 @@ public class RoomService {
 
     public RoomJoinResponse subscribeRoom(Long roomId, Long memberId) {
         participantService.validateParticipant(memberId, roomId);
-        Room room = roomReader.getById(roomId);
+        Room room = roomReader.getCacheById(roomId);
         if (!room.getRoomStatus().canSubscribeRoom) {
             throw new ErrorException(UNAUTHORIZED_SUBSCRIBE_ROOM);
         }

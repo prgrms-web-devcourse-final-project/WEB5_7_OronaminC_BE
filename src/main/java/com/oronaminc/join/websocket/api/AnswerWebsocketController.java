@@ -1,5 +1,6 @@
 package com.oronaminc.join.websocket.api;
 
+import static com.oronaminc.join.global.exception.ErrorCode.TOO_MANY_REQUESTS_ANSWER;
 import static com.oronaminc.join.global.exception.ErrorCode.UNAUTHORIZED_MEMBER;
 
 import com.oronaminc.join.answer.domain.Answer;
@@ -9,9 +10,11 @@ import com.oronaminc.join.answer.dto.AnswerRequest;
 import com.oronaminc.join.answer.dto.AnswerUpdateResponse;
 import com.oronaminc.join.answer.mapper.AnswerMapper;
 import com.oronaminc.join.answer.service.AnswerService;
-import com.oronaminc.join.answer.util.PermissionValidator;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.websocket.common.EventType;
+import com.oronaminc.join.global.ratelimit.RateLimitService;
+import com.oronaminc.join.global.ratelimit.RateLimitType;
+import io.github.bucket4j.Bucket;
 import jakarta.validation.Valid;
 import java.security.Principal;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +31,7 @@ import org.springframework.stereotype.Controller;
 public class AnswerWebsocketController {
 
     private final AnswerService answerService;
-    private final PermissionValidator permissionValidator;
+    private final RateLimitService rateLimitService;
 
     @MessageMapping("/rooms/{roomId}/question/{questionId}/answers/create")
     @SendTo("/topic/rooms/{roomId}/answers")
@@ -40,11 +43,15 @@ public class AnswerWebsocketController {
     ) {
         Long memberId = getMemberId(principal);
 
-        permissionValidator.validateAnswerPermission(roomId, memberId);
+        Bucket bucket = rateLimitService.getBucket(RateLimitType.CREATE_ANSWER, roomId, memberId, questionId);
+
+        if (!bucket.tryConsume(1)) {
+            throw new ErrorException(TOO_MANY_REQUESTS_ANSWER);
+        }
 
         Answer answer = answerService.create(roomId, memberId, questionId, request);
 
-        log.info("답변 메세지 = {}", request.content());
+        log.info("답변 메세지 = {}", answer.getContent());
 
         return AnswerMapper.toAnswerCreateResponse(answer);
     }
@@ -59,9 +66,9 @@ public class AnswerWebsocketController {
 
         Long memberId = getMemberId(principal);
 
-        permissionValidator.validateAnswerUpdatePermission(answerId, memberId);
+        Answer answer = answerService.update(answerId, memberId, request);
 
-        Answer answer = answerService.update(answerId, request);
+        log.info("수정 메세지 = {}", answer.getContent());
 
         return AnswerMapper.toAnswerUpdateResponse(answer);
     }
@@ -69,16 +76,14 @@ public class AnswerWebsocketController {
     @MessageMapping("/answers/{answerId}/delete")
     @SendTo("/topic/rooms/{roomId}/answers")
     public AnswerDeleteResponse delete(
-        @DestinationVariable Long roomId,
-        @DestinationVariable Long questionId,
         @DestinationVariable Long answerId,
         Principal principal
     ) {
         Long memberId = getMemberId(principal);
 
-        permissionValidator.validateAnswerDeletePermission(answerId, memberId);
+        answerService.delete(answerId, memberId);
 
-        answerService.delete(answerId);
+        log.info("삭제되었습니다.");
 
         return new AnswerDeleteResponse(answerId, EventType.DELETE);
     }

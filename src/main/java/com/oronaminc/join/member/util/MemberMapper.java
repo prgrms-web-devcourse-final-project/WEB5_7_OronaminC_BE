@@ -5,6 +5,7 @@ import java.util.Map;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.domain.MemberType;
 import com.oronaminc.join.member.dto.GuestLoginRequest;
+import com.oronaminc.join.member.dto.KakaoUserResponse;
 import com.oronaminc.join.member.security.MemberDetails;
 
 import lombok.AccessLevel;
@@ -45,6 +46,23 @@ public class MemberMapper {
                 .nickname(profile.get("nickname").toString())
                 .profileImage(profile.get("profile_image_url").toString())
                 .memberType(MemberType.MEMBER)
+                .build();
+    }
+
+    public static Member toNewKakaoMember(KakaoUserResponse kakaoUser) {
+        return Member.builder()
+                .email(kakaoUser.email())
+                .nickname(kakaoUser.nickname())
+                .profileImage(kakaoUser.profileImageUrl())
+                .memberType(MemberType.MEMBER)
+                .build();
+    }
+
+    public static KakaoUserResponse toKakaoUserResponse(Map<String, Object> kakaoAccount, Map<String, Object> profile) {
+        return KakaoUserResponse.builder()
+                .email((String) kakaoAccount.get("email"))
+                .nickname((String) profile.get("nickname"))
+                .profileImageUrl((String) profile.get("profile_image_url"))
                 .build();
     }
 }
