@@ -1,5 +1,6 @@
 package com.oronaminc.join.member.util;
 
+import com.oronaminc.join.member.dto.SessionInfoResponse;
 import java.util.Map;
 
 import com.oronaminc.join.member.domain.Member;
@@ -64,5 +65,14 @@ public class MemberMapper {
                 .nickname((String) profile.get("nickname"))
                 .profileImageUrl((String) profile.get("profile_image_url"))
                 .build();
+    }
+
+    public static SessionInfoResponse toSessionInfoResponse(MemberDetails memberDetails) {
+        return new SessionInfoResponse(
+                memberDetails.getId(),
+                memberDetails.getName(),
+                memberDetails.getNickname(),
+                memberDetails.getRole()
+        );
     }
 }
