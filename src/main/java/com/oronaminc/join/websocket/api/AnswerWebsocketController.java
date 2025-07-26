@@ -11,6 +11,7 @@ import com.oronaminc.join.answer.dto.AnswerUpdateResponse;
 import com.oronaminc.join.answer.mapper.AnswerMapper;
 import com.oronaminc.join.answer.service.AnswerService;
 import com.oronaminc.join.global.exception.ErrorException;
+import com.oronaminc.join.websocket.common.EventType;
 import com.oronaminc.join.global.ratelimit.RateLimitService;
 import com.oronaminc.join.global.ratelimit.RateLimitType;
 import io.github.bucket4j.Bucket;
@@ -84,7 +85,7 @@ public class AnswerWebsocketController {
 
         log.info("삭제되었습니다.");
 
-        return new AnswerDeleteResponse(answerId, "DELETE");
+        return new AnswerDeleteResponse(answerId, EventType.DELETE);
     }
 
     private Long getMemberId(Principal principal) {

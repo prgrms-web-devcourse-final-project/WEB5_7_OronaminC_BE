@@ -18,7 +18,7 @@ public class ExceptionAdvice {
     public ResponseEntity<ErrorResponse> handleErrorException(ErrorException ex) {
         ErrorCode errorCode = ex.getErrorCode();
 
-        log.error(errorCode.getMessage(), ex);
+        log.error("ErrorCode: {}, ErrorMessage: {}", ex.getErrorCode(), ex.getErrorMessage());
 
         HttpStatus httpStatus = switch (errorCode.getErrorStatus()) {
             case NOT_FOUND -> HttpStatus.NOT_FOUND;

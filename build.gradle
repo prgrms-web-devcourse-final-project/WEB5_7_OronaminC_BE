@@ -60,6 +60,8 @@ dependencies {
     // bucket4j
     implementation 'com.bucket4j:bucket4j_jdk17-core:8.14.0'
 
+    // commons-lang3
+    implementation 'org.apache.commons:commons-lang3:3.18.0'
     // caffeine
     implementation 'com.github.ben-manes.caffeine:caffeine'
 

@@ -8,6 +8,7 @@ import com.oronaminc.join.answer.dto.AnswerUpdateResponse;
 import com.oronaminc.join.global.dto.WriterDto;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.question.domain.Question;
+import com.oronaminc.join.websocket.common.EventType;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -17,7 +18,7 @@ public class AnswerMapper {
     public static AnswerCreateResponse toAnswerCreateResponse(Answer answer) {
         return AnswerCreateResponse.builder()
             .questionId(answer.getQuestion().getId())
-            .event("CREATE")
+            .event(EventType.CREATE)
             .answerId(answer.getId())
             .content(answer.getContent())
             .emojiCount(0)
@@ -51,7 +52,7 @@ public class AnswerMapper {
     public static AnswerUpdateResponse toAnswerUpdateResponse(Answer answer) {
         return AnswerUpdateResponse.builder()
             .answerId(answer.getId())
-            .event("UPDATE")
+            .event(EventType.UPDATE)
             .content(answer.getContent())
             .build();
     }
