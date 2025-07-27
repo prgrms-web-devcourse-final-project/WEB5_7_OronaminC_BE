@@ -12,6 +12,7 @@ import com.oronaminc.join.question.dto.QuestionAssembleResponse;
 import com.oronaminc.join.question.dto.QuestionListResponse;
 import com.oronaminc.join.question.dto.QuestionUpdateResponse;
 import com.oronaminc.join.room.domain.Room;
+import com.oronaminc.join.websocket.common.EventType;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Slice;
@@ -25,7 +26,7 @@ public class QuestionMapper {
 
     public static QuestionCreateResponse toQuestionCreateResponse (Question question) {
         return QuestionCreateResponse.builder()
-            .event("CREATE")
+            .event(EventType.CREATE)
             .questionId(question.getId())
             .content(question.getContent())
             .emojiCount(0L)
@@ -56,7 +57,7 @@ public class QuestionMapper {
 
     public static QuestionUpdateResponse toQuestionUpdateResponse(Question question) {
         return QuestionUpdateResponse.builder()
-            .event("UPDATE")
+            .event(EventType.UPDATE)
             .questionId(question.getId())
             .content(question.getContent())
             .build();
@@ -64,7 +65,7 @@ public class QuestionMapper {
 
     public static QuestionDeleteResponse toQuestionDeleteResponse(Long questionId) {
         return new QuestionDeleteResponse(
-            "DELETE",
+            EventType.DELETE,
             questionId
         );
     }

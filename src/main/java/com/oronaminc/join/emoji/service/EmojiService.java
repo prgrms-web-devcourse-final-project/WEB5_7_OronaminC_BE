@@ -11,6 +11,7 @@ import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.member.service.MemberReader;
 import com.oronaminc.join.question.service.QuestionReader;
 import com.oronaminc.join.room.service.RoomReader;
+import com.oronaminc.join.websocket.common.EventType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +47,7 @@ public class EmojiService {
 
         emojiCount = incrementEmojiCount(targetType, targetId);
 
-        return new EmojiResponse("CREATE", targetType, targetId, emojiCount);
+        return new EmojiResponse(EventType.CREATE, targetType, targetId, emojiCount);
 
     }
 
@@ -62,7 +63,7 @@ public class EmojiService {
         );
         emojiCount = decrementEmojiCount(targetType, targetId);
 
-        return new EmojiResponse("DELETE", targetType, targetId, emojiCount);
+        return new EmojiResponse(EventType.DELETE, targetType, targetId, emojiCount);
 
     }
 

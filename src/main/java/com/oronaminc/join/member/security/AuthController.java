@@ -1,5 +1,8 @@
 package com.oronaminc.join.member.security;
 
+
+import static com.oronaminc.join.member.util.MemberMapper.toSessionInfoResponse;
+
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -46,7 +49,7 @@ public class AuthController {
     )
     @PostMapping("/kakao")
     @ResponseStatus(HttpStatus.OK)
-    public KakaoLoginResponse kakaoLogin(
+    public SessionInfoResponse kakaoLogin(
             @RequestBody KakaoLoginRequest kakaoLoginRequest,
             HttpServletRequest request
     ) {
@@ -64,7 +67,7 @@ public class AuthController {
 
         request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
 
-        return new KakaoLoginResponse(memberDetails.getId());
+        return toSessionInfoResponse(memberDetails);
     }
 
     @Operation(
@@ -77,7 +80,7 @@ public class AuthController {
     )
     @PostMapping("/guest")
     @ResponseStatus(HttpStatus.CREATED)
-    public GuestLoginResponse guestLogin(@RequestBody @Valid GuestLoginRequest guestLoginRequest, HttpServletRequest request) {
+    public SessionInfoResponse guestLogin(@RequestBody @Valid GuestLoginRequest guestLoginRequest, HttpServletRequest request) {
         MemberDetails guest = authService.loadGuest(guestLoginRequest);
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
@@ -90,7 +93,7 @@ public class AuthController {
 
         request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
 
-        return new GuestLoginResponse(guest.getId());
+        return toSessionInfoResponse(guest);
     }
 
     @Operation(
@@ -106,12 +109,7 @@ public class AuthController {
     @ResponseStatus(HttpStatus.OK)
     public SessionInfoResponse getSessionInfo(@AuthenticationPrincipal MemberDetails memberDetails) {
 
-        return new SessionInfoResponse(
-                memberDetails.getId(),
-                memberDetails.getName(),
-                memberDetails.getNickname(),
-                memberDetails.getRole()
-        );
+        return toSessionInfoResponse(memberDetails);
     }
 
     @Operation(

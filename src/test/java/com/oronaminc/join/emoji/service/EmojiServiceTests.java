@@ -20,6 +20,7 @@ import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.service.QuestionReader;
 import com.oronaminc.join.room.domain.Room;
 import com.oronaminc.join.room.service.RoomReader;
+import com.oronaminc.join.websocket.common.EventType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -83,7 +84,7 @@ class EmojiServiceTests {
             new EmojiRequest(targetType, targetId));
 
         // then
-        assertThat(response.event()).isEqualTo("CREATE");
+        assertThat(response.event()).isEqualTo(EventType.CREATE);
         assertThat(response.targetType()).isEqualTo(targetType);
         assertThat(response.targetId()).isEqualTo(targetId);
         assertThat(response.emojiCount()).isEqualTo(emojiCount + 1);
@@ -121,7 +122,7 @@ class EmojiServiceTests {
             new EmojiRequest(targetType, targetId));
 
         // then
-        assertThat(response.event()).isEqualTo("CREATE");
+        assertThat(response.event()).isEqualTo(EventType.CREATE);
         assertThat(response.targetType()).isEqualTo(targetType);
         assertThat(response.targetId()).isEqualTo(targetId);
         assertThat(response.emojiCount()).isEqualTo(emojiCount + 1);
@@ -159,7 +160,7 @@ class EmojiServiceTests {
             new EmojiRequest(targetType, targetId));
 
         // then
-        assertThat(response.event()).isEqualTo("CREATE");
+        assertThat(response.event()).isEqualTo(EventType.CREATE);
         assertThat(response.targetType()).isEqualTo(targetType);
         assertThat(response.targetId()).isEqualTo(targetId);
         assertThat(response.emojiCount()).isEqualTo(emojiCount + 1);
@@ -228,7 +229,7 @@ class EmojiServiceTests {
             new EmojiRequest(targetType, targetId));
 
         // then
-        assertThat(response.event()).isEqualTo("DELETE");
+        assertThat(response.event()).isEqualTo(EventType.DELETE);
         assertThat(response.targetType()).isEqualTo(targetType);
         assertThat(response.targetId()).isEqualTo(targetId);
         assertThat(response.emojiCount()).isEqualTo(emojiCount - 1);
@@ -264,7 +265,7 @@ class EmojiServiceTests {
             new EmojiRequest(targetType, targetId));
 
         // then
-        assertThat(response.event()).isEqualTo("DELETE");
+        assertThat(response.event()).isEqualTo(EventType.DELETE);
         assertThat(response.targetType()).isEqualTo(targetType);
         assertThat(response.targetId()).isEqualTo(targetId);
         assertThat(response.emojiCount()).isEqualTo(emojiCount - 1);
@@ -300,7 +301,7 @@ class EmojiServiceTests {
             new EmojiRequest(targetType, targetId));
 
         // then
-        assertThat(response.event()).isEqualTo("DELETE");
+        assertThat(response.event()).isEqualTo(EventType.DELETE);
         assertThat(response.targetType()).isEqualTo(targetType);
         assertThat(response.targetId()).isEqualTo(targetId);
         assertThat(response.emojiCount()).isEqualTo(emojiCount - 1);

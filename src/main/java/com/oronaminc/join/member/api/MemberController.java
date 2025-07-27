@@ -46,8 +46,8 @@ public class MemberController {
     @GetMapping("/exists")
     @ResponseStatus(HttpStatus.OK)
     public ExistsMemberResponse existsMemberByEmail(
-        @Valid ExistsMemberRequest existsMemberRequest) {
-        boolean exists = memberService.existsMemberByEmail(existsMemberRequest.email());
+        @RequestParam String email) {
+        boolean exists = memberService.existsMemberByEmail(email);
         return new ExistsMemberResponse(exists);
     }
 
