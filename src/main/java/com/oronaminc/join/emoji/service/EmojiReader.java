@@ -5,7 +5,9 @@ import com.oronaminc.join.emoji.domain.Emoji;
 import com.oronaminc.join.emoji.domain.TargetType;
 import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +38,11 @@ public class EmojiReader {
         TargetType targetType) {
         return emojiRepository.existsByMemberIdAndTargetIdAndTargetType(memberId, targetId,
             targetType);
+    }
+
+    public Set<Long> findTargetIdsByMemberAndTargetTypeInBatch(Long memberId, TargetType targetType, List<Long> targetIds) {
+        if (targetIds.isEmpty() || targetType == null) return Set.of();
+        return emojiRepository.findTargetIdsByMemberIdAndTargetTypeAndTargetIdIn(memberId, targetType, targetIds);
     }
 
 }

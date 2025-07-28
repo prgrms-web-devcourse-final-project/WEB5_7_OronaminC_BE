@@ -1,16 +1,20 @@
 package com.oronaminc.join.answer.mapper;
 
 import com.oronaminc.join.answer.domain.Answer;
-import com.oronaminc.join.answer.dto.AnswerRequest;
 import com.oronaminc.join.answer.dto.AnswerCreateResponse;
 import com.oronaminc.join.answer.dto.AnswerGetResponse;
+import com.oronaminc.join.answer.dto.AnswerListResponse;
+import com.oronaminc.join.answer.dto.AnswerRequest;
 import com.oronaminc.join.answer.dto.AnswerUpdateResponse;
+import com.oronaminc.join.emoji.domain.TargetType;
+import com.oronaminc.join.emoji.service.EmojiReader;
 import com.oronaminc.join.global.dto.WriterDto;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.websocket.common.EventType;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Slice;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class AnswerMapper {
@@ -31,11 +35,12 @@ public class AnswerMapper {
             .build();
     }
 
-    public static AnswerGetResponse toAnswerGetResponse(Answer answer, Long emojiCount, boolean isEmojied) {
+    public static AnswerGetResponse toAnswerGetResponse(Answer answer, boolean isEmojied) {
+
         return AnswerGetResponse.builder()
             .answerId(answer.getId())
-            .emojiCount(emojiCount)
-            .Emojied(isEmojied)
+            .emojiCount(answer.getEmojiCount())
+            .isEmojied(isEmojied)
             .content(answer.getContent())
             .writer(new WriterDto(
                 answer.getMember().getId(),
@@ -55,6 +60,11 @@ public class AnswerMapper {
             .event(EventType.UPDATE)
             .content(answer.getContent())
             .build();
+    }
+
+    public static AnswerListResponse toAnswerListResponse(
+        Slice<AnswerGetResponse> slice) {
+        return new AnswerListResponse(slice.getContent());
     }
 
 }

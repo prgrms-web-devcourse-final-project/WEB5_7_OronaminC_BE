@@ -3,10 +3,11 @@ package com.oronaminc.join.answer.service;
 import static com.oronaminc.join.global.exception.ErrorCode.NOT_FOUND_ROOM;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willThrow;
 
 import com.oronaminc.join.answer.dao.AnswerRepository;
 import com.oronaminc.join.answer.domain.Answer;
@@ -31,7 +32,8 @@ import com.oronaminc.join.room.domain.Room;
 import com.oronaminc.join.room.domain.RoomStatus;
 import com.oronaminc.join.room.service.RoomReader;
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,6 +41,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Slice;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 public class AnswerServiceTests {
@@ -142,47 +146,102 @@ public class AnswerServiceTests {
     }
 
     @Test
-    @DisplayName("답변 조회 성공")
-    void getAnswer_success() {
+    @DisplayName("답변 목록 조회 - 커서 없이 최초 페이지 조회")
+    void getAnswers_firstPage_success() {
         // given
-        Long memberId = 1L;
-        Long roomId = 1L;
-        Long questionId = 1L;
-
-        Answer mockAnswer = Answer.builder()
-            .id(10L)
-            .question(mockQuestion)
-            .member(mockMember)
-            .content("답변입니다.")
-            .emojiCount(5L)
-            .version(0)
-            .build();
-
-        mockEmoji = Emoji.builder()
-            .id(1L)
-            .member(mockMember)
-            .targetType(TargetType.ANSWER)
-            .targetId(mockAnswer.getId())
-            .build();
-
-        // mocking
-        given(memberReader.getById(memberId)).willReturn(mockMember);
-        given(roomReader.getById(roomId)).willReturn(mockRoom);
-        given(questionReader.getByIdAndRoomId(questionId, roomId)).willReturn(mockQuestion);
-        given(answerReader.getByQuestionId(questionId)).willReturn(mockAnswer);
-        given(emojiReader.findByMemberIdAndTargetIdAndTargetType(memberId, mockAnswer.getId(),
-            TargetType.ANSWER)).willReturn(Optional.of(mockEmoji));
+        List<Answer> answers = List.of(createAnswer(100L,LocalDateTime.now()), createAnswer(99L,LocalDateTime.now() ));
+        given(memberReader.getById(1L)).willReturn(mockMember);
+        given(roomReader.getById(1L)).willReturn(mockRoom);
+        given(questionReader.getByIdAndRoomId(1L, 1L)).willReturn(mockQuestion);
+        given(answerReader.getByQuestionId(1L)).willReturn(null);
+        given(answerReader.getFirstPageByQuestionId(eq(1L), any())).willReturn(answers);
+        given(emojiReader.findTargetIdsByMemberAndTargetTypeInBatch(1L, TargetType.ANSWER,
+            List.of(100L, 99L)))
+            .willReturn(Set.of(100L));
 
         // when
-        AnswerGetResponse response = answerService.getAnswer(roomId, questionId, memberId);
+        Slice<AnswerGetResponse> response = answerService.getAnswers(1L, 1L, 1L, null, null, 10);
 
         // then
-        assertThat(response.answerId()).isEqualTo(mockAnswer.getId());
-        assertThat(response.content()).isEqualTo(mockAnswer.getContent());
-        assertThat(response.emojiCount()).isEqualTo(5L);
-        assertThat(response.Emojied()).isTrue();
-        assertThat(response.writer().memberId()).isEqualTo(mockMember.getId());
-        assertThat(response.writer().nickname()).isEqualTo(mockMember.getNickname());
+        assertThat(response.getContent().get(0).answerId()).isEqualTo(100L);
+        assertThat(response.getContent().get(0).isEmojied()).isTrue();
+    }
+
+    @Test
+    @DisplayName("답변 목록 조회 - 커서 기준 이후 답변 조회")
+    void getAnswers_cursorPaging_success() {
+        // given
+        List<Answer> answers = List.of(createAnswer(80L,LocalDateTime.now()), createAnswer(79L,LocalDateTime.now()));
+        given(memberReader.getById(1L)).willReturn(mockMember);
+        given(roomReader.getById(1L)).willReturn(mockRoom);
+        given(questionReader.getByIdAndRoomId(1L, 1L)).willReturn(mockQuestion);
+        given(answerReader.getByQuestionId(1L)).willReturn(null);
+        given(answerReader.getAnswerByQuestionIdWithCursor(eq(1L), any(), any(), any())).willReturn(
+            answers);
+        given(emojiReader.findTargetIdsByMemberAndTargetTypeInBatch(1L, TargetType.ANSWER,
+            List.of(80L, 79L)))
+            .willReturn(Set.of());
+
+        // when
+        Slice<AnswerGetResponse> response = answerService.getAnswers(1L, 1L, 1L, 90L,
+            LocalDateTime.now(), 10);
+
+        // then
+        assertThat(response.getContent().get(0).answerId()).isEqualTo(80L);
+        assertThat(response.getContent().get(0).isEmojied()).isFalse();
+    }
+
+    @Test
+    @DisplayName("답변 목록 조회 - 공감이 포함된 답변들 조회")
+    void getAnswers_containsEmojiedAnswers() {
+        // given
+        List<Answer> answers = List.of(createAnswer(1L,LocalDateTime.now()), createAnswer(2L,LocalDateTime.now()));
+        given(memberReader.getById(1L)).willReturn(mockMember);
+        given(roomReader.getById(1L)).willReturn(mockRoom);
+        given(questionReader.getByIdAndRoomId(1L, 1L)).willReturn(mockQuestion);
+        given(answerReader.getByQuestionId(1L)).willReturn(null);
+        given(answerReader.getFirstPageByQuestionId(eq(1L), any())).willReturn(answers);
+        given(emojiReader.findTargetIdsByMemberAndTargetTypeInBatch(1L, TargetType.ANSWER,
+            List.of(1L, 2L)))
+            .willReturn(Set.of(2L));
+
+        // when
+        Slice<AnswerGetResponse> response = answerService.getAnswers(1L, 1L, 1L, null, null, 10);
+
+        // then
+        assertThat(response.getContent().get(0).isEmojied()).isFalse();
+        assertThat(response.getContent().get(1).isEmojied()).isTrue();
+    }
+
+
+    @Test
+    @DisplayName("답변 목록 조회 - 결과가 비어도 예외 없이 처리")
+    void getAnswers_emptyList_noError() {
+        // given
+        given(memberReader.getById(1L)).willReturn(mockMember);
+        given(roomReader.getById(1L)).willReturn(mockRoom);
+        given(questionReader.getByIdAndRoomId(1L, 1L)).willReturn(mockQuestion);
+        given(answerReader.getByQuestionId(1L)).willReturn(null);
+        given(answerReader.getFirstPageByQuestionId(eq(1L), any())).willReturn(List.of());
+
+        // when
+        Slice<AnswerGetResponse> response = answerService.getAnswers(1L, 1L, 1L, null, null, 10);
+
+        // then
+        assertThat(response.getContent()).asInstanceOf(LIST).isEmpty();
+    }
+
+    private Answer createAnswer(Long id, LocalDateTime createdAt) {
+        Answer answer = Answer.builder()
+            .id(id)
+            .member(mockMember)
+            .question(mockQuestion)
+            .content("답변입니다")
+            .emojiCount(0L)
+            .build();
+
+        ReflectionTestUtils.setField(answer, "createdAt", createdAt);
+        return answer;
     }
 
     @Test
