@@ -1,17 +1,22 @@
 package com.oronaminc.join.answer.api;
 
 import com.oronaminc.join.answer.dto.AnswerGetResponse;
+import com.oronaminc.join.answer.dto.AnswerListResponse;
+import com.oronaminc.join.answer.mapper.AnswerMapper;
 import com.oronaminc.join.answer.service.AnswerService;
 import com.oronaminc.join.member.security.MemberDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,14 +38,19 @@ public class AnswerController {
     )
     @GetMapping("/rooms/{roomId}/questions/{questionId}/answers")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<AnswerGetResponse> getAnswer(
+    public ResponseEntity<AnswerListResponse> getAnswers(
         @PathVariable Long roomId,
         @PathVariable Long questionId,
-        @AuthenticationPrincipal MemberDetails memberDetails
+        @AuthenticationPrincipal MemberDetails memberDetails,
+        @RequestParam(required = false) Long lastId,
+        @RequestParam(required = false) LocalDateTime lastCreatedAt,
+        @RequestParam(defaultValue = "10") int size
     ) {
         Long memberId = memberDetails.getId();
-        AnswerGetResponse response = answerService.getAnswer(roomId, questionId, memberId);
-        return ResponseEntity.ok(response);
+
+        Slice<AnswerGetResponse> response = answerService.getAnswers(roomId, questionId, memberId,
+            lastId, lastCreatedAt, size);
+        return ResponseEntity.ok(AnswerMapper.toAnswerListResponse(response));
     }
 
 }
