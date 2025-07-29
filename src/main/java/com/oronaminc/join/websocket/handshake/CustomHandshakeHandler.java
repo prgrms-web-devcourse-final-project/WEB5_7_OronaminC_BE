@@ -58,5 +58,4 @@ public class CustomHandshakeHandler extends DefaultHandshakeHandler {
         // fallback 경로로 전송
         return null;
     }
-
 }
