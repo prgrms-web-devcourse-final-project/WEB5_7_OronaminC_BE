@@ -152,7 +152,6 @@ public class AnswerServiceTests {
         given(memberReader.getById(1L)).willReturn(mockMember);
         given(roomReader.getById(1L)).willReturn(mockRoom);
         given(questionReader.getByIdAndRoomId(1L, 1L)).willReturn(mockQuestion);
-        given(answerReader.getByQuestionId(1L)).willReturn(null);
         given(answerReader.getFirstPageByQuestionId(eq(1L), any())).willReturn(answers);
         given(emojiReader.findTargetIdsByMemberAndTargetTypeInBatch(1L, TargetType.ANSWER,
             List.of(100L, 99L)))
@@ -174,7 +173,6 @@ public class AnswerServiceTests {
         given(memberReader.getById(1L)).willReturn(mockMember);
         given(roomReader.getById(1L)).willReturn(mockRoom);
         given(questionReader.getByIdAndRoomId(1L, 1L)).willReturn(mockQuestion);
-        given(answerReader.getByQuestionId(1L)).willReturn(null);
         given(answerReader.getAnswerByQuestionIdWithCursor(eq(1L), any(), any(), any())).willReturn(
             answers);
         given(emojiReader.findTargetIdsByMemberAndTargetTypeInBatch(1L, TargetType.ANSWER,
@@ -198,7 +196,6 @@ public class AnswerServiceTests {
         given(memberReader.getById(1L)).willReturn(mockMember);
         given(roomReader.getById(1L)).willReturn(mockRoom);
         given(questionReader.getByIdAndRoomId(1L, 1L)).willReturn(mockQuestion);
-        given(answerReader.getByQuestionId(1L)).willReturn(null);
         given(answerReader.getFirstPageByQuestionId(eq(1L), any())).willReturn(answers);
         given(emojiReader.findTargetIdsByMemberAndTargetTypeInBatch(1L, TargetType.ANSWER,
             List.of(1L, 2L)))
@@ -220,7 +217,6 @@ public class AnswerServiceTests {
         given(memberReader.getById(1L)).willReturn(mockMember);
         given(roomReader.getById(1L)).willReturn(mockRoom);
         given(questionReader.getByIdAndRoomId(1L, 1L)).willReturn(mockQuestion);
-        given(answerReader.getByQuestionId(1L)).willReturn(null);
         given(answerReader.getFirstPageByQuestionId(eq(1L), any())).willReturn(List.of());
 
         // when
