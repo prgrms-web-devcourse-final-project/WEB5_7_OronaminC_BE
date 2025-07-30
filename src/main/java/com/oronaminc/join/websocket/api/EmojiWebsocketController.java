@@ -1,5 +1,11 @@
 package com.oronaminc.join.websocket.api;
 
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.stereotype.Controller;
+
 import com.oronaminc.join.emoji.dto.EmojiRequest;
 import com.oronaminc.join.emoji.dto.EmojiResponse;
 import com.oronaminc.join.emoji.service.EmojiFacade;
@@ -7,15 +13,10 @@ import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.global.ratelimit.RateLimitService;
 import com.oronaminc.join.global.ratelimit.RateLimitType;
+
 import io.github.bucket4j.Bucket;
 import jakarta.validation.Valid;
-import java.security.Principal;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.stereotype.Controller;
 
 @Controller
 @RequiredArgsConstructor
@@ -28,10 +29,9 @@ public class EmojiWebsocketController {
     @SendTo("/topic/rooms/{roomId}/emojis")
     public EmojiResponse createEmoji(
         @DestinationVariable Long roomId,
-        @Payload @Valid EmojiRequest emojiRequest,
-        Principal principal
+        @Payload @Valid EmojiRequest emojiRequest
     ) {
-        Long memberId = Long.valueOf(principal.getName());
+        Long memberId = emojiRequest.memberId();
 
         Bucket bucket = rateLimitService.getBucket(RateLimitType.EMOJI, memberId,
             emojiRequest.targetType(), emojiRequest.targetId());
@@ -47,10 +47,9 @@ public class EmojiWebsocketController {
     @SendTo("/topic/rooms/{roomId}/emojis")
     public EmojiResponse deleteEmoji(
         @DestinationVariable Long roomId,
-        @Payload @Valid EmojiRequest emojiRequest,
-        Principal principal
+        @Payload @Valid EmojiRequest emojiRequest
     ) {
-        Long memberId = Long.valueOf(principal.getName());
+        Long memberId = emojiRequest.memberId();
 
         Bucket bucket = rateLimitService.getBucket(RateLimitType.EMOJI, memberId,
             emojiRequest.targetType(), emojiRequest.targetId());
