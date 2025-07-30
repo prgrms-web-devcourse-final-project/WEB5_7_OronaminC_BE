@@ -6,12 +6,14 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
 import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.global.ratelimit.RateLimitService;
 import com.oronaminc.join.global.ratelimit.RateLimitType;
+import com.oronaminc.join.member.security.MemberDetails;
 import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.dto.QuestionCreateResponse;
 import com.oronaminc.join.question.dto.QuestionDeleteResponse;
@@ -42,7 +44,8 @@ public class QuestionWebsocketController {
     ) {
         log.debug("수신한 메시지 = {}", request.content());
 
-        Long memberId = Long.valueOf(principal.getName());
+        MemberDetails memberDetails = (MemberDetails)((Authentication)principal).getPrincipal();
+        Long memberId = Long.valueOf(memberDetails.getId());
 
         log.debug("회원 아이디 = {}", memberId);
 
@@ -66,6 +69,7 @@ public class QuestionWebsocketController {
         @Payload @Valid QuestionRequest request,
         Principal principal
     ) {
+
         Long memberId = Long.valueOf(principal.getName());
 
         Question updated = questionService.update(memberId, roomId, questionId, request);

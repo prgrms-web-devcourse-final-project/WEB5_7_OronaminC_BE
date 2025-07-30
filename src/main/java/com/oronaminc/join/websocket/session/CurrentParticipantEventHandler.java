@@ -2,14 +2,11 @@ package com.oronaminc.join.websocket.session;
 
 import static com.oronaminc.join.global.exception.ErrorCode.*;
 
-import com.oronaminc.join.global.exception.ErrorCode;
 import java.security.Principal;
 import java.util.Set;
 
 import org.springframework.context.event.EventListener;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.room.event.RoomExitEvent;
@@ -24,27 +21,27 @@ public class CurrentParticipantEventHandler {
     private static final String ROOM_PREFIX = "/topic/rooms/";
     private static final String JOIN_SUFFIX = "/join";
 
-    @EventListener
-    public void handleSubscribe(SessionSubscribeEvent event) {
-        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
-        String destination = accessor.getDestination();
-        Principal principal = accessor.getUser();
-
-        if (destination == null) {
-            throw new ErrorException(STOMP_INVALID_DESTINATION);
-        }
-
-        if (!destination.startsWith(ROOM_PREFIX)) {
-            return;
-        }
-
-        Long memberId = parseMemberId(principal);
-        Long roomId = parseRoomId(destination);
-
-        if (!isRoomJoinPath(destination)) {
-            validateParticipantRoomJoin(roomId, memberId);
-        }
-    }
+    // @EventListener
+    // public void handleSubscribe(SessionSubscribeEvent event) {
+    //     StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
+    //     String destination = accessor.getDestination();
+    //     Principal principal = accessor.getUser();
+    //
+    //     if (destination == null) {
+    //         throw new ErrorException(STOMP_INVALID_DESTINATION);
+    //     }
+    //
+    //     if (!destination.startsWith(ROOM_PREFIX)) {
+    //         return;
+    //     }
+    //
+    //     Long memberId = parseMemberId(principal);
+    //     Long roomId = parseRoomId(destination);
+    //
+    //     if (!isRoomJoinPath(destination)) {
+    //         validateParticipantRoomJoin(roomId, memberId);
+    //     }
+    // }
 
     @EventListener
     public void handleUnsubscribe(RoomExitEvent event) {

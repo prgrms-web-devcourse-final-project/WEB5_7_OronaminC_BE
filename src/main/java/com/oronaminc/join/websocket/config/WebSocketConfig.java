@@ -3,6 +3,7 @@ package com.oronaminc.join.websocket.config;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -27,6 +28,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final StompErrorHandler stompErrorHandler;
     private final WebsocketSessionManager sessionManager;
     private final ApplicationEventPublisher publisher;
+    private final StompAuthChannelInterceptor stompAuthChannelInterceptor;
 
     @Bean
     public WebSocketHandlerDecoratorFactory webSocketHandlerDecoratorFactory(
@@ -65,5 +67,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
         registry.setDecoratorFactories(webSocketHandlerDecoratorFactory(sessionManager, publisher));
+    }
+
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(stompAuthChannelInterceptor);
     }
 }
