@@ -47,15 +47,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns("*")
                 // websocket 연결 전 쿠키 체크
-                // .addInterceptors(new HttpSessionHandshakeInterceptor())
+                .addInterceptors(new HttpSessionHandshakeInterceptor())
                 // websocket 연결 후 principal 생성
-                // .setHandshakeHandler(handshakeHandler)
+                .setHandshakeHandler(handshakeHandler)
                 .withSockJS();
 
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns("*")
-                // .addInterceptors(new HttpSessionHandshakeInterceptor())
-                // .setHandshakeHandler(handshakeHandler)
+                .addInterceptors(new HttpSessionHandshakeInterceptor())
+                .setHandshakeHandler(handshakeHandler)
         ;
 
         registry.setErrorHandler(stompErrorHandler);
