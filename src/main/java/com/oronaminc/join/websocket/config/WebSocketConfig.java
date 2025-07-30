@@ -52,10 +52,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 // .setHandshakeHandler(handshakeHandler)
                 .withSockJS();
 
-        // registry.addEndpoint("/ws")
-        //         .setAllowedOriginPatterns("*")
-        //         .addInterceptors(new HttpSessionHandshakeInterceptor())
-        //         .setHandshakeHandler(handshakeHandler);
+        registry.addEndpoint("/ws")
+                .setAllowedOriginPatterns("*")
+                // .addInterceptors(new HttpSessionHandshakeInterceptor())
+                // .setHandshakeHandler(handshakeHandler)
+        ;
 
         registry.setErrorHandler(stompErrorHandler);
     }
