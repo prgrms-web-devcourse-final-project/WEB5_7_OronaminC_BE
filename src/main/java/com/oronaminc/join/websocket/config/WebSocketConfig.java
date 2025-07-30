@@ -3,13 +3,13 @@ package com.oronaminc.join.websocket.config;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 import org.springframework.web.socket.handler.WebSocketHandlerDecoratorFactory;
-import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
 import com.oronaminc.join.websocket.handshake.CustomHandshakeHandler;
 import com.oronaminc.join.websocket.session.CustomWebSocketHandlerDecorator;
@@ -27,6 +27,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final StompErrorHandler stompErrorHandler;
     private final WebsocketSessionManager sessionManager;
     private final ApplicationEventPublisher publisher;
+    private final StompAuthChannelInterceptor stompAuthChannelInterceptor;
 
     @Bean
     public WebSocketHandlerDecoratorFactory webSocketHandlerDecoratorFactory(
@@ -48,15 +49,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns("*")
                 // websocket 연결 전 쿠키 체크
-                .addInterceptors(new HttpSessionHandshakeInterceptor())
+                // .addInterceptors(new HttpSessionHandshakeInterceptor())
                 // websocket 연결 후 principal 생성
-                .setHandshakeHandler(handshakeHandler)
+                // .setHandshakeHandler(handshakeHandler)
                 .withSockJS();
 
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns("*")
-                .addInterceptors(new HttpSessionHandshakeInterceptor())
-                .setHandshakeHandler(handshakeHandler)
+                // .addInterceptors(new HttpSessionHandshakeInterceptor())
+                // .setHandshakeHandler(handshakeHandler)
         ;
 
         registry.setErrorHandler(stompErrorHandler);
@@ -65,5 +66,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
         registry.setDecoratorFactories(webSocketHandlerDecoratorFactory(sessionManager, publisher));
+    }
+
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(stompAuthChannelInterceptor);
     }
 }
