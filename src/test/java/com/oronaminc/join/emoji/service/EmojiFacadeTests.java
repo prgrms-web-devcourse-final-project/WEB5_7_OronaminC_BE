@@ -89,7 +89,7 @@ class EmojiFacadeTests {
             executorService.submit(() -> {
                 try {
                     emojiFacade.createEmoji(members.get(idx).getId(),
-                        new EmojiRequest(TargetType.ROOM, roomId));
+                        new EmojiRequest(TargetType.ROOM, roomId, members.get(idx).getId()));
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -147,7 +147,7 @@ class EmojiFacadeTests {
             executorService.submit(() -> {
                 try {
                     emojiFacade.deleteEmoji(members.get(idx).getId(),
-                        new EmojiRequest(TargetType.ROOM, roomId));
+                        new EmojiRequest(TargetType.ROOM, roomId, members.get(idx).getId()));
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
