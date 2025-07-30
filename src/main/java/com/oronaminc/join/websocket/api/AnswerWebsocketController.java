@@ -1,7 +1,12 @@
 package com.oronaminc.join.websocket.api;
 
-import static com.oronaminc.join.global.exception.ErrorCode.TOO_MANY_REQUESTS_ANSWER;
-import static com.oronaminc.join.global.exception.ErrorCode.UNAUTHORIZED_MEMBER;
+import static com.oronaminc.join.global.exception.ErrorCode.*;
+
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.stereotype.Controller;
 
 import com.oronaminc.join.answer.domain.Answer;
 import com.oronaminc.join.answer.dto.AnswerCreateResponse;
@@ -11,19 +16,14 @@ import com.oronaminc.join.answer.dto.AnswerUpdateResponse;
 import com.oronaminc.join.answer.mapper.AnswerMapper;
 import com.oronaminc.join.answer.service.AnswerService;
 import com.oronaminc.join.global.exception.ErrorException;
-import com.oronaminc.join.websocket.common.EventType;
 import com.oronaminc.join.global.ratelimit.RateLimitService;
 import com.oronaminc.join.global.ratelimit.RateLimitType;
+import com.oronaminc.join.websocket.common.EventType;
+
 import io.github.bucket4j.Bucket;
 import jakarta.validation.Valid;
-import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.stereotype.Controller;
 
 @Slf4j
 @Controller
@@ -38,10 +38,9 @@ public class AnswerWebsocketController {
     public AnswerCreateResponse create(
         @DestinationVariable Long roomId,
         @DestinationVariable Long questionId,
-        @Payload @Valid AnswerRequest request,
-        Principal principal
+        @Payload @Valid AnswerRequest request
     ) {
-        Long memberId = getMemberId(principal);
+        Long memberId = request.memberId();
 
         Bucket bucket = rateLimitService.getBucket(RateLimitType.CREATE_ANSWER, roomId, memberId, questionId);
 
@@ -60,11 +59,10 @@ public class AnswerWebsocketController {
     @SendTo("/topic/rooms/{roomId}/answers")
     public AnswerUpdateResponse update(
         @DestinationVariable Long answerId,
-        @Payload @Valid AnswerRequest request,
-        Principal principal
+        @Payload @Valid AnswerRequest request
     ) {
 
-        Long memberId = getMemberId(principal);
+        Long memberId = request.memberId();
 
         Answer answer = answerService.update(answerId, memberId, request);
 
@@ -77,22 +75,15 @@ public class AnswerWebsocketController {
     @SendTo("/topic/rooms/{roomId}/answers")
     public AnswerDeleteResponse delete(
         @DestinationVariable Long answerId,
-        Principal principal
+        @Payload @Valid StompMemberRequest request
     ) {
-        Long memberId = getMemberId(principal);
+        Long memberId = request.memberId();
 
         answerService.delete(answerId, memberId);
 
         log.info("삭제되었습니다.");
 
         return new AnswerDeleteResponse(answerId, EventType.DELETE);
-    }
-
-    private Long getMemberId(Principal principal) {
-        if (principal == null) {
-            throw new ErrorException(UNAUTHORIZED_MEMBER);
-        }
-        return Long.valueOf(principal.getName());
     }
 
 }

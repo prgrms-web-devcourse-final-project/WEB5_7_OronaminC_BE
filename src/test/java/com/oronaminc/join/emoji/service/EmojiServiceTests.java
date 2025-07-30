@@ -1,9 +1,16 @@
 package com.oronaminc.join.emoji.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.oronaminc.join.answer.domain.Answer;
 import com.oronaminc.join.answer.service.AnswerReader;
@@ -21,13 +28,6 @@ import com.oronaminc.join.question.service.QuestionReader;
 import com.oronaminc.join.room.domain.Room;
 import com.oronaminc.join.room.service.RoomReader;
 import com.oronaminc.join.websocket.common.EventType;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class EmojiServiceTests {
@@ -81,7 +81,7 @@ class EmojiServiceTests {
 
         // when
         EmojiResponse response = emojiService.createEmoji(memberId,
-            new EmojiRequest(targetType, targetId));
+            new EmojiRequest(targetType, targetId, memberId));
 
         // then
         assertThat(response.event()).isEqualTo(EventType.CREATE);
@@ -119,7 +119,7 @@ class EmojiServiceTests {
 
         // when
         EmojiResponse response = emojiService.createEmoji(memberId,
-            new EmojiRequest(targetType, targetId));
+            new EmojiRequest(targetType, targetId, memberId));
 
         // then
         assertThat(response.event()).isEqualTo(EventType.CREATE);
@@ -157,7 +157,7 @@ class EmojiServiceTests {
 
         // when
         EmojiResponse response = emojiService.createEmoji(memberId,
-            new EmojiRequest(targetType, targetId));
+            new EmojiRequest(targetType, targetId, memberId));
 
         // then
         assertThat(response.event()).isEqualTo(EventType.CREATE);
@@ -194,7 +194,7 @@ class EmojiServiceTests {
         // then
         assertThatThrownBy(
             () -> {
-                emojiService.createEmoji(memberId, new EmojiRequest(targetType, targetId));
+                emojiService.createEmoji(memberId, new EmojiRequest(targetType, targetId, memberId));
             }
         ).isInstanceOf(ErrorException.class);
 
@@ -226,7 +226,7 @@ class EmojiServiceTests {
 
         // when
         EmojiResponse response = emojiService.deleteEmoji(memberId,
-            new EmojiRequest(targetType, targetId));
+            new EmojiRequest(targetType, targetId, memberId));
 
         // then
         assertThat(response.event()).isEqualTo(EventType.DELETE);
@@ -262,7 +262,7 @@ class EmojiServiceTests {
 
         // when
         EmojiResponse response = emojiService.deleteEmoji(memberId,
-            new EmojiRequest(targetType, targetId));
+            new EmojiRequest(targetType, targetId, memberId));
 
         // then
         assertThat(response.event()).isEqualTo(EventType.DELETE);
@@ -298,7 +298,7 @@ class EmojiServiceTests {
 
         // when
         EmojiResponse response = emojiService.deleteEmoji(memberId,
-            new EmojiRequest(targetType, targetId));
+            new EmojiRequest(targetType, targetId, memberId));
 
         // then
         assertThat(response.event()).isEqualTo(EventType.DELETE);
@@ -335,7 +335,7 @@ class EmojiServiceTests {
         // then
         assertThatThrownBy(
             () -> {
-                emojiService.deleteEmoji(memberId, new EmojiRequest(targetType, targetId));
+                emojiService.deleteEmoji(memberId, new EmojiRequest(targetType, targetId, memberId));
             }
         ).isInstanceOf(ErrorException.class);
 

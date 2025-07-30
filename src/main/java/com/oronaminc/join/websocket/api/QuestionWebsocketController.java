@@ -1,7 +1,5 @@
 package com.oronaminc.join.websocket.api;
 
-import java.security.Principal;
-
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -37,11 +35,9 @@ public class QuestionWebsocketController {
     @SendTo("/topic/rooms/{roomId}/questions")
     public QuestionCreateResponse createQuestion(
         @DestinationVariable Long roomId,
-        @Payload @Valid QuestionRequest request,
-        Principal principal
+        @Payload @Valid QuestionRequest request
     ) {
         log.debug("수신한 메시지 = {}", request.content());
-        log.debug("principal = {}", principal);
 
         Long memberId = request.memberId();
 
@@ -64,11 +60,10 @@ public class QuestionWebsocketController {
     public QuestionUpdateResponse updateQuestion(
         @DestinationVariable Long roomId,
         @DestinationVariable Long questionId,
-        @Payload @Valid QuestionRequest request,
-        Principal principal
+        @Payload @Valid QuestionRequest request
     ) {
 
-        Long memberId = Long.valueOf(principal.getName());
+        Long memberId = request.memberId();
 
         Question updated = questionService.update(memberId, roomId, questionId, request);
 
@@ -80,9 +75,9 @@ public class QuestionWebsocketController {
     public QuestionDeleteResponse deleteQuestion(
         @DestinationVariable Long roomId,
         @DestinationVariable Long questionId,
-        Principal principal
+        @Payload @Valid StompMemberRequest request
     ) {
-        Long memberId = Long.valueOf(principal.getName());
+        Long memberId = request.memberId();
 
         Long deletedId = questionService.delete(memberId, roomId, questionId);
 
