@@ -1,5 +1,14 @@
 package com.oronaminc.join.answer.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.oronaminc.join.answer.dao.AnswerRepository;
 import com.oronaminc.join.answer.domain.Answer;
@@ -16,15 +25,8 @@ import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.service.QuestionReader;
 import com.oronaminc.join.room.domain.Room;
 import com.oronaminc.join.room.service.RoomReader;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
@@ -65,7 +67,6 @@ public class AnswerService {
         memberReader.getById(memberId);
         roomReader.getById(roomId);
         questionReader.getByIdAndRoomId(questionId, roomId);
-        answerReader.getByQuestionId(questionId);
 
         Pageable pageable = PageRequest.of(0, size + 1);
 
