@@ -1,5 +1,13 @@
 package com.oronaminc.join.websocket.api;
 
+import java.security.Principal;
+
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.stereotype.Controller;
+
 import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.global.ratelimit.RateLimitService;
@@ -11,16 +19,11 @@ import com.oronaminc.join.question.dto.QuestionRequest;
 import com.oronaminc.join.question.dto.QuestionUpdateResponse;
 import com.oronaminc.join.question.service.QuestionService;
 import com.oronaminc.join.question.util.QuestionMapper;
+
 import io.github.bucket4j.Bucket;
 import jakarta.validation.Valid;
-import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.stereotype.Controller;
 
 @Slf4j
 @Controller
@@ -37,7 +40,11 @@ public class QuestionWebsocketController {
         @Payload @Valid QuestionRequest request,
         Principal principal
     ) {
+        log.debug("수신한 메시지 = {}", request.content());
+
         Long memberId = Long.valueOf(principal.getName());
+
+        log.debug("회원 아이디 = {}", memberId);
 
         Bucket bucket = rateLimitService.getBucket(RateLimitType.CREATE_QUESTION, roomId, memberId);
 
@@ -47,7 +54,6 @@ public class QuestionWebsocketController {
 
         Question question = questionService.create(roomId, memberId, request);
 
-        log.info("수신한 메시지 = {}", request.content());
 
         return QuestionMapper.toQuestionCreateResponse(question);
     }
