@@ -1,13 +1,24 @@
 package com.oronaminc.join.answer.service;
 
-import static com.oronaminc.join.global.exception.ErrorCode.NOT_FOUND_ROOM;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
+import static com.oronaminc.join.global.exception.ErrorCode.*;
+import static org.assertj.core.api.AssertionsForClassTypes.*;
+import static org.assertj.core.api.InstanceOfAssertFactories.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Slice;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.oronaminc.join.answer.dao.AnswerRepository;
 import com.oronaminc.join.answer.domain.Answer;
@@ -31,18 +42,6 @@ import com.oronaminc.join.question.service.QuestionReader;
 import com.oronaminc.join.room.domain.Room;
 import com.oronaminc.join.room.domain.RoomStatus;
 import com.oronaminc.join.room.service.RoomReader;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Slice;
-import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 public class AnswerServiceTests {
@@ -114,7 +113,7 @@ public class AnswerServiceTests {
             .participantType(ParticipantType.TEAM)
             .build();
 
-        request = new AnswerRequest("답변입니다.");
+        request = new AnswerRequest("답변입니다.", mockMember.getId());
     }
 
     @Test
@@ -258,7 +257,7 @@ public class AnswerServiceTests {
         given(permissionValidator.validateAnswerUpdatePermission(1L, 1L))
             .willReturn(answer);
 
-        AnswerRequest request = new AnswerRequest("수정된 내용");
+        AnswerRequest request = new AnswerRequest("수정된 내용", 1L);
 
         // when
         Answer result = answerService.update(answer.getId(), answer.getMember().getId(), request);

@@ -1,7 +1,5 @@
 package com.oronaminc.join.websocket.api;
 
-import java.security.Principal;
-
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -25,10 +23,10 @@ public class RoomWebsocketController {
     @SendTo("/topic/rooms/{roomId}/join")
     public RoomJoinResponse joinRoom(
             @DestinationVariable Long roomId,
-            Principal principal,
+            StompMemberRequest request,
             Message<?> message
     ) {
-        Long memberId = Long.valueOf(principal.getName());
+        Long memberId = request.memberId();
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
         String sessionId = accessor.getSessionId();
 
