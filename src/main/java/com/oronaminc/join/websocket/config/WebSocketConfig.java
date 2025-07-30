@@ -9,6 +9,7 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 import org.springframework.web.socket.handler.WebSocketHandlerDecoratorFactory;
+import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
 import com.oronaminc.join.websocket.handshake.CustomHandshakeHandler;
 import com.oronaminc.join.websocket.session.CustomWebSocketHandlerDecorator;
