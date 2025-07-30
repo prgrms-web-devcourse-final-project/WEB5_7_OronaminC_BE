@@ -2,6 +2,7 @@ package com.oronaminc.join.websocket.session;
 
 import static com.oronaminc.join.global.exception.ErrorCode.*;
 
+import com.oronaminc.join.global.exception.ErrorCode;
 import java.security.Principal;
 import java.util.Set;
 
