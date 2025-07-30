@@ -44,6 +44,7 @@ public class QuestionWebsocketController {
     ) {
         log.debug("수신한 메시지 = {}", request.content());
         log.debug("principal = {}", principal);
+
         MemberDetails memberDetails = (MemberDetails)((Authentication)principal).getPrincipal();
         Long memberId = Long.valueOf(memberDetails.getId());
 
