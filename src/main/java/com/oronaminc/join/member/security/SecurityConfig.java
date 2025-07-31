@@ -47,8 +47,8 @@ public class SecurityConfig {
                                 "/ws/**"
                         )
                         .permitAll()
-                        .requestMatchers("/ws/**").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest()
+                        .authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
                 .oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfo -> userInfo
