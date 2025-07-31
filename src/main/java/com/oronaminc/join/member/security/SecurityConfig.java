@@ -44,7 +44,10 @@ public class SecurityConfig {
                                 "/login/oauth2/code/kakao",
                                 "/api/auth/logout",
                                 "/dev/**",
-                                "/ws/**"
+                                "/ws/**",
+                                "/api/auth/guest",
+                                "/api/auth/kakao",
+                                "/login"
                         )
                         .permitAll()
                         .anyRequest()
