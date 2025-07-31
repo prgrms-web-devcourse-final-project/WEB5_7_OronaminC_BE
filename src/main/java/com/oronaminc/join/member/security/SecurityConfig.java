@@ -30,12 +30,12 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/auth/guest",
-                                "/api/auth/kakao",
-                                "/login"
-                        )
-                        .anonymous()
+                        // .requestMatchers(
+                        //         "/api/auth/guest",
+                        //         "/api/auth/kakao",
+                        //         "/login"
+                        // )
+                        // .anonymous()
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-resources/**",
