@@ -1,16 +1,5 @@
 package com.oronaminc.join.room.service;
 
-import static com.oronaminc.join.global.exception.ErrorCode.*;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.oronaminc.join.answer.domain.Answer;
 import com.oronaminc.join.answer.service.AnswerReader;
 import com.oronaminc.join.document.domain.Document;
@@ -27,23 +16,22 @@ import com.oronaminc.join.question.service.QuestionReader;
 import com.oronaminc.join.room.dao.RoomRepository;
 import com.oronaminc.join.room.domain.Room;
 import com.oronaminc.join.room.domain.RoomStatus;
-import com.oronaminc.join.room.dto.CreateRoomRequest;
-import com.oronaminc.join.room.dto.CreateRoomResponse;
-import com.oronaminc.join.room.dto.JoinRoomRequest;
-import com.oronaminc.join.room.dto.JoinRoomResponse;
-import com.oronaminc.join.room.dto.ReportResponse;
+import com.oronaminc.join.room.dto.*;
 import com.oronaminc.join.room.event.RoomDeleteEvent;
-import com.oronaminc.join.room.dto.RoomDetailResponse;
-import com.oronaminc.join.room.dto.RoomJoinResponse;
-import com.oronaminc.join.room.dto.RoomUpdateInfoResponse;
-import com.oronaminc.join.room.dto.RoomUpdateRequest;
-import com.oronaminc.join.room.dto.RoomUpdateStatusRequest;
-import com.oronaminc.join.room.dto.TopQnAResponse;
 import com.oronaminc.join.room.util.CodeGenerator;
 import com.oronaminc.join.room.util.RoomMapper;
 import com.oronaminc.join.websocket.session.CurrentParticipantManager;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static com.oronaminc.join.global.exception.ErrorCode.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -139,7 +127,7 @@ public class RoomService {
     @Transactional
     @CacheEvict(cacheNames = "roomById", key = "#roomId")
     public void updateRoomStatus(Long memberId, Long roomId,
-            RoomUpdateStatusRequest roomUpdateStatusRequest) {
+                                 RoomUpdateStatusRequest roomUpdateStatusRequest) {
         participantService.validatePresenter(roomId, memberId);
         Room room = roomReader.getById(roomId);
 
@@ -215,9 +203,12 @@ public class RoomService {
     }
 
     private Double calculateAnswerRate(Long totalQuestions, Long totalAnswerByQuestion) {
-        return (totalQuestions == 0)
-                ? 0.0
-                : ((double)totalAnswerByQuestion / totalQuestions) * 100;
+        if (totalQuestions == 0) {
+            return 0.0;
+        }
+
+        double rate = ((double) totalAnswerByQuestion / totalQuestions) * 100;
+        return Math.round(rate * 10.0) / 10.0;
 
     }
 
