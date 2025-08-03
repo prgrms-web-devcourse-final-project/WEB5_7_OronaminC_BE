@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,13 +33,13 @@ import com.oronaminc.join.room.dto.CreateRoomResponse;
 import com.oronaminc.join.room.dto.JoinRoomRequest;
 import com.oronaminc.join.room.dto.JoinRoomResponse;
 import com.oronaminc.join.room.dto.ReportResponse;
-import com.oronaminc.join.room.event.RoomDeleteEvent;
 import com.oronaminc.join.room.dto.RoomDetailResponse;
 import com.oronaminc.join.room.dto.RoomJoinResponse;
 import com.oronaminc.join.room.dto.RoomUpdateInfoResponse;
 import com.oronaminc.join.room.dto.RoomUpdateRequest;
 import com.oronaminc.join.room.dto.RoomUpdateStatusRequest;
 import com.oronaminc.join.room.dto.TopQnAResponse;
+import com.oronaminc.join.room.event.RoomDeleteEvent;
 import com.oronaminc.join.room.util.CodeGenerator;
 import com.oronaminc.join.room.util.RoomMapper;
 import com.oronaminc.join.websocket.session.CurrentParticipantManager;
@@ -61,6 +62,7 @@ public class RoomService {
     private final RoomReader roomReader;
     private final CurrentParticipantManager currentParticipantManager;
     private final ApplicationEventPublisher publisher;
+    private final CacheManager cacheManager;
 
     private static final int CODE_LENGTH = 6;
 
@@ -104,7 +106,6 @@ public class RoomService {
     }
 
     @Transactional
-    @CacheEvict(cacheNames = "roomById", key = "#roomId")
     public void updateRoom(Long memberId, Long roomId, RoomUpdateRequest updateRoomRequest) {
         participantService.validatePresenter(roomId, memberId);
 
@@ -117,10 +118,11 @@ public class RoomService {
         room.update(updateRoomRequest);
         participantService.updateTeam(room, updateRoomRequest.teamEmail());
         documentService.updateDocument(updateRoomRequest.documentUrl(), roomId);
+
+        clearCache(room.getId(), room.getSecretCode());
     }
 
     @Transactional
-    @CacheEvict(cacheNames = "roomById", key = "#roomId")
     public void deleteRoom(Long memberId, Long roomId) {
         participantService.validatePresenter(roomId, memberId);
 
@@ -131,18 +133,19 @@ public class RoomService {
             throw new ErrorException(BAD_REQUEST_ROOM_STARTED);
         }
 
+        clearCache(room.getId(), room.getSecretCode());
         publisher.publishEvent(new RoomDeleteEvent(roomId));
         roomRepository.deleteById(roomId);
         s3Service.deleteFile(document.getFileUrl());
     }
 
     @Transactional
-    @CacheEvict(cacheNames = "roomById", key = "#roomId")
     public void updateRoomStatus(Long memberId, Long roomId,
             RoomUpdateStatusRequest roomUpdateStatusRequest) {
         participantService.validatePresenter(roomId, memberId);
         Room room = roomReader.getById(roomId);
 
+        clearCache(room.getId(), room.getSecretCode());
         RoomStatus updateStatus = roomUpdateStatusRequest.roomStatus();
         List<RoomStatus> canUpdateStatus = List.of(RoomStatus.STARTED, RoomStatus.ENDED);
         if (!canUpdateStatus.contains(roomUpdateStatusRequest.roomStatus())) {
@@ -230,5 +233,17 @@ public class RoomService {
         Integer limit = room.getParticipantLimit();
         currentParticipantManager.addParticipant(roomId, memberId, limit);
         return new RoomJoinResponse(currentParticipantManager.getRoomParticipants(roomId).size());
+    }
+
+    private void clearCache(Long roomId, String secretCode) {
+        Cache roomByIdCache = cacheManager.getCache("roomById");
+        if (roomByIdCache != null) {
+            roomByIdCache.evict(roomId);
+        }
+
+        Cache roomBySecretCodeCache = cacheManager.getCache("roomBySecretCode");
+        if (roomBySecretCodeCache != null) {
+            roomBySecretCodeCache.evict(secretCode);
+        }
     }
 }
