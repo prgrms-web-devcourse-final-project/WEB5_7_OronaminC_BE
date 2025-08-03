@@ -218,9 +218,12 @@ public class RoomService {
     }
 
     private Double calculateAnswerRate(Long totalQuestions, Long totalAnswerByQuestion) {
-        return (totalQuestions == 0)
-                ? 0.0
-                : ((double)totalAnswerByQuestion / totalQuestions) * 100;
+        if (totalQuestions == 0) {
+            return 0.0;
+        }
+
+        double rate = ((double) totalAnswerByQuestion / totalQuestions) * 100;
+        return Math.round(rate * 10.0) / 10.0;
 
     }
 
