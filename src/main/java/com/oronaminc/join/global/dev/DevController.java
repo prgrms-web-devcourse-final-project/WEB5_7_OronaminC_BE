@@ -2,6 +2,7 @@ package com.oronaminc.join.global.dev;
 
 import java.util.List;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,6 +24,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
+@Profile("local")
 @RestController
 @Tag(name = "개발용 API")
 @RequestMapping("/dev")

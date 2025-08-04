@@ -47,7 +47,8 @@ public class SecurityConfig {
                                 "/ws/**",
                                 "/api/auth/guest",
                                 "/api/auth/kakao",
-                                "/login"
+                                "/login",
+                                "/health"
                         )
                         .permitAll()
                         .anyRequest()
