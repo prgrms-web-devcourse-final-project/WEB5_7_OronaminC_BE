@@ -23,6 +23,7 @@ import com.oronaminc.join.room.domain.Room;
 import com.oronaminc.join.room.domain.RoomStatus;
 import com.oronaminc.join.room.domain.RoomType;
 import com.oronaminc.join.room.dto.RoomUpdateStatusRequest;
+import com.oronaminc.join.room.util.CodeGenerator;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -48,12 +49,21 @@ class RoomCacheTests {
 
     @BeforeEach
     void setUp() {
+        String code;
+        while (true) {
+            String codeTest = CodeGenerator.generateCode(6);
+            if (!roomReader.existsBySecretCode(codeTest)) {
+                code = codeTest;
+                break;
+            }
+        }
+
         Room room = Room.builder()
                 .title("Test Room")
                 .description("Test Description")
                 .roomStatus(RoomStatus.BEFORE_START)
                 .roomType(RoomType.PUBLIC)
-                .secretCode("123456")
+                .secretCode(code)
                 .build();
 
         roomRepository.save(room);
