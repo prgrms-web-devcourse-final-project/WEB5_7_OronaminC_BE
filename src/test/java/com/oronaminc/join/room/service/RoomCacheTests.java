@@ -53,6 +53,7 @@ class RoomCacheTests {
                 .description("Test Description")
                 .roomStatus(RoomStatus.BEFORE_START)
                 .roomType(RoomType.PUBLIC)
+                .secretCode("123456")
                 .build();
 
         roomRepository.save(room);
