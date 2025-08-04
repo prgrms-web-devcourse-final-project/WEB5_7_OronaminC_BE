@@ -46,7 +46,6 @@ import com.oronaminc.join.websocket.session.CurrentParticipantManager;
 
 import lombok.RequiredArgsConstructor;
 
-
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -142,7 +141,7 @@ public class RoomService {
 
     @Transactional
     public void updateRoomStatus(Long memberId, Long roomId,
-                                 RoomUpdateStatusRequest roomUpdateStatusRequest) {
+            RoomUpdateStatusRequest roomUpdateStatusRequest) {
         participantService.validatePresenter(roomId, memberId);
         Room room = roomReader.getById(roomId);
 
