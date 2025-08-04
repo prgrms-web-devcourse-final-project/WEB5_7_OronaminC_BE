@@ -41,7 +41,7 @@ public class CustomWebSocketHandlerDecorator extends WebSocketHandlerDecorator {
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus)
             throws Exception {
         // 세션 연결 종료되면 map에서 제거
-        exitRoomPublishEvent(session);
+        // exitRoomPublishEvent(session);
         sessionManager.removeSession(session.getId());
         super.afterConnectionClosed(session, closeStatus);
     }
