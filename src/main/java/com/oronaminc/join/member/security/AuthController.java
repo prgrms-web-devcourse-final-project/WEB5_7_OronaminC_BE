@@ -1,11 +1,8 @@
 package com.oronaminc.join.member.security;
 
 
-import static com.oronaminc.join.member.util.MemberMapper.toSessionInfoResponse;
-
 import com.oronaminc.join.member.dto.GuestLoginRequest;
 import com.oronaminc.join.member.dto.KakaoLoginRequest;
-import com.oronaminc.join.member.dto.SessionInfoResponse;
 import com.oronaminc.join.member.token.AuthTokenResponse;
 import com.oronaminc.join.member.token.JwtUtils;
 import com.oronaminc.join.member.token.LoginResponse;
@@ -20,9 +17,7 @@ import jakarta.validation.Valid;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -76,23 +71,6 @@ public class AuthController {
             loginResponse.refreshTokenExpiresIn());
 
         return Map.of("token", loginResponse.authTokenResponse());
-    }
-
-    @Operation(
-        summary = "현재 세션 사용자 정보 조회",
-        description = "로그인한 사용자의 세션 정보를 반환합니다. 로그인하지 않은 경우 403 또는 401이 발생합니다.",
-        responses = {
-            @ApiResponse(responseCode = "200", description = "세션 사용자 정보 조회 성공"),
-            @ApiResponse(responseCode = "401", description = "로그인되지 않은 사용자"),
-            @ApiResponse(responseCode = "403", description = "인증된 사용자 아님")
-        }
-    )
-    @GetMapping("/session")
-    @ResponseStatus(HttpStatus.OK)
-    public SessionInfoResponse getSessionInfo(
-        @AuthenticationPrincipal MemberDetails memberDetails) {
-
-        return toSessionInfoResponse(memberDetails);
     }
 
     @Operation(
