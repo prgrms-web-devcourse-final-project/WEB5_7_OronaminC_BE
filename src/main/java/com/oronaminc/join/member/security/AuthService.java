@@ -1,7 +1,6 @@
 package com.oronaminc.join.member.security;
 
 import static com.oronaminc.join.member.util.MemberMapper.toGuestMember;
-import static com.oronaminc.join.member.util.MemberMapper.toGuestMemberDetails;
 
 import com.oronaminc.join.member.dao.MemberRepository;
 import com.oronaminc.join.member.domain.Member;
@@ -72,13 +71,21 @@ public class AuthService extends DefaultOAuth2UserService {
     // }
 
     @Transactional
-    public MemberDetails loadGuest(GuestLoginRequest guestLoginRequest) {
+    public LoginResponse loadGuest(GuestLoginRequest guestLoginRequest) {
         Member guest = toGuestMember(guestLoginRequest);
 
         memberRepository.save(guest);
         guest.registerGuest();
 
-        return toGuestMemberDetails(guest);
+        TokenPair tokenPair = jwtTokenProvider.generateTokenPair(
+            new JwtMemberInfo(guest.getId(), guest.getNickname(), guest.getMemberType()));
+
+        AuthTokenResponse authTokenResponse = new AuthTokenResponse(tokenPair.accessToken(),
+            tokenPair.accessTokenExpiresIn(), guest.getId(),
+            guest.getNickname(), guest.getMemberType());
+
+        return new LoginResponse(authTokenResponse, tokenPair.refreshToken(),
+            tokenPair.refreshTokenExpiresIn());
     }
 
     @Transactional

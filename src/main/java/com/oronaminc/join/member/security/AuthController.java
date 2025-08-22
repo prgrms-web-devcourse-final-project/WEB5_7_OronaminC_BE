@@ -17,17 +17,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -64,7 +58,6 @@ public class AuthController {
 
     @Operation(
         summary = "비회원 로그인",
-        description = "닉네임을 입력하면 비회원 세션이 생성되고 인증이 설정됩니다. 이후 모든 요청에 세션 인증이 적용됩니다.",
         responses = {
             @ApiResponse(responseCode = "201", description = "비회원 로그인 성공"),
             @ApiResponse(responseCode = "400", description = "닉네임 누락 또는 유효성 검증 실패")
@@ -72,23 +65,17 @@ public class AuthController {
     )
     @PostMapping("/guest")
     @ResponseStatus(HttpStatus.CREATED)
-    public SessionInfoResponse guestLogin(@RequestBody @Valid GuestLoginRequest guestLoginRequest,
-        HttpServletRequest request) {
-        MemberDetails guest = authService.loadGuest(guestLoginRequest);
+    public Map<String, AuthTokenResponse> guestLogin(
+        @RequestBody @Valid GuestLoginRequest guestLoginRequest,
+        HttpServletResponse response) {
+        LoginResponse loginResponse = authService.loadGuest(guestLoginRequest);
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-            guest, null, List.of(new SimpleGrantedAuthority(guest.getRole()))
-        );
+        String refreshToken = loginResponse.refreshToken();
 
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        context.setAuthentication(authentication);
-        SecurityContextHolder.setContext(context);
+        JwtUtils.addRefreshTokenCookie(response, refreshToken,
+            loginResponse.refreshTokenExpiresIn());
 
-        request.getSession(true)
-            .setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                context);
-
-        return toSessionInfoResponse(guest);
+        return Map.of("token", loginResponse.authTokenResponse());
     }
 
     @Operation(
