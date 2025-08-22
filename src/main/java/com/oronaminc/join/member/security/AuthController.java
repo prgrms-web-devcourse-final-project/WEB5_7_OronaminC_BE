@@ -3,8 +3,23 @@ package com.oronaminc.join.member.security;
 
 import static com.oronaminc.join.member.util.MemberMapper.toSessionInfoResponse;
 
+import com.oronaminc.join.member.dto.GuestLoginRequest;
+import com.oronaminc.join.member.dto.KakaoLoginRequest;
+import com.oronaminc.join.member.dto.SessionInfoResponse;
+import com.oronaminc.join.member.token.AuthTokenResponse;
+import com.oronaminc.join.member.token.JwtUtils;
+import com.oronaminc.join.member.token.LoginResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import java.util.List;
-
+import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,54 +35,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.oronaminc.join.member.dto.GuestLoginRequest;
-import com.oronaminc.join.member.dto.GuestLoginResponse;
-import com.oronaminc.join.member.dto.KakaoLoginRequest;
-import com.oronaminc.join.member.dto.KakaoLoginResponse;
-import com.oronaminc.join.member.dto.SessionInfoResponse;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-
 @RestController
 @RequestMapping("/api/auth")
 @Tag(name = "Auth", description = "로그인 관련 API")
 @RequiredArgsConstructor
 public class AuthController {
+
     private final AuthService authService;
 
     @Operation(
-            summary = "카카오 로그인",
-            description = "redirect url 에 포함된 파라미터의 code와 state를 입력해주세요. 이후 모든 요청에 세션 인증이 적용됩니다."
+        summary = "카카오 로그인"
     )
     @PostMapping("/kakao")
     @ResponseStatus(HttpStatus.OK)
-    public SessionInfoResponse kakaoLogin(
-            @RequestBody KakaoLoginRequest kakaoLoginRequest,
-            HttpServletRequest request
+    public Map<String, AuthTokenResponse> kakaoLogin(
+        @RequestBody KakaoLoginRequest kakaoLoginRequest,
+        HttpServletResponse response
     ) {
-        MemberDetails memberDetails = authService.kakaoLogin(kakaoLoginRequest.code());
+        LoginResponse loginResponse = authService.kakaoLogin(kakaoLoginRequest.code());
 
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                memberDetails, null, List.of(new SimpleGrantedAuthority(memberDetails.getRole()))
-        );
+        String refreshToken = loginResponse.refreshToken();
 
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        context.setAuthentication(authentication);
-        SecurityContextHolder.setContext(context);
+        JwtUtils.addRefreshTokenCookie(response, refreshToken,
+            loginResponse.refreshTokenExpiresIn());
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
-
-        return toSessionInfoResponse(memberDetails);
+        return Map.of("token", loginResponse.authTokenResponse());
     }
 
     @Operation(
@@ -80,18 +72,21 @@ public class AuthController {
     )
     @PostMapping("/guest")
     @ResponseStatus(HttpStatus.CREATED)
-    public SessionInfoResponse guestLogin(@RequestBody @Valid GuestLoginRequest guestLoginRequest, HttpServletRequest request) {
+    public SessionInfoResponse guestLogin(@RequestBody @Valid GuestLoginRequest guestLoginRequest,
+        HttpServletRequest request) {
         MemberDetails guest = authService.loadGuest(guestLoginRequest);
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-                guest, null, List.of(new SimpleGrantedAuthority(guest.getRole()))
+            guest, null, List.of(new SimpleGrantedAuthority(guest.getRole()))
         );
 
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
 
-        request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
+        request.getSession(true)
+            .setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                context);
 
         return toSessionInfoResponse(guest);
     }
@@ -107,7 +102,8 @@ public class AuthController {
     )
     @GetMapping("/session")
     @ResponseStatus(HttpStatus.OK)
-    public SessionInfoResponse getSessionInfo(@AuthenticationPrincipal MemberDetails memberDetails) {
+    public SessionInfoResponse getSessionInfo(
+        @AuthenticationPrincipal MemberDetails memberDetails) {
 
         return toSessionInfoResponse(memberDetails);
     }

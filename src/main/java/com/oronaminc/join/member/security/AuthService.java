@@ -1,9 +1,22 @@
 package com.oronaminc.join.member.security;
 
-import static com.oronaminc.join.member.util.MemberMapper.*;
+import static com.oronaminc.join.member.util.MemberMapper.toGuestMember;
+import static com.oronaminc.join.member.util.MemberMapper.toGuestMemberDetails;
 
+import com.oronaminc.join.member.dao.MemberRepository;
+import com.oronaminc.join.member.domain.Member;
+import com.oronaminc.join.member.dto.GuestLoginRequest;
+import com.oronaminc.join.member.dto.KakaoUserResponse;
+import com.oronaminc.join.member.service.MemberReader;
+import com.oronaminc.join.member.token.AuthTokenResponse;
+import com.oronaminc.join.member.token.JwtMemberInfo;
+import com.oronaminc.join.member.token.JwtTokenProvider;
+import com.oronaminc.join.member.token.LoginResponse;
+import com.oronaminc.join.member.token.TokenPair;
+import com.oronaminc.join.member.util.MemberMapper;
 import java.util.Map;
-
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -17,22 +30,14 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import com.oronaminc.join.member.dao.MemberRepository;
-import com.oronaminc.join.member.domain.Member;
-import com.oronaminc.join.member.dto.GuestLoginRequest;
-import com.oronaminc.join.member.dto.KakaoUserResponse;
-import com.oronaminc.join.member.service.MemberReader;
-import com.oronaminc.join.member.util.MemberMapper;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class AuthService extends DefaultOAuth2UserService {
+
     private final MemberRepository memberRepository;
     private final MemberReader memberReader;
+    private final JwtTokenProvider jwtTokenProvider;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -77,14 +82,23 @@ public class AuthService extends DefaultOAuth2UserService {
     }
 
     @Transactional
-    public MemberDetails kakaoLogin(String code) {
+    public LoginResponse kakaoLogin(String code) {
         String accessToken = getAccessToken(code);
         KakaoUserResponse kakaoUser = getUserInfo(accessToken);
 
         Member member = memberRepository.findByEmail(kakaoUser.email())
-                .orElseGet(() -> memberRepository.save(MemberMapper.toNewKakaoMember(kakaoUser)));
+            .orElseGet(() -> memberRepository.save(MemberMapper.toNewKakaoMember(kakaoUser)));
 
-        return toOAuth2MemberDetails(member);
+        TokenPair tokenPair = jwtTokenProvider.generateTokenPair(
+            new JwtMemberInfo(member.getId(), member.getNickname(), member.getMemberType()));
+
+        AuthTokenResponse authTokenResponse = new AuthTokenResponse(tokenPair.accessToken(),
+            tokenPair.accessTokenExpiresIn(), member.getId(),
+            member.getNickname(), member.getMemberType());
+
+        return new LoginResponse(authTokenResponse, tokenPair.refreshToken(),
+            tokenPair.refreshTokenExpiresIn());
+
     }
 
     private String getAccessToken(String code) {
@@ -112,7 +126,8 @@ public class AuthService extends DefaultOAuth2UserService {
 
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<Map> response = restTemplate.exchange(USER_INFO_URI, HttpMethod.GET, entity, Map.class);
+        ResponseEntity<Map> response = restTemplate.exchange(USER_INFO_URI, HttpMethod.GET, entity,
+            Map.class);
 
         Map<String, Object> attributes = response.getBody();
 
