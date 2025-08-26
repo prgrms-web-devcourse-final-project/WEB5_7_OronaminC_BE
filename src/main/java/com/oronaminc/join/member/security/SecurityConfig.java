@@ -1,12 +1,8 @@
 package com.oronaminc.join.member.security;
 
-import static org.springframework.security.config.Customizer.*;
-
-import java.util.List;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -15,10 +11,12 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
-@Profile("!test")
+//@Profile("!test")
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -30,29 +28,29 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        // .requestMatchers(
-                        //         "/api/auth/guest",
-                        //         "/api/auth/kakao",
-                        //         "/login"
-                        // )
-                        // .anonymous()
-                        .requestMatchers(
-                                "/swagger-ui/**",
-                                "/swagger-resources/**",
-                                "/v3/api-docs/**",
-                                "/oauth2/authorization/**",
-                                "/login/oauth2/code/kakao",
-                                "/api/auth/logout",
-                                "/dev/**",
-                                "/ws/**",
-                                "/api/auth/guest",
-                                "/api/auth/kakao",
-                                "/login",
-                                "/health"
-                        )
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated()
+                                // .requestMatchers(
+                                //         "/api/auth/guest",
+                                //         "/api/auth/kakao",
+                                //         "/login"
+                                // )
+                                // .anonymous()
+                                .requestMatchers(
+                                        "/swagger-ui/**",
+                                        "/swagger-resources/**",
+                                        "/v3/api-docs/**",
+                                        "/oauth2/**",
+                                        "/login/oauth2/code/kakao",
+                                        "/api/auth/logout",
+                                        "/dev/**",
+                                        "/ws/**",
+                                        "/api/auth/guest",
+                                        "/api/auth/kakao",
+                                        "/login"
+//                                        "/health"
+                                )
+                                .permitAll()
+                                .anyRequest()
+                                .authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
                 .oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfo -> userInfo
