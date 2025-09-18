@@ -11,6 +11,7 @@ import com.oronaminc.join.member.token.AuthTokenResponse;
 import com.oronaminc.join.member.token.JwtMemberInfo;
 import com.oronaminc.join.member.token.JwtTokenProvider;
 import com.oronaminc.join.member.token.LoginResponse;
+import com.oronaminc.join.member.token.RefreshTokenStore;
 import com.oronaminc.join.member.token.TokenPair;
 import com.oronaminc.join.member.util.MemberMapper;
 import java.util.Map;
@@ -37,6 +38,7 @@ public class AuthService extends DefaultOAuth2UserService {
     private final MemberRepository memberRepository;
     private final MemberReader memberReader;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenStore refreshTokenStore;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -79,6 +81,7 @@ public class AuthService extends DefaultOAuth2UserService {
 
         TokenPair tokenPair = jwtTokenProvider.generateTokenPair(
             new JwtMemberInfo(guest.getId(), guest.getNickname(), guest.getMemberType()));
+        refreshTokenStore.saveLatest(guest.getId(), tokenPair.refreshToken());
 
         AuthTokenResponse authTokenResponse = new AuthTokenResponse(tokenPair.accessToken(),
             tokenPair.accessTokenExpiresIn(), guest.getId(),
@@ -98,6 +101,8 @@ public class AuthService extends DefaultOAuth2UserService {
 
         TokenPair tokenPair = jwtTokenProvider.generateTokenPair(
             new JwtMemberInfo(member.getId(), member.getNickname(), member.getMemberType()));
+
+        refreshTokenStore.saveLatest(member.getId(), tokenPair.refreshToken());
 
         AuthTokenResponse authTokenResponse = new AuthTokenResponse(tokenPair.accessToken(),
             tokenPair.accessTokenExpiresIn(), member.getId(),

@@ -4,19 +4,21 @@ package com.oronaminc.join.member.security;
 import com.oronaminc.join.member.dto.GuestLoginRequest;
 import com.oronaminc.join.member.dto.KakaoLoginRequest;
 import com.oronaminc.join.member.token.AuthTokenResponse;
+import com.oronaminc.join.member.token.JwtTokenProvider;
 import com.oronaminc.join.member.token.JwtUtils;
 import com.oronaminc.join.member.token.LoginResponse;
+import com.oronaminc.join.member.token.RefreshTokenStore;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,6 +33,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenStore refreshTokenStore;
 
     @Operation(
         summary = "카카오 로그인"
@@ -84,7 +88,30 @@ public class AuthController {
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void logout(HttpServletRequest request, HttpServletResponse response) {
-        HttpSession session = request.getSession();
+
+        String refresh = null;
+        if(request.getCookies() != null){
+            for (Cookie cookie : request.getCookies()) {
+                if ("refreshToken".equals(cookie.getName())) refresh = cookie.getValue();
+            }
+        }
+
+        if (refresh != null) {
+            try {
+                var body = jwtTokenProvider.parseClaims(refresh);
+                refreshTokenStore.isBlacklisted(refresh);
+                refreshTokenStore.saveLatest(body.memberId(), "");
+            }catch (Exception ignored){ }
+        }
+
+        // 쿠키 제거
+        ResponseCookie expired = ResponseCookie.from("refreshToken", "")
+            .httpOnly(true).secure(true).sameSite("None")
+                .path("/").maxAge(0).build();
+
+        SecurityContextHolder.clearContext();
+
+        /*HttpSession session = request.getSession();
         if (session != null) {
             session.invalidate();
         }
@@ -95,6 +122,6 @@ public class AuthController {
         cookie.setPath("/");
         cookie.setHttpOnly(true);
         cookie.setMaxAge(0);
-        response.addCookie(cookie);
+        response.addCookie(cookie);*/
     }
 }
