@@ -19,7 +19,7 @@ public class JwtUtils {
             .httpOnly(true)
             .secure(true)
             .path("/")
-            .sameSite("Strict")
+            .sameSite("None")
             .maxAge(JwtUtils.toSeconds(expiresIn))
             .build();
 
