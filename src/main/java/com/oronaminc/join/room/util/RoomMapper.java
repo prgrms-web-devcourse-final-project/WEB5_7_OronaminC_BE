@@ -3,15 +3,16 @@ package com.oronaminc.join.room.util;
 import java.time.LocalTime;
 import java.util.List;
 
-import com.oronaminc.join.document.domain.Document;
 import com.oronaminc.join.participant.domain.Participant;
 import com.oronaminc.join.room.domain.Room;
 import com.oronaminc.join.room.domain.RoomStatus;
 import com.oronaminc.join.room.domain.RoomType;
 import com.oronaminc.join.room.dto.CreateRoomRequest;
 import com.oronaminc.join.room.dto.CreateRoomResponse;
+import com.oronaminc.join.room.dto.ReportResponse;
 import com.oronaminc.join.room.dto.RoomDetailResponse;
 import com.oronaminc.join.room.dto.RoomUpdateInfoResponse;
+import com.oronaminc.join.room.dto.TopQnAResponse;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -36,7 +37,7 @@ public class RoomMapper {
         return new CreateRoomResponse(room.getId(), room.getSecretCode());
     }
 
-    public static RoomDetailResponse toRoomDetailResponse(Room room, Participant presenter, List<Participant> team, String presignedUrl, Long memberId) {
+    public static RoomDetailResponse toRoomDetailResponse(Room room, Participant presenter, List<Participant> team, String presignedUrl, Long memberId, int participantCount) {
         return RoomDetailResponse.builder()
                 .title(room.getTitle())
                 .description(room.getDescription())
@@ -44,7 +45,7 @@ public class RoomMapper {
                 .team(team.stream().map(participant -> participant.getMember().getNickname()).toList())
                 .roomCode(room.getSecretCode())
                 .presignedUrl(presignedUrl)
-                .participantCount(0)
+                .participantCount(participantCount)
                 .participantLimit(room.getParticipantLimit())
                 .emojiCount(room.getEmojiCount())
                 .isHost(presenter.getMember().getId().equals(memberId))
@@ -64,6 +65,18 @@ public class RoomMapper {
                 .endDate(room.getEndedAt().toLocalDate())
                 .participantLimit(room.getParticipantLimit())
                 .teamEmail(team.stream().map(teamParticipant -> teamParticipant.getMember().getEmail()).toList())
+                .build();
+    }
+
+    public static ReportResponse toReportResponse(Room room, Long totalView,Long totalQuestions, Double answerRate, List<TopQnAResponse> top3QnA) {
+        return ReportResponse.builder()
+                .roomId(room.getId())
+                .title(room.getTitle())
+                .totalView(totalView)
+                .totalQuestions(totalQuestions)
+                .answerRate(answerRate)
+                .totalEmojis(room.getEmojiCount())
+                .topQnA(top3QnA)
                 .build();
     }
 }

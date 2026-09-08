@@ -1,83 +1,151 @@
 package com.oronaminc.join.member.security;
 
-import java.util.Map;
-import java.util.Optional;
-
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import static com.oronaminc.join.member.util.MemberMapper.toGuestMember;
 
 import com.oronaminc.join.member.dao.MemberRepository;
 import com.oronaminc.join.member.domain.Member;
-import com.oronaminc.join.member.domain.MemberType;
 import com.oronaminc.join.member.dto.GuestLoginRequest;
+import com.oronaminc.join.member.dto.KakaoUserResponse;
 import com.oronaminc.join.member.service.MemberReader;
-
+import com.oronaminc.join.member.token.AuthTokenResponse;
+import com.oronaminc.join.member.token.JwtMemberInfo;
+import com.oronaminc.join.member.token.JwtTokenProvider;
+import com.oronaminc.join.member.token.LoginResponse;
+import com.oronaminc.join.member.token.RefreshTokenStore;
+import com.oronaminc.join.member.token.TokenPair;
+import com.oronaminc.join.member.util.MemberMapper;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class AuthService extends DefaultOAuth2UserService {
+
     private final MemberRepository memberRepository;
     private final MemberReader memberReader;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenStore refreshTokenStore;
 
-    @Override
-    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        OAuth2User oAuth2User = super.loadUser(userRequest);
-        Map<String, Object> attributes = oAuth2User.getAttributes();
+    private final RestTemplate restTemplate = new RestTemplate();
 
-        log.info("attributes :: " + attributes);
+    private static final String TOKEN_URI = "https://kauth.kakao.com/oauth/token";
+    private static final String USER_INFO_URI = "https://kapi.kakao.com/v2/user/me";
+
+    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
+    private String clientId;
+
+    @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
+    private String redirectUri;
+
+    @Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
+    private String clientSecret;
+
+    // @Override
+    // public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+    //     OAuth2User oAuth2User = super.loadUser(userRequest);
+    //     Map<String, Object> attributes = oAuth2User.getAttributes();
+    //
+    //     log.info("attributes :: " + attributes);
+    //
+    //     Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
+    //     Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
+    //
+    //
+    //     Optional<Member> optionalMember = memberReader.findByEmail(kakaoAccount.get("email").toString());
+    //
+    //     Member member = optionalMember.orElseGet(() -> memberRepository.save(toKakaoMember(kakaoAccount, profile)));
+    //
+    //     return toOAuth2MemberDetails(member);
+    // }
+
+    @Transactional
+    public LoginResponse loadGuest(GuestLoginRequest guestLoginRequest) {
+        Member guest = toGuestMember(guestLoginRequest);
+
+        memberRepository.save(guest);
+        guest.registerGuest();
+
+        TokenPair tokenPair = jwtTokenProvider.generateTokenPair(
+            new JwtMemberInfo(guest.getId(), guest.getNickname(), guest.getMemberType()));
+        refreshTokenStore.saveLatest(guest.getId(), tokenPair.refreshToken());
+
+        AuthTokenResponse authTokenResponse = new AuthTokenResponse(tokenPair.accessToken(),
+            tokenPair.accessTokenExpiresIn(), guest.getId(),
+            guest.getNickname(), guest.getMemberType());
+
+        return new LoginResponse(authTokenResponse, tokenPair.refreshToken(),
+            tokenPair.refreshTokenExpiresIn());
+    }
+
+    @Transactional
+    public LoginResponse kakaoLogin(String code) {
+        String accessToken = getAccessToken(code);
+        KakaoUserResponse kakaoUser = getUserInfo(accessToken);
+
+        Member member = memberRepository.findByEmail(kakaoUser.email())
+            .orElseGet(() -> memberRepository.save(MemberMapper.toNewKakaoMember(kakaoUser)));
+
+        TokenPair tokenPair = jwtTokenProvider.generateTokenPair(
+            new JwtMemberInfo(member.getId(), member.getNickname(), member.getMemberType()));
+
+        refreshTokenStore.saveLatest(member.getId(), tokenPair.refreshToken());
+
+        AuthTokenResponse authTokenResponse = new AuthTokenResponse(tokenPair.accessToken(),
+            tokenPair.accessTokenExpiresIn(), member.getId(),
+            member.getNickname(), member.getMemberType());
+
+        return new LoginResponse(authTokenResponse, tokenPair.refreshToken(),
+            tokenPair.refreshTokenExpiresIn());
+
+    }
+
+    private String getAccessToken(String code) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "authorization_code");
+        params.add("client_id", clientId);
+        params.add("redirect_uri", redirectUri);
+        params.add("code", code);
+        params.add("client_secret", clientSecret);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+
+        ResponseEntity<Map> response = restTemplate.postForEntity(TOKEN_URI, request, Map.class);
+
+        return (String) response.getBody().get("access_token");
+    }
+
+    private KakaoUserResponse getUserInfo(String accessToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<Map> response = restTemplate.exchange(USER_INFO_URI, HttpMethod.GET, entity,
+            Map.class);
+
+        Map<String, Object> attributes = response.getBody();
 
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
         Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
 
-
-        Optional<Member> optionalMember = memberReader.findByEmail(kakaoAccount.get("email").toString());
-
-        Member member = optionalMember.orElseGet(
-                () -> memberRepository.save(
-                        Member.builder()
-                                .email(kakaoAccount.get("email").toString())
-                                .nickname(profile.get("nickname").toString())
-                                .profileImage(profile.get("profile_image_url").toString())
-                                .memberType(MemberType.MEMBER)
-                                .build()
-                )
-        );
-
-        return MemberDetails.builder()
-                .id(member.getId())
-                .name(member.getEmail())
-                .nickname(member.getNickname())
-                .role(member.getMemberType())
-                .build();
+        return MemberMapper.toKakaoUserResponse(kakaoAccount, profile);
     }
-
-    @Transactional
-    public MemberDetails loadGuest(GuestLoginRequest guestLoginRequest) {
-        Member guest = Member.builder()
-                .email(null)
-                .nickname(guestLoginRequest.nickname())
-                .profileImage(null)
-                .memberType(MemberType.GUEST)
-                .build();
-
-        memberRepository.save(guest);
-
-        // 1. 비회원 MemberDetails 생성
-        MemberDetails memberDetails = MemberDetails.builder()
-                .id(guest.getId())
-                .name("GUEST_" + guest.getId())
-                .nickname(guest.getNickname())
-                .role(MemberType.GUEST)
-                .build();
-
-        return memberDetails;
-    }
-
 }

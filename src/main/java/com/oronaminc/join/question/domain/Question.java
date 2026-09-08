@@ -2,7 +2,7 @@ package com.oronaminc.join.question.domain;
 
 import com.oronaminc.join.global.entity.BaseEntity;
 import com.oronaminc.join.member.domain.Member;
-import com.oronaminc.join.question.dto.QuestionCreateRequest;
+import com.oronaminc.join.question.dto.QuestionRequest;
 import com.oronaminc.join.room.domain.Room;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -25,7 +25,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-// TODO: ddl-auto: create,update에만 유효 -> 추후 flyway sql 생성
 @Table(name = "question", indexes = {
     @Index(name = "idx_question_id_room", columnList = "room_id")
 })
@@ -50,13 +49,17 @@ public class Question extends BaseEntity {
     @Version
     private Integer version;
 
-    public static Question create(Room room, Member member, QuestionCreateRequest requestDto) {
+    public static Question create(Room room, Member member, QuestionRequest requestDto) {
         return Question.builder()
             .room(room)
             .member(member)
             .content(requestDto.content())
             .emojiCount(0L)
             .build();
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
     }
 
     public Long incrementEmojiCount() {

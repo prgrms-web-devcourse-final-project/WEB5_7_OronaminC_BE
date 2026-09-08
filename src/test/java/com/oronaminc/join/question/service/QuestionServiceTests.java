@@ -15,23 +15,24 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.oronaminc.join.answer.service.AnswerService;
 import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.member.domain.MemberType;
 import com.oronaminc.join.member.service.MemberReader;
-import com.oronaminc.join.participant.domain.Participant;
-import com.oronaminc.join.participant.domain.ParticipantType;
+import com.oronaminc.join.participant.service.ParticipantReader;
 import com.oronaminc.join.participant.service.ParticipantService;
 import com.oronaminc.join.question.dao.QuestionRepository;
 import com.oronaminc.join.question.domain.Question;
 import com.oronaminc.join.question.domain.QuestionSort;
 import com.oronaminc.join.question.dto.QuestionAssembleResponse;
-import com.oronaminc.join.question.dto.QuestionCreateRequest;
 import com.oronaminc.join.question.dto.QuestionFlatResponse;
+import com.oronaminc.join.question.dto.QuestionRequest;
 import com.oronaminc.join.room.domain.Room;
 import com.oronaminc.join.room.domain.RoomStatus;
 import com.oronaminc.join.room.service.RoomReader;
@@ -53,14 +54,17 @@ class QuestionServiceTests {
     @Mock
     private MemberReader memberReader;
     @Mock
+    private ParticipantReader participantReader;
+    @Mock
     private ParticipantService participantService;
     @Mock
     private QuestionReader questionReader;
+    @Mock
+    private AnswerService answerService;
 
     private Room mockRoom;
     private Member mockMember;
-    private Participant mockParticipant;
-    private QuestionCreateRequest request;
+    private QuestionRequest request;
     private QuestionFlatResponse mockQ1;
     private QuestionFlatResponse mockQ2;
 
@@ -87,14 +91,7 @@ class QuestionServiceTests {
             .roomStatus(RoomStatus.STARTED)
             .build();
 
-        mockParticipant = Participant.builder()
-            .id(1L)
-            .room(mockRoom)
-            .member(mockMember)
-            .participantType(ParticipantType.GUEST)
-            .build();
-
-        request = new QuestionCreateRequest("질문입니다");
+        request = new QuestionRequest("질문입니다", mockMember.getId());
 
         mockQ1 = QuestionFlatResponse.builder()
             .questionId(1L)
@@ -120,23 +117,103 @@ class QuestionServiceTests {
     }
 
     @Test
+    @DisplayName("질문 작성자이거나 관리자이면 질문이 성공적으로 삭제된다")
+    void delete_sucess() {
+        // given
+        Long roomId = 1L;
+        Long memberId = 1L;
+
+        Question question = Question.builder().id(1L).room(mockRoom).member(mockMember)
+            .content("질문").build();
+
+        given(participantReader.existsByRoomIdAndMemberId(roomId, memberId)).willReturn(true);
+        given(questionReader.getByIdAndRoomId(1L, roomId)).willReturn(question);
+        given(participantReader.existsPresenterOrTeamByMemberId(roomId, memberId)).willReturn(true);
+        doNothing().when(questionRepository).deleteById(1L);
+        doNothing().when(answerService).deleteByQuestion(1L);
+
+        Long deleted = questionService.delete(memberId, roomId, 1L);
+
+        assertThat(deleted).isEqualTo(1L);
+        verify(questionRepository).deleteById(1L);
+    }
+
+    @Test
+    @DisplayName("질문이 성공적으로 수정된다")
+    void updateQuestion_success() {
+        // given
+        Long roomId = 1L;
+        Long memberId = 1L;
+
+        Question question = Question.builder().id(1L).room(mockRoom).member(mockMember)
+            .content("변경 전").build();
+
+        given(participantReader.existsByRoomIdAndMemberId(roomId, memberId)).willReturn(true);
+        given(questionReader.getByIdAndRoomId(1L, roomId)).willReturn(question);
+
+        // when
+        Question updated = questionService.update(memberId, roomId, 1L, request);
+
+        // then
+        assertThat(updated.getId()).isEqualTo(1L);
+        assertThat(updated.getContent()).isEqualTo("질문입니다");
+
+    }
+
+    @Test
+    @DisplayName("잘못된 값이 들어오면 질문 수정이 실패한다")
+    void updateQuestion_found_fail() {
+        // given
+        Long notRoomId = 999L;
+
+        given(questionReader.getByIdAndRoomId(1L, notRoomId)).willThrow(
+            new ErrorException(ErrorCode.NOT_FOUND_ROOM_QUESTION));
+
+        // when & then
+        assertThatThrownBy(() -> questionService.update(999L, notRoomId, 1L, request))
+            .isInstanceOf(ErrorException.class)
+            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_ROOM_QUESTION);
+
+    }
+
+    @Test
+    @DisplayName("작성자가 아니면 질문 수정이 실패한다")
+    void updateQuestion_fail() {
+        // given
+        Long roomId = 1L;
+        Long notMemberId = 999L;
+
+        Question question = Question.builder().id(1L).room(mockRoom).member(mockMember)
+            .content("변경 전").build();
+
+        given(participantReader.existsByRoomIdAndMemberId(roomId, notMemberId)).willReturn(true);
+        given(questionReader.getByIdAndRoomId(1L, roomId)).willReturn(question);
+
+        // when then
+        assertThatThrownBy(() -> questionService.update(notMemberId, roomId, 1L, request))
+            .isInstanceOf(ErrorException.class)
+            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.UNAUTHORIZED_EDIT_QUESTION);
+
+    }
+
+    @Test
     @DisplayName("최신순 질문 목록 조회")
     void getQuestionByCreatedAt_success() {
         // given
         Long roomId = 1L;
         Long memberId = 1L;
         int size = 1;
-
+        Pageable pageable = PageRequest.of(0, size + 1);
 
         List<QuestionFlatResponse> mockList = List.of(mockQ1, mockQ2);
 
         given(memberReader.getById(memberId)).willReturn(mockMember);
         given(roomReader.getById(roomId)).willReturn(mockRoom);
-        given(questionReader.findByCreatedAt(null, memberId, roomId, PageRequest.of(0, size + 1)))
+        given(questionReader.findQuestionsOrderBy(null, null, memberId, roomId, QuestionSort.CREATEDAT, pageable))
             .willReturn(mockList);
 
-
-        Slice<QuestionAssembleResponse> result = questionService.getQuestions(QuestionSort.CREATEDAT,
+        Slice<QuestionAssembleResponse> result = questionService.getQuestions(
+            QuestionSort.CREATEDAT,
             null, null, size, memberId, roomId);
 
         assertThat(result).isNotNull();
@@ -150,14 +227,14 @@ class QuestionServiceTests {
         Long roomId = 1L;
         Long memberId = 1L;
         int size = 1;
+        Pageable pageable = PageRequest.of(0, size + 1);
 
         List<QuestionFlatResponse> mockList = List.of(mockQ1, mockQ2);
 
         given(memberReader.getById(memberId)).willReturn(mockMember);
         given(roomReader.getById(roomId)).willReturn(mockRoom);
-        given(questionReader.findByEmojiCount(null, null, memberId, roomId, PageRequest.of(0, size + 1)))
+        given(questionReader.findQuestionsOrderBy(null, null, memberId, roomId, QuestionSort.EMOJI, pageable))
             .willReturn(mockList);
-
 
         Slice<QuestionAssembleResponse> result = questionService.getQuestions(QuestionSort.EMOJI,
             null, null, size, memberId, roomId);
@@ -173,16 +250,17 @@ class QuestionServiceTests {
         Long roomId = 1L;
         Long memberId = 1L;
         int size = 1;
+        Pageable pageable = PageRequest.of(0, size + 1);
 
         List<QuestionFlatResponse> mockList = List.of(mockQ1, mockQ2);
 
         given(memberReader.getById(memberId)).willReturn(mockMember);
         given(roomReader.getById(roomId)).willReturn(mockRoom);
-        given(questionReader.findByMyQuestion(null, memberId, roomId, PageRequest.of(0, size + 1)))
+        given(questionReader.findQuestionsOrderBy(null, null, memberId, roomId, QuestionSort.MYQUESTION, pageable))
             .willReturn(mockList);
 
-
-        Slice<QuestionAssembleResponse> result = questionService.getQuestions(QuestionSort.MYQUESTION,
+        Slice<QuestionAssembleResponse> result = questionService.getQuestions(
+            QuestionSort.MYQUESTION,
             null, null, size, memberId, roomId);
 
         assertThat(result).isNotNull();
@@ -223,7 +301,8 @@ class QuestionServiceTests {
     @DisplayName("존재하지 않는 member가 들어오면 예외 발생")
     void createQuestion_member_fail() {
         // given
-        given(memberReader.getById(anyLong())).willThrow(new ErrorException(ErrorCode.NOT_FOUND_MEMBER));
+        given(memberReader.getById(anyLong())).willThrow(
+            new ErrorException(ErrorCode.NOT_FOUND_MEMBER));
 
         // when & then
         assertThatThrownBy(() -> questionService.create(1L, 1L, request))
@@ -237,7 +316,8 @@ class QuestionServiceTests {
     void createQuestion_room_fail() {
         // given
         given(memberReader.getById(anyLong())).willReturn(mockMember);
-        given(roomReader.getById(anyLong())).willThrow(new ErrorException(ErrorCode.NOT_FOUND_ROOM));
+        given(roomReader.getById(anyLong())).willThrow(
+            new ErrorException(ErrorCode.NOT_FOUND_ROOM));
 
         // when & then
         assertThatThrownBy(() -> questionService.create(1L, 1L, request))
@@ -256,9 +336,8 @@ class QuestionServiceTests {
         given(memberReader.getById(memberId)).willReturn(mockMember);
         given(roomReader.getById(roomId)).willReturn(mockRoom);
         willThrow(new ErrorException(ErrorCode.NOT_FOUND_PARTICIPANT))
-                .given(participantService)
-                .validateParticipant(roomId, memberId);
-
+            .given(participantService)
+            .validateParticipant(roomId, memberId);
 
         // when & then
         assertThatThrownBy(() -> questionService.create(1L, 1L, request))

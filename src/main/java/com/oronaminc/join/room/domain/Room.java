@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import com.oronaminc.join.global.entity.BaseEntity;
 import com.oronaminc.join.room.dto.RoomUpdateRequest;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -33,6 +34,7 @@ public class Room extends BaseEntity {
     private String title;
     private String description;
 
+    @Column(unique = true)
     private String secretCode;
 
     @Enumerated(EnumType.STRING)

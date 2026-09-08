@@ -4,6 +4,7 @@ import static com.oronaminc.join.global.exception.ErrorCode.*;
 
 import java.util.Optional;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import com.oronaminc.join.global.exception.ErrorException;
@@ -22,7 +23,13 @@ public class RoomReader {
     }
 
     public Room getById(Long roomId) {
-        return roomRepository.findById(roomId)
+        return findById(roomId)
+                .orElseThrow(() -> new ErrorException(NOT_FOUND_ROOM));
+    }
+
+    @Cacheable(cacheNames = "roomById")
+    public Room getCacheById(Long roomId) {
+        return findById(roomId)
                 .orElseThrow(() -> new ErrorException(NOT_FOUND_ROOM));
     }
 
@@ -31,6 +38,12 @@ public class RoomReader {
     }
 
     public Room getBySecretCode(String secretCode) {
+        return this.findBySecretCode(secretCode)
+                .orElseThrow(() -> new ErrorException(NOT_FOUND_ROOM));
+    }
+
+    @Cacheable(cacheNames = "roomBySecretCode")
+    public Room getCacheBySecretCode(String secretCode) {
         return this.findBySecretCode(secretCode)
                 .orElseThrow(() -> new ErrorException(NOT_FOUND_ROOM));
     }

@@ -1,48 +1,62 @@
 package com.oronaminc.join.member.security;
 
+
+import com.oronaminc.join.member.dto.GuestLoginRequest;
+import com.oronaminc.join.member.dto.KakaoLoginRequest;
+import com.oronaminc.join.member.token.AuthTokenResponse;
+import com.oronaminc.join.member.token.JwtTokenProvider;
+import com.oronaminc.join.member.token.JwtUtils;
+import com.oronaminc.join.member.token.LoginResponse;
+import com.oronaminc.join.member.token.RefreshTokenStore;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.tags.Tags;
-import java.util.List;
-
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.oronaminc.join.member.dto.GuestLoginRequest;
-import com.oronaminc.join.member.dto.GuestLoginResponse;
-import com.oronaminc.join.member.dto.SessionInfoResponse;
-
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-
 @RestController
 @RequestMapping("/api/auth")
 @Tag(name = "Auth", description = "로그인 관련 API")
 @RequiredArgsConstructor
 public class AuthController {
+
     private final AuthService authService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenStore refreshTokenStore;
+
+    @Operation(
+        summary = "카카오 로그인"
+    )
+    @PostMapping("/kakao")
+    @ResponseStatus(HttpStatus.OK)
+    public Map<String, AuthTokenResponse> kakaoLogin(
+        @RequestBody KakaoLoginRequest kakaoLoginRequest,
+        HttpServletResponse response
+    ) {
+        LoginResponse loginResponse = authService.kakaoLogin(kakaoLoginRequest.code());
+
+        String refreshToken = loginResponse.refreshToken();
+
+        JwtUtils.addRefreshTokenCookie(response, refreshToken,
+            loginResponse.refreshTokenExpiresIn());
+
+        return Map.of("token", loginResponse.authTokenResponse());
+    }
 
     @Operation(
         summary = "비회원 로그인",
-        description = "닉네임을 입력하면 비회원 세션이 생성되고 인증이 설정됩니다. 이후 모든 요청에 세션 인증이 적용됩니다.",
         responses = {
             @ApiResponse(responseCode = "201", description = "비회원 로그인 성공"),
             @ApiResponse(responseCode = "400", description = "닉네임 누락 또는 유효성 검증 실패")
@@ -50,41 +64,17 @@ public class AuthController {
     )
     @PostMapping("/guest")
     @ResponseStatus(HttpStatus.CREATED)
-    public GuestLoginResponse guestLogin(@RequestBody @Valid GuestLoginRequest guestLoginRequest, HttpServletRequest request) {
-        MemberDetails guest = authService.loadGuest(guestLoginRequest);
+    public Map<String, AuthTokenResponse> guestLogin(
+        @RequestBody @Valid GuestLoginRequest guestLoginRequest,
+        HttpServletResponse response) {
+        LoginResponse loginResponse = authService.loadGuest(guestLoginRequest);
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                guest, null, List.of(new SimpleGrantedAuthority(guest.getRole()))
-        );
+        String refreshToken = loginResponse.refreshToken();
 
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        context.setAuthentication(authentication);
-        SecurityContextHolder.setContext(context);
+        JwtUtils.addRefreshTokenCookie(response, refreshToken,
+            loginResponse.refreshTokenExpiresIn());
 
-        request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
-
-        return new GuestLoginResponse(guest.getId());
-    }
-
-    @Operation(
-        summary = "현재 세션 사용자 정보 조회",
-        description = "로그인한 사용자의 세션 정보를 반환합니다. 로그인하지 않은 경우 403 또는 401이 발생합니다.",
-        responses = {
-            @ApiResponse(responseCode = "200", description = "세션 사용자 정보 조회 성공"),
-            @ApiResponse(responseCode = "401", description = "로그인되지 않은 사용자"),
-            @ApiResponse(responseCode = "403", description = "인증된 사용자 아님")
-        }
-    )
-    @GetMapping("/session")
-    @ResponseStatus(HttpStatus.OK)
-    public SessionInfoResponse getSessionInfo(@AuthenticationPrincipal MemberDetails memberDetails) {
-
-        return new SessionInfoResponse(
-                memberDetails.getId(),
-                memberDetails.getName(),
-                memberDetails.getNickname(),
-                memberDetails.getRole()
-        );
+        return Map.of("token", loginResponse.authTokenResponse());
     }
 
     @Operation(
@@ -98,7 +88,30 @@ public class AuthController {
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void logout(HttpServletRequest request, HttpServletResponse response) {
-        HttpSession session = request.getSession();
+
+        String refresh = null;
+        if(request.getCookies() != null){
+            for (Cookie cookie : request.getCookies()) {
+                if ("refreshToken".equals(cookie.getName())) refresh = cookie.getValue();
+            }
+        }
+
+        if (refresh != null) {
+            try {
+                var body = jwtTokenProvider.parseClaims(refresh);
+                refreshTokenStore.isBlacklisted(refresh);
+                refreshTokenStore.saveLatest(body.memberId(), "");
+            }catch (Exception ignored){ }
+        }
+
+        // 쿠키 제거
+        ResponseCookie expired = ResponseCookie.from("refreshToken", "")
+            .httpOnly(true).secure(true).sameSite("None")
+                .path("/").maxAge(0).build();
+
+        SecurityContextHolder.clearContext();
+
+        /*HttpSession session = request.getSession();
         if (session != null) {
             session.invalidate();
         }
@@ -109,6 +122,6 @@ public class AuthController {
         cookie.setPath("/");
         cookie.setHttpOnly(true);
         cookie.setMaxAge(0);
-        response.addCookie(cookie);
+        response.addCookie(cookie);*/
     }
 }

@@ -1,13 +1,7 @@
-package com.oronaminc.join.websocket.config;
+package com.oronaminc.join.websocket.stomp;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.oronaminc.join.global.exception.ErrorCode;
-import com.oronaminc.join.global.exception.ErrorException;
-import com.oronaminc.join.global.exception.ErrorResponse;
 import java.nio.charset.StandardCharsets;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -15,6 +9,15 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.oronaminc.join.global.exception.ErrorCode;
+import com.oronaminc.join.global.exception.ErrorException;
+import com.oronaminc.join.global.exception.ErrorResponse;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration
