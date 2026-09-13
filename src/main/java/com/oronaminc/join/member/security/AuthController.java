@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -108,6 +109,7 @@ public class AuthController {
         ResponseCookie expired = ResponseCookie.from("refreshToken", "")
             .httpOnly(true).secure(true).sameSite("None")
                 .path("/").maxAge(0).build();
+        response.setHeader(HttpHeaders.SET_COOKIE, expired.toString());
 
         SecurityContextHolder.clearContext();
 
