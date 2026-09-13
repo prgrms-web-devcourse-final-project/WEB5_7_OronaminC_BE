@@ -17,6 +17,7 @@ public enum ErrorCode {
     // 상황에 따라 추가
     NOT_FOUND_MEMBER("AUTH-001", "존재하지 않는 회원입니다.", NOT_FOUND),
     UNAUTHORIZED_MEMBER("AUTH-002", "인증되지 않은 회원입니다.", UNAUTHORIZED),
+    INVALID_REFRESH_TOKEN("AUTH-003", "유효하지 않거나 만료된 refresh token입니다.", BAD_REQUEST),
 
     NOT_FOUND_ROOM("ROOM-001", "존재하지 않는 발표방입니다.", NOT_FOUND),
     BAD_REQUEST_ROOM_STARTED("ROOM-002", "시작 상태의 발표방은 수정 및 삭제할 수 없습니다.", BAD_REQUEST),

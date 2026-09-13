@@ -1,5 +1,7 @@
 package com.oronaminc.join.member.security;
 
+import com.oronaminc.join.global.exception.ErrorCode;
+import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.member.token.AuthTokenResponse;
 import com.oronaminc.join.member.token.JwtMemberInfo;
 import com.oronaminc.join.member.token.JwtTokenProvider;
@@ -26,12 +28,12 @@ public class TokenController {
     @PostMapping("/refresh")
     public AuthTokenResponse refresh(HttpServletRequest request, HttpServletResponse response) {
         String refresh = extraRefreshCookie(request);
-        if (refresh == null) throw new IllegalArgumentException("refresh cookie is null");
+        if (refresh == null) throw new ErrorException(ErrorCode.INVALID_REFRESH_TOKEN);
 
-        if (refreshTokenStore.isBlacklisted(refresh)) throw new IllegalArgumentException("refresh cookie is blacklisted");
+        if (refreshTokenStore.isBlacklisted(refresh)) throw new ErrorException(ErrorCode.INVALID_REFRESH_TOKEN);
 
         TokenBody body = jwtTokenProvider.parseClaims(refresh);
-        if (!refreshTokenStore.isLatest(body.memberId(), refresh)) throw new IllegalArgumentException("refresh token is invalid");
+        if (!refreshTokenStore.isLatest(body.memberId(), refresh)) throw new ErrorException(ErrorCode.INVALID_REFRESH_TOKEN);
 
         TokenPair tokenPair = jwtTokenProvider.generateTokenPair(new JwtMemberInfo(body.memberId(),
             body.nickname(), body.role()));
