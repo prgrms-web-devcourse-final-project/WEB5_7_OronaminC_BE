@@ -1,4 +1,4 @@
-package com.oronaminc.join.websocket.config;
+package com.oronaminc.join.websocket.session;
 
 import java.io.IOException;
 import java.util.Map;
@@ -30,4 +30,8 @@ public class WebsocketSessionManager {
 
     }
 
+    public void addAttribute(String sessionId, String attributeName, Object attributeValue) {
+        WebSocketSession session = sessions.get(sessionId);
+        session.getAttributes().put(attributeName, attributeValue);
+    }
 }

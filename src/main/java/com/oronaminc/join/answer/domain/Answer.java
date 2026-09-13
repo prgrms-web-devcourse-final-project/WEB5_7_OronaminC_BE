@@ -1,6 +1,5 @@
 package com.oronaminc.join.answer.domain;
 
-import com.oronaminc.join.answer.dto.AnswerCreateRequest;
 import com.oronaminc.join.global.entity.BaseEntity;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.question.domain.Question;
@@ -27,7 +26,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-// TODO: ddl-auto: create,update에만 유효 -> 추후 flyway sql 생성
 @Table(name = "answer", indexes = {
     @Index(name = "idx_answer_question_member", columnList = "question_id, member_id")
 })
@@ -58,6 +56,10 @@ public class Answer extends BaseEntity {
             .content(content)
             .emojiCount(0L)
             .build();
+    }
+
+    public void updataContent(String content) {
+        this.content = content;
     }
 
     public Long incrementEmojiCount() {

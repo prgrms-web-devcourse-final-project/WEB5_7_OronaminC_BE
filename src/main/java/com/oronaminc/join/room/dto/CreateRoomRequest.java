@@ -1,11 +1,11 @@
 package com.oronaminc.join.room.dto;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.util.List;
 
 import org.hibernate.validator.constraints.Length;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
@@ -38,7 +38,7 @@ public record CreateRoomRequest(
 
         @NotNull
         @Size(max = 5)
-        @Schema(description = "발표방 추가한 팀원 목록", example = "{팀원1@example.com, 팀원2@example.com}")
+        @Schema(description = "발표방 추가한 팀원 목록")
         List<String> teamEmail
 ) {
 }

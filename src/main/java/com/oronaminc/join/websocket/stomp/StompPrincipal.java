@@ -1,4 +1,4 @@
-package com.oronaminc.join.websocket.config;
+package com.oronaminc.join.websocket.stomp;
 
 import java.security.Principal;
 import lombok.AllArgsConstructor;

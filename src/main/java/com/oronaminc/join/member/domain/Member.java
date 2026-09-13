@@ -30,4 +30,8 @@ public class Member extends BaseEntity {
     public void updateNickname(String nickname) {
         this.nickname = nickname;
     }
+
+    public void registerGuest() {
+        this.email = "GUEST_" + this.id;
+    }
 }

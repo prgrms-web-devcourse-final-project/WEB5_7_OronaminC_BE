@@ -7,5 +7,6 @@ public enum ErrorStatus {
     ALREADY_EXISTS,
     BAD_REQUEST,
     UNAUTHORIZED,
-    FORBIDDEN
+    FORBIDDEN,
+    TOO_MANY_REQUESTS
 }

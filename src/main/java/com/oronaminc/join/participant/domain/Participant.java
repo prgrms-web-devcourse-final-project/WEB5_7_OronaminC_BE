@@ -1,15 +1,23 @@
 package com.oronaminc.join.participant.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Index;
-import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
 import com.oronaminc.join.global.entity.BaseEntity;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.room.domain.Room;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,4 +52,8 @@ public class Participant extends BaseEntity {
     private ParticipantType participantType;
 
     private LocalDateTime exitedAt;
+
+    public void updateExitAt() {
+        this.exitedAt = LocalDateTime.now();
+    }
 }

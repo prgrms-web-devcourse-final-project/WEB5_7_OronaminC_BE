@@ -1,13 +1,9 @@
-package com.oronaminc.join.websocket.config;
+package com.oronaminc.join.websocket.stomp;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.oronaminc.join.global.exception.ErrorCode;
-import com.oronaminc.join.global.exception.ErrorException;
-import com.oronaminc.join.global.exception.ErrorResponse;
 import java.nio.charset.StandardCharsets;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -15,6 +11,15 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.oronaminc.join.global.exception.ErrorCode;
+import com.oronaminc.join.global.exception.ErrorException;
+import com.oronaminc.join.global.exception.ErrorResponse;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration
@@ -30,11 +35,29 @@ public class StompErrorHandler extends StompSubProtocolErrorHandler {
     public Message<byte[]> handleClientMessageProcessingError(Message<byte[]> clientMessage,
         Throwable ex) {
 
-        if (ex instanceof ErrorException ee) {
+        ErrorException ee = findErrorException(ex);
+        if (ee != null) {
             return sendErrorMessage(ee);
         }
 
         return super.handleClientMessageProcessingError(clientMessage, ex);
+    }
+
+    // cause 체인을 따라가며 ErrorException을 찾는다 (AbstractMessageChannel.send()에서
+    // MessageDeliveryException 등으로 래핑되는 경우 대비). 순환 참조에 대비해 이미 방문한
+    // 예외는 Set으로 추적하여 무한 루프를 방지한다.
+    private ErrorException findErrorException(Throwable ex) {
+        Set<Throwable> visited = new HashSet<>();
+        Throwable current = ex;
+
+        while (current != null && visited.add(current)) {
+            if (current instanceof ErrorException ee) {
+                return ee;
+            }
+            current = current.getCause();
+        }
+
+        return null;
     }
 
     // 실제 stomp 에러를 클라이언트에게 전송

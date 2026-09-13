@@ -12,7 +12,6 @@ jobs:
 
     env:
       SPRING_PROFILES_ACTIVE: ci
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
     steps:
       - name: 브랜치로 체크아웃
@@ -27,19 +26,10 @@ jobs:
       - name: application-ci.yml 주입
         run: |
           mkdir -p src/main/resources
-          echo "${{ secrets.APPLICATION_YML_CI }}" | base64 --decode > src/main/resources/application-ci.yml
+          echo "${{ secrets.APPLICATION_YML_CI }}" > src/main/resources/application-ci.yml
 
       - name: 권한 세팅
         run: chmod +x ./gradlew
 
       - name: 테스트 수행
         run: ./gradlew test --no-daemon
-
-      - name: Slack 알림 보내기(테스트 실패 시)
-        if: failure()
-        uses: slackapi/slack-github-action@v1.24.0
-        with:
-          payload: |
-            {
-              "text": "🔴 *CI 테스트 실패 알림*\n리포지토리: `${{ github.repository }}`\n브랜치: `${{ github.ref_name }}`\nPR 번호: `${{ github.event.pull_request.number }}`\nPR 제목: `${{ github.event.pull_request.title }}`\n워크플로우: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>\n실패 커밋: `${{ github.event.pull_request.head.sha }}`"
-            }
