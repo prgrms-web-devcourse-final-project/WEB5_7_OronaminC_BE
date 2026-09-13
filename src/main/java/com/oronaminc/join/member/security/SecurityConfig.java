@@ -9,7 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception
                         .defaultAuthenticationEntryPointFor(
                                 restAuthenticationEntryPoint,
-                                new AntPathRequestMatcher("/api/**")))
+                                PathPatternRequestMatcher.withDefaults().matcher("/api/**")))
                 .authorizeHttpRequests(auth -> auth
                                 // .requestMatchers(
                                 //         "/api/auth/guest",
