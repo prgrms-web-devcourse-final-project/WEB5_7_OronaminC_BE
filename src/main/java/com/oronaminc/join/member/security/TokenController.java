@@ -35,7 +35,7 @@ public class TokenController {
 
         TokenPair tokenPair = jwtTokenProvider.generateTokenPair(new JwtMemberInfo(body.memberId(),
             body.nickname(), body.role()));
-        refreshTokenStore.isBlacklisted(refresh);
+        refreshTokenStore.blacklist(refresh);
         refreshTokenStore.saveLatest(body.memberId(), tokenPair.refreshToken());
         JwtUtils.addRefreshTokenCookie(response, tokenPair.refreshToken(), tokenPair.refreshTokenExpiresIn());
 

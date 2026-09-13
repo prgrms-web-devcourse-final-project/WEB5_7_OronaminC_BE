@@ -43,6 +43,7 @@ public class SecurityConfig {
                                         "/oauth2/**",
                                         "/login/oauth2/code/kakao",
                                         "/api/auth/logout",
+                                        "/api/auth/token/refresh",
                                         "/dev/**",
                                         "/ws/**",
                                         "/api/auth/guest",

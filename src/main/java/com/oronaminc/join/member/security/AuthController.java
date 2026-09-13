@@ -99,7 +99,7 @@ public class AuthController {
         if (refresh != null) {
             try {
                 var body = jwtTokenProvider.parseClaims(refresh);
-                refreshTokenStore.isBlacklisted(refresh);
+                refreshTokenStore.blacklist(refresh);
                 refreshTokenStore.saveLatest(body.memberId(), "");
             }catch (Exception ignored){ }
         }

@@ -32,6 +32,10 @@ public class RefreshTokenStore {
         return v != null && v;
     }
 
+    public void blacklist(String refreshToken) {
+        blacklist().put(refreshToken, Boolean.TRUE);
+    }
+
     private String key(Long memberId) {
         return "refresh:" + memberId;
     }
