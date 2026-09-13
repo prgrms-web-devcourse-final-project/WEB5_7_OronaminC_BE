@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -25,10 +26,18 @@ public class SecurityConfig {
     private final AuthService authService;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, JwtTokenProvider jwt) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtTokenProvider jwt,
+        RestAuthenticationEntryPoint restAuthenticationEntryPoint) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                // "/api/**" 요청은 인증되지 않은 경우 oauth2Login()의 기본 302 리다이렉트
+                // 대신 401 JSON(ErrorCode.UNAUTHORIZED_MEMBER)으로 응답한다.
+                // 그 외 경로(카카오 로그인 흐름 등)는 oauth2Login()의 기존 리다이렉트 동작을 유지한다.
+                .exceptionHandling(exception -> exception
+                        .defaultAuthenticationEntryPointFor(
+                                restAuthenticationEntryPoint,
+                                new AntPathRequestMatcher("/api/**")))
                 .authorizeHttpRequests(auth -> auth
                                 // .requestMatchers(
                                 //         "/api/auth/guest",
