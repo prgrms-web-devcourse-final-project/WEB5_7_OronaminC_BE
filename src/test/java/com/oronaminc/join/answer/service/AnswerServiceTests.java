@@ -113,7 +113,7 @@ public class AnswerServiceTests {
             .participantType(ParticipantType.TEAM)
             .build();
 
-        request = new AnswerRequest("답변입니다.", mockMember.getId());
+        request = new AnswerRequest("답변입니다.");
     }
 
     @Test
@@ -253,7 +253,7 @@ public class AnswerServiceTests {
         given(permissionValidator.validateAnswerUpdatePermission(1L, 1L))
             .willReturn(answer);
 
-        AnswerRequest request = new AnswerRequest("수정된 내용", 1L);
+        AnswerRequest request = new AnswerRequest("수정된 내용");
 
         // when
         Answer result = answerService.update(answer.getId(), answer.getMember().getId(), request);

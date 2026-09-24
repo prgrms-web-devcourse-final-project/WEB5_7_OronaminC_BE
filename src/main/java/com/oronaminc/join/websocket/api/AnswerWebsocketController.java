@@ -2,6 +2,8 @@ package com.oronaminc.join.websocket.api;
 
 import static com.oronaminc.join.global.exception.ErrorCode.*;
 
+import java.security.Principal;
+
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -38,9 +40,10 @@ public class AnswerWebsocketController {
     public AnswerCreateResponse create(
         @DestinationVariable Long roomId,
         @DestinationVariable Long questionId,
-        @Payload @Valid AnswerRequest request
+        @Payload @Valid AnswerRequest request,
+        Principal principal
     ) {
-        Long memberId = request.memberId();
+        Long memberId = getMemberId(principal);
 
         Bucket bucket = rateLimitService.getBucket(RateLimitType.CREATE_ANSWER, roomId, memberId, questionId);
 
@@ -59,10 +62,11 @@ public class AnswerWebsocketController {
     @SendTo("/topic/rooms/{roomId}/answers")
     public AnswerUpdateResponse update(
         @DestinationVariable Long answerId,
-        @Payload @Valid AnswerRequest request
+        @Payload @Valid AnswerRequest request,
+        Principal principal
     ) {
 
-        Long memberId = request.memberId();
+        Long memberId = getMemberId(principal);
 
         Answer answer = answerService.update(answerId, memberId, request);
 
@@ -75,15 +79,22 @@ public class AnswerWebsocketController {
     @SendTo("/topic/rooms/{roomId}/answers")
     public AnswerDeleteResponse delete(
         @DestinationVariable Long answerId,
-        @Payload @Valid StompMemberRequest request
+        Principal principal
     ) {
-        Long memberId = request.memberId();
+        Long memberId = getMemberId(principal);
 
         answerService.delete(answerId, memberId);
 
         log.info("삭제되었습니다.");
 
         return new AnswerDeleteResponse(answerId, EventType.DELETE);
+    }
+
+    private Long getMemberId(Principal principal) {
+        if (principal == null) {
+            throw new ErrorException(UNAUTHORIZED_MEMBER);
+        }
+        return Long.valueOf(principal.getName());
     }
 
 }
