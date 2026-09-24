@@ -3,6 +3,7 @@ package com.oronaminc.join.answer.api;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.lenient;
 
 import com.oronaminc.join.answer.domain.Answer;
 import com.oronaminc.join.answer.service.AnswerReader;
@@ -90,75 +91,63 @@ public class PermissionValidTests {
     }
 
     @Test
-    @DisplayName("삭제 권한 - 질문 작성자(GUEST 포함)는 삭제 가능")
-    void deletePermission_success_byQuestionWriter() {
+    @DisplayName("삭제 권한 - 답변 작성자 본인(GUEST 포함)은 삭제 가능")
+    void deletePermission_success_byAnswerWriter() {
+        given(answerReader.getById(200L)).willReturn(answer); // 답변자 = 본인
+
+        assertThatCode(() -> permissionValidator.validateAnswerDeletePermission(1L, 200L, 1L))
+            .doesNotThrowAnyException();
+    }
+
+    @Test
+    @DisplayName("삭제 권한 - 질문 작성자라도 남의 답변은 삭제 불가")
+    void deletePermission_fail_byQuestionWriter() {
         // given
         question = Question.builder().id(100L).member(member).room(room).build(); // 질문자 = 본인
         answer = Answer.builder().id(200L).question(question).member(Member.builder().id(999L).build()).build(); // 답변자는 본인 아님
 
-        Participant participant = Participant.builder()
-            .member(member)
-            .room(room)
-            .participantType(ParticipantType.GUEST)
-            .build();
-
         given(answerReader.getById(200L)).willReturn(answer);
-        given(participantReader.getByRoomIdAndMemberId(1L, 1L)).willReturn(participant);
 
         // when & then
-        assertThatCode(() -> permissionValidator.validateAnswerDeletePermission(1L, 200L, 1L))
-            .doesNotThrowAnyException();
-    }
-
-
-    @Test
-    @DisplayName("삭제 권한 - 팀원(TEAM)은 삭제 가능")
-    void deletePermission_success_byTeam() {
-        Participant participant = Participant.builder()
-            .member(member)
-            .room(room)
-            .participantType(ParticipantType.TEAM)
-            .build();
-
-        given(answerReader.getById(200L)).willReturn(answer);
-        given(participantReader.getByRoomIdAndMemberId(1L, 1L)).willReturn(participant);
-
-        assertThatCode(() -> permissionValidator.validateAnswerDeletePermission(1L, 200L, 1L))
-            .doesNotThrowAnyException();
+        assertThatThrownBy(() -> permissionValidator.validateAnswerDeletePermission(1L, 200L, 1L))
+            .isInstanceOf(ErrorException.class)
+            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.UNAUTHORIZED_DELETE_ANSWER);
     }
 
     @Test
-    @DisplayName("삭제 권한 - 발표자(PRESENTER)는 삭제 가능")
-    void deletePermission_success_byPresenter() {
-        Participant participant = Participant.builder()
-            .member(member)
-            .room(room)
-            .participantType(ParticipantType.PRESENTER)
-            .build();
+    @DisplayName("삭제 권한 - 팀원(TEAM)이라도 남의 답변은 삭제 불가")
+    void deletePermission_fail_byTeam() {
+        answer = Answer.builder().id(200L).question(question).member(Member.builder().id(999L).build()).build();
+        stubParticipantType(ParticipantType.TEAM);
 
         given(answerReader.getById(200L)).willReturn(answer);
-        given(participantReader.getByRoomIdAndMemberId(1L, 1L)).willReturn(participant);
-
-        assertThatCode(() -> permissionValidator.validateAnswerDeletePermission(1L, 200L, 1L))
-            .doesNotThrowAnyException();
-    }
-
-
-    @Test
-    @DisplayName("삭제 권한 - 권한 없는 GUEST는 삭제 불가")
-    void deletePermission_fail_unauthorizedGuest() {
-        Participant participant = Participant.builder()
-            .member(member)
-            .room(room)
-            .participantType(ParticipantType.GUEST)
-            .build();
-
-        given(answerReader.getById(200L)).willReturn(answer);
-        given(participantReader.getByRoomIdAndMemberId(1L, 1L)).willReturn(participant);
 
         assertThatThrownBy(() -> permissionValidator.validateAnswerDeletePermission(1L, 200L, 1L))
             .isInstanceOf(ErrorException.class)
             .hasFieldOrPropertyWithValue("errorCode", ErrorCode.UNAUTHORIZED_DELETE_ANSWER);
+    }
+
+    @Test
+    @DisplayName("삭제 권한 - 발표자(PRESENTER)라도 남의 답변은 삭제 불가")
+    void deletePermission_fail_byPresenter() {
+        answer = Answer.builder().id(200L).question(question).member(Member.builder().id(999L).build()).build();
+        stubParticipantType(ParticipantType.PRESENTER);
+
+        given(answerReader.getById(200L)).willReturn(answer);
+
+        assertThatThrownBy(() -> permissionValidator.validateAnswerDeletePermission(1L, 200L, 1L))
+            .isInstanceOf(ErrorException.class)
+            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.UNAUTHORIZED_DELETE_ANSWER);
+    }
+
+    // 삭제 권한은 역할을 보지 않지만, 역할 기반 검증으로 되돌아가는 회귀를 잡기 위해 역할을 lenient 스텁으로 둔다
+    private void stubParticipantType(ParticipantType type) {
+        Participant participant = Participant.builder()
+            .member(member)
+            .room(room)
+            .participantType(type)
+            .build();
+        lenient().when(participantReader.getByRoomIdAndMemberId(1L, 1L)).thenReturn(participant);
     }
 
     @Test

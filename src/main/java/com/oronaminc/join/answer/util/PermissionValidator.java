@@ -1,7 +1,9 @@
 package com.oronaminc.join.answer.util;
 
 import static com.oronaminc.join.global.exception.ErrorCode.NOT_FOUND_ANSWER;
+import static com.oronaminc.join.global.exception.ErrorCode.UNAUTHORIZED_DELETE_ANSWER;
 import static com.oronaminc.join.global.exception.ErrorCode.UNAUTHORIZED_EDIT_ANSWER;
+import static com.oronaminc.join.global.exception.ErrorCode.UNAUTHORIZED_ROLE_ANSWER;
 
 import com.oronaminc.join.answer.domain.Answer;
 import com.oronaminc.join.answer.service.AnswerReader;
@@ -22,7 +24,14 @@ public class PermissionValidator {
     private final AnswerReader answerReader;
 
     public void validateAnswerCreatePermission(Long roomId, Long memberId, Question question) {
-        validatePermission(roomId, memberId, question, PermissionType.CREATE);
+        Participant participant = participantReader.getByRoomIdAndMemberId(roomId, memberId);
+        ParticipantType type = participant.getParticipantType();
+        boolean isQuestionWriter = question.getMember().getId().equals(memberId);
+
+        if (!(isQuestionWriter || type == ParticipantType.TEAM
+            || type == ParticipantType.PRESENTER)) {
+            throw new ErrorException(UNAUTHORIZED_ROLE_ANSWER);
+        }
     }
 
     public Answer validateAnswerUpdatePermission(Long roomId, Long answerId, Long memberId) {
@@ -37,9 +46,10 @@ public class PermissionValidator {
 
     public Answer validateAnswerDeletePermission(Long roomId, Long answerId, Long memberId) {
         Answer answer = getAnswerInRoom(roomId, answerId);
-        Question question = answer.getQuestion();
 
-        validatePermission(roomId, memberId, question, PermissionType.DELETE);
+        if (!answer.getMember().getId().equals(memberId)) {
+            throw new ErrorException(UNAUTHORIZED_DELETE_ANSWER);
+        }
 
         return answer;
     }
@@ -54,18 +64,6 @@ public class PermissionValidator {
         }
 
         return answer;
-    }
-
-    private void validatePermission(Long roomId, Long memberId, Question question,
-        PermissionType permissionType) {
-        Participant participant = participantReader.getByRoomIdAndMemberId(roomId, memberId);
-        ParticipantType type = participant.getParticipantType();
-        boolean isQuestionWriter = question.getMember().getId().equals(memberId);
-
-        if (!(isQuestionWriter || type == ParticipantType.TEAM
-            || type == ParticipantType.PRESENTER)) {
-            throw new ErrorException(permissionType.toErrorCode());
-        }
     }
 
 }
