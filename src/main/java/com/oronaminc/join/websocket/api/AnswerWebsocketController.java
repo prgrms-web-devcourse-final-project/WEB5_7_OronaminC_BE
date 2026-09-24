@@ -16,6 +16,7 @@ import com.oronaminc.join.answer.dto.AnswerDeleteResponse;
 import com.oronaminc.join.answer.dto.AnswerRequest;
 import com.oronaminc.join.answer.dto.AnswerUpdateResponse;
 import com.oronaminc.join.answer.mapper.AnswerMapper;
+import com.oronaminc.join.answer.service.AnswerFacade;
 import com.oronaminc.join.answer.service.AnswerService;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.global.ratelimit.RateLimitService;
@@ -34,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AnswerWebsocketController {
 
     private final AnswerService answerService;
+    private final AnswerFacade answerFacade;
     private final RateLimitService rateLimitService;
 
     @MessageMapping("/rooms/{roomId}/question/{questionId}/answers/create")
@@ -70,7 +72,7 @@ public class AnswerWebsocketController {
 
         Long memberId = StompPrincipalUtil.getMemberId(principal);
 
-        Answer answer = answerService.update(roomId, answerId, memberId, request);
+        Answer answer = answerFacade.update(roomId, answerId, memberId, request);
 
         log.info("수정 메세지 = {}", answer.getContent());
 
@@ -86,7 +88,7 @@ public class AnswerWebsocketController {
     ) {
         Long memberId = StompPrincipalUtil.getMemberId(principal);
 
-        answerService.delete(roomId, answerId, memberId);
+        answerFacade.delete(roomId, answerId, memberId);
 
         log.info("삭제되었습니다.");
 

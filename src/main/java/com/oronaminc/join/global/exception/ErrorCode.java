@@ -50,6 +50,7 @@ public enum ErrorCode {
     UNAUTHORIZED_EDIT_ANSWER("ANSWER-004", "작성자가 아니면 해당 댓글을 수정할 수 없습니다.", UNAUTHORIZED),
     UNAUTHORIZED_DELETE_ANSWER("ANSWER-005", "답변 작성자만 삭제할 수 있습니다.", UNAUTHORIZED),
     TOO_MANY_REQUESTS_ANSWER("ANSWER-006", "잠시 후 다시 시도해주세요.", UNAUTHORIZED),
+    CONFLICT_ANSWER("ANSWER-007", "답변 처리 중 충돌이 발생했습니다.", CONFLICT),
 
     ACCESS_DENIED_SESSION("SESSION-1201", "접근 권한이 없습니다.", FORBIDDEN),
     NOT_FOUND_SESSION("SESSION-1202", "세션이 유효하지 않습니다.", UNAUTHORIZED),
