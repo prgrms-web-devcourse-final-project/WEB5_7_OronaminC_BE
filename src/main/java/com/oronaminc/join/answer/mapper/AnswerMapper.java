@@ -6,8 +6,6 @@ import com.oronaminc.join.answer.dto.AnswerGetResponse;
 import com.oronaminc.join.answer.dto.AnswerListResponse;
 import com.oronaminc.join.answer.dto.AnswerRequest;
 import com.oronaminc.join.answer.dto.AnswerUpdateResponse;
-import com.oronaminc.join.emoji.domain.TargetType;
-import com.oronaminc.join.emoji.service.EmojiReader;
 import com.oronaminc.join.global.dto.WriterDto;
 import com.oronaminc.join.member.domain.Member;
 import com.oronaminc.join.question.domain.Question;

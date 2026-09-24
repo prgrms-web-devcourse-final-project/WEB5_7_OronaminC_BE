@@ -97,7 +97,7 @@ public class AnswerService {
     public Answer update(Long roomId, Long answerId, Long memberId, AnswerRequest request) {
         Answer answer = permissionValidator.validateAnswerUpdatePermission(roomId, answerId, memberId);
 
-        answer.updataContent(request.content());
+        answer.updateContent(request.content());
 
         return answer;
     }

@@ -58,7 +58,7 @@ public class Answer extends BaseEntity {
             .build();
     }
 
-    public void updataContent(String content) {
+    public void updateContent(String content) {
         this.content = content;
     }
 

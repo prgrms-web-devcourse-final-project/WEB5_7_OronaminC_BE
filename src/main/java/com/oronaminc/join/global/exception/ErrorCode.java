@@ -44,12 +44,12 @@ public enum ErrorCode {
     UNAUTHORIZED_DELETE_QUESTION("QUESTION-004", "작성자 및 관리자만 질문을 삭제할 수 있습니다.", UNAUTHORIZED),
     TOO_MANY_REQUESTS_QUESTION("QUESTION-005", "잠시 후 다시 시도해주세요.", TOO_MANY_REQUESTS),
 
-    UNAUTHORIZED_ROLE_ANSWER("ANSWER-001", "질문 작성자 또는 팀원과 발표자만 댓글을 작성할 수 있습니다.", UNAUTHORIZED),
+    UNAUTHORIZED_ROLE_ANSWER("ANSWER-001", "질문 작성자 또는 팀원과 발표자만 답변을 작성할 수 있습니다.", FORBIDDEN),
     NOT_FOUND_EXIST_ANSWER("ANSWER-002", "해당 질문에 대한 답변이 존재하지 않습니다.", NOT_FOUND),
     NOT_FOUND_ANSWER("ANSWER-003", "답변이 존재하지 않습니다.", NOT_FOUND),
-    UNAUTHORIZED_EDIT_ANSWER("ANSWER-004", "작성자가 아니면 해당 댓글을 수정할 수 없습니다.", UNAUTHORIZED),
-    UNAUTHORIZED_DELETE_ANSWER("ANSWER-005", "답변 작성자만 삭제할 수 있습니다.", UNAUTHORIZED),
-    TOO_MANY_REQUESTS_ANSWER("ANSWER-006", "잠시 후 다시 시도해주세요.", UNAUTHORIZED),
+    UNAUTHORIZED_EDIT_ANSWER("ANSWER-004", "답변 작성자만 수정할 수 있습니다.", FORBIDDEN),
+    UNAUTHORIZED_DELETE_ANSWER("ANSWER-005", "답변 작성자만 삭제할 수 있습니다.", FORBIDDEN),
+    TOO_MANY_REQUESTS_ANSWER("ANSWER-006", "잠시 후 다시 시도해주세요.", TOO_MANY_REQUESTS),
     CONFLICT_ANSWER("ANSWER-007", "답변 처리 중 충돌이 발생했습니다.", CONFLICT),
 
     ACCESS_DENIED_SESSION("SESSION-1201", "접근 권한이 없습니다.", FORBIDDEN),

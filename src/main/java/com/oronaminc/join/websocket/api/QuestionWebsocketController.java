@@ -75,7 +75,7 @@ public class QuestionWebsocketController {
         return QuestionMapper.toQuestionUpdateResponse(updated);
     }
 
-    @MessageMapping("rooms/{roomId}/questions/{questionId}/delete")
+    @MessageMapping("/rooms/{roomId}/questions/{questionId}/delete")
     @SendTo("/topic/rooms/{roomId}/questions")
     public QuestionDeleteResponse deleteQuestion(
         @DestinationVariable Long roomId,
