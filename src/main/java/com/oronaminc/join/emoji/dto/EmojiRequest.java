@@ -11,9 +11,7 @@ public record EmojiRequest(
     TargetType targetType,
     @NotNull
     @Schema(description = "공감 대상 ID", example = "1")
-    Long targetId,
-    @NotNull
-    Long memberId
+    Long targetId
 ) {
 
 }

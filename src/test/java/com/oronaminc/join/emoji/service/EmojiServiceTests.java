@@ -81,7 +81,7 @@ class EmojiServiceTests {
 
         // when
         EmojiResponse response = emojiService.createEmoji(memberId,
-            new EmojiRequest(targetType, targetId, memberId));
+            new EmojiRequest(targetType, targetId));
 
         // then
         assertThat(response.event()).isEqualTo(EventType.CREATE);
@@ -119,7 +119,7 @@ class EmojiServiceTests {
 
         // when
         EmojiResponse response = emojiService.createEmoji(memberId,
-            new EmojiRequest(targetType, targetId, memberId));
+            new EmojiRequest(targetType, targetId));
 
         // then
         assertThat(response.event()).isEqualTo(EventType.CREATE);
@@ -157,7 +157,7 @@ class EmojiServiceTests {
 
         // when
         EmojiResponse response = emojiService.createEmoji(memberId,
-            new EmojiRequest(targetType, targetId, memberId));
+            new EmojiRequest(targetType, targetId));
 
         // then
         assertThat(response.event()).isEqualTo(EventType.CREATE);
@@ -194,7 +194,7 @@ class EmojiServiceTests {
         // then
         assertThatThrownBy(
             () -> {
-                emojiService.createEmoji(memberId, new EmojiRequest(targetType, targetId, memberId));
+                emojiService.createEmoji(memberId, new EmojiRequest(targetType, targetId));
             }
         ).isInstanceOf(ErrorException.class);
 
@@ -226,7 +226,7 @@ class EmojiServiceTests {
 
         // when
         EmojiResponse response = emojiService.deleteEmoji(memberId,
-            new EmojiRequest(targetType, targetId, memberId));
+            new EmojiRequest(targetType, targetId));
 
         // then
         assertThat(response.event()).isEqualTo(EventType.DELETE);
@@ -262,7 +262,7 @@ class EmojiServiceTests {
 
         // when
         EmojiResponse response = emojiService.deleteEmoji(memberId,
-            new EmojiRequest(targetType, targetId, memberId));
+            new EmojiRequest(targetType, targetId));
 
         // then
         assertThat(response.event()).isEqualTo(EventType.DELETE);
@@ -298,7 +298,7 @@ class EmojiServiceTests {
 
         // when
         EmojiResponse response = emojiService.deleteEmoji(memberId,
-            new EmojiRequest(targetType, targetId, memberId));
+            new EmojiRequest(targetType, targetId));
 
         // then
         assertThat(response.event()).isEqualTo(EventType.DELETE);
@@ -335,7 +335,7 @@ class EmojiServiceTests {
         // then
         assertThatThrownBy(
             () -> {
-                emojiService.deleteEmoji(memberId, new EmojiRequest(targetType, targetId, memberId));
+                emojiService.deleteEmoji(memberId, new EmojiRequest(targetType, targetId));
             }
         ).isInstanceOf(ErrorException.class);
 

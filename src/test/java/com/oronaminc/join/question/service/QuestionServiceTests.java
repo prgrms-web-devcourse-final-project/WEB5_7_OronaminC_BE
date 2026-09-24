@@ -91,7 +91,7 @@ class QuestionServiceTests {
             .roomStatus(RoomStatus.STARTED)
             .build();
 
-        request = new QuestionRequest("질문입니다", mockMember.getId());
+        request = new QuestionRequest("질문입니다");
 
         mockQ1 = QuestionFlatResponse.builder()
             .questionId(1L)

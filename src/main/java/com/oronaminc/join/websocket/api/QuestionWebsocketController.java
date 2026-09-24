@@ -1,5 +1,7 @@
 package com.oronaminc.join.websocket.api;
 
+import java.security.Principal;
+
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -17,6 +19,7 @@ import com.oronaminc.join.question.dto.QuestionRequest;
 import com.oronaminc.join.question.dto.QuestionUpdateResponse;
 import com.oronaminc.join.question.service.QuestionService;
 import com.oronaminc.join.question.util.QuestionMapper;
+import com.oronaminc.join.websocket.stomp.StompPrincipalUtil;
 
 import io.github.bucket4j.Bucket;
 import jakarta.validation.Valid;
@@ -35,11 +38,12 @@ public class QuestionWebsocketController {
     @SendTo("/topic/rooms/{roomId}/questions")
     public QuestionCreateResponse createQuestion(
         @DestinationVariable Long roomId,
-        @Payload @Valid QuestionRequest request
+        @Payload @Valid QuestionRequest request,
+        Principal principal
     ) {
         log.debug("수신한 메시지 = {}", request.content());
 
-        Long memberId = request.memberId();
+        Long memberId = StompPrincipalUtil.getMemberId(principal);
 
         log.debug("회원 아이디 = {}", memberId);
 
@@ -60,10 +64,11 @@ public class QuestionWebsocketController {
     public QuestionUpdateResponse updateQuestion(
         @DestinationVariable Long roomId,
         @DestinationVariable Long questionId,
-        @Payload @Valid QuestionRequest request
+        @Payload @Valid QuestionRequest request,
+        Principal principal
     ) {
 
-        Long memberId = request.memberId();
+        Long memberId = StompPrincipalUtil.getMemberId(principal);
 
         Question updated = questionService.update(memberId, roomId, questionId, request);
 
@@ -75,9 +80,9 @@ public class QuestionWebsocketController {
     public QuestionDeleteResponse deleteQuestion(
         @DestinationVariable Long roomId,
         @DestinationVariable Long questionId,
-        @Payload @Valid StompMemberRequest request
+        Principal principal
     ) {
-        Long memberId = request.memberId();
+        Long memberId = StompPrincipalUtil.getMemberId(principal);
 
         Long deletedId = questionService.delete(memberId, roomId, questionId);
 

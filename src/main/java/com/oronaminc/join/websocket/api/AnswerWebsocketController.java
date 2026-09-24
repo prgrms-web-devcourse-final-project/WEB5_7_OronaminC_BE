@@ -21,6 +21,7 @@ import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.global.ratelimit.RateLimitService;
 import com.oronaminc.join.global.ratelimit.RateLimitType;
 import com.oronaminc.join.websocket.common.EventType;
+import com.oronaminc.join.websocket.stomp.StompPrincipalUtil;
 
 import io.github.bucket4j.Bucket;
 import jakarta.validation.Valid;
@@ -43,7 +44,7 @@ public class AnswerWebsocketController {
         @Payload @Valid AnswerRequest request,
         Principal principal
     ) {
-        Long memberId = getMemberId(principal);
+        Long memberId = StompPrincipalUtil.getMemberId(principal);
 
         Bucket bucket = rateLimitService.getBucket(RateLimitType.CREATE_ANSWER, roomId, memberId, questionId);
 
@@ -66,7 +67,7 @@ public class AnswerWebsocketController {
         Principal principal
     ) {
 
-        Long memberId = getMemberId(principal);
+        Long memberId = StompPrincipalUtil.getMemberId(principal);
 
         Answer answer = answerService.update(answerId, memberId, request);
 
@@ -81,20 +82,13 @@ public class AnswerWebsocketController {
         @DestinationVariable Long answerId,
         Principal principal
     ) {
-        Long memberId = getMemberId(principal);
+        Long memberId = StompPrincipalUtil.getMemberId(principal);
 
         answerService.delete(answerId, memberId);
 
         log.info("삭제되었습니다.");
 
         return new AnswerDeleteResponse(answerId, EventType.DELETE);
-    }
-
-    private Long getMemberId(Principal principal) {
-        if (principal == null) {
-            throw new ErrorException(UNAUTHORIZED_MEMBER);
-        }
-        return Long.valueOf(principal.getName());
     }
 
 }

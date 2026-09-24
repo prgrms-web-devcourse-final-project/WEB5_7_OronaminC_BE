@@ -1,5 +1,7 @@
 package com.oronaminc.join.websocket.api;
 
+import java.security.Principal;
+
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -13,6 +15,7 @@ import com.oronaminc.join.global.exception.ErrorCode;
 import com.oronaminc.join.global.exception.ErrorException;
 import com.oronaminc.join.global.ratelimit.RateLimitService;
 import com.oronaminc.join.global.ratelimit.RateLimitType;
+import com.oronaminc.join.websocket.stomp.StompPrincipalUtil;
 
 import io.github.bucket4j.Bucket;
 import jakarta.validation.Valid;
@@ -29,9 +32,10 @@ public class EmojiWebsocketController {
     @SendTo("/topic/rooms/{roomId}/emojis")
     public EmojiResponse createEmoji(
         @DestinationVariable Long roomId,
-        @Payload @Valid EmojiRequest emojiRequest
+        @Payload @Valid EmojiRequest emojiRequest,
+        Principal principal
     ) {
-        Long memberId = emojiRequest.memberId();
+        Long memberId = StompPrincipalUtil.getMemberId(principal);
 
         Bucket bucket = rateLimitService.getBucket(RateLimitType.EMOJI, memberId,
             emojiRequest.targetType(), emojiRequest.targetId());
@@ -47,9 +51,10 @@ public class EmojiWebsocketController {
     @SendTo("/topic/rooms/{roomId}/emojis")
     public EmojiResponse deleteEmoji(
         @DestinationVariable Long roomId,
-        @Payload @Valid EmojiRequest emojiRequest
+        @Payload @Valid EmojiRequest emojiRequest,
+        Principal principal
     ) {
-        Long memberId = emojiRequest.memberId();
+        Long memberId = StompPrincipalUtil.getMemberId(principal);
 
         Bucket bucket = rateLimitService.getBucket(RateLimitType.EMOJI, memberId,
             emojiRequest.targetType(), emojiRequest.targetId());
