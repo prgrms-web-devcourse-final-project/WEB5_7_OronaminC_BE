@@ -106,7 +106,7 @@ public class PermissionValidTests {
         given(participantReader.getByRoomIdAndMemberId(1L, 1L)).willReturn(participant);
 
         // when & then
-        assertThatCode(() -> permissionValidator.validateAnswerDeletePermission( 200L, 1L))
+        assertThatCode(() -> permissionValidator.validateAnswerDeletePermission(1L, 200L, 1L))
             .doesNotThrowAnyException();
     }
 
@@ -123,7 +123,7 @@ public class PermissionValidTests {
         given(answerReader.getById(200L)).willReturn(answer);
         given(participantReader.getByRoomIdAndMemberId(1L, 1L)).willReturn(participant);
 
-        assertThatCode(() -> permissionValidator.validateAnswerDeletePermission( 200L, 1L))
+        assertThatCode(() -> permissionValidator.validateAnswerDeletePermission(1L, 200L, 1L))
             .doesNotThrowAnyException();
     }
 
@@ -139,7 +139,7 @@ public class PermissionValidTests {
         given(answerReader.getById(200L)).willReturn(answer);
         given(participantReader.getByRoomIdAndMemberId(1L, 1L)).willReturn(participant);
 
-        assertThatCode(() -> permissionValidator.validateAnswerDeletePermission( 200L, 1L))
+        assertThatCode(() -> permissionValidator.validateAnswerDeletePermission(1L, 200L, 1L))
             .doesNotThrowAnyException();
     }
 
@@ -156,8 +156,28 @@ public class PermissionValidTests {
         given(answerReader.getById(200L)).willReturn(answer);
         given(participantReader.getByRoomIdAndMemberId(1L, 1L)).willReturn(participant);
 
-        assertThatThrownBy(() -> permissionValidator.validateAnswerDeletePermission(200L, 1L))
+        assertThatThrownBy(() -> permissionValidator.validateAnswerDeletePermission(1L, 200L, 1L))
             .isInstanceOf(ErrorException.class)
             .hasFieldOrPropertyWithValue("errorCode", ErrorCode.UNAUTHORIZED_DELETE_ANSWER);
+    }
+
+    @Test
+    @DisplayName("수정 권한 - 답변이 경로의 방에 속하지 않으면 예외 발생")
+    void updatePermission_fail_answerNotInRoom() {
+        given(answerReader.getById(200L)).willReturn(answer);
+
+        assertThatThrownBy(() -> permissionValidator.validateAnswerUpdatePermission(2L, 200L, 1L))
+            .isInstanceOf(ErrorException.class)
+            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_ANSWER);
+    }
+
+    @Test
+    @DisplayName("삭제 권한 - 답변이 경로의 방에 속하지 않으면 예외 발생")
+    void deletePermission_fail_answerNotInRoom() {
+        given(answerReader.getById(200L)).willReturn(answer);
+
+        assertThatThrownBy(() -> permissionValidator.validateAnswerDeletePermission(2L, 200L, 1L))
+            .isInstanceOf(ErrorException.class)
+            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_ANSWER);
     }
 }

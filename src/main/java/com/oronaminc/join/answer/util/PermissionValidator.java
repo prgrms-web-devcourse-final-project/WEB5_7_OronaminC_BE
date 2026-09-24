@@ -1,5 +1,6 @@
 package com.oronaminc.join.answer.util;
 
+import static com.oronaminc.join.global.exception.ErrorCode.NOT_FOUND_ANSWER;
 import static com.oronaminc.join.global.exception.ErrorCode.UNAUTHORIZED_EDIT_ANSWER;
 
 import com.oronaminc.join.answer.domain.Answer;
@@ -24,8 +25,8 @@ public class PermissionValidator {
         validatePermission(roomId, memberId, question, PermissionType.CREATE);
     }
 
-    public Answer validateAnswerUpdatePermission(Long answerId, Long memberId) {
-        Answer answer = answerReader.getById(answerId);
+    public Answer validateAnswerUpdatePermission(Long roomId, Long answerId, Long memberId) {
+        Answer answer = getAnswerInRoom(roomId, answerId);
 
         if (!answer.getMember().getId().equals(memberId)) {
             throw new ErrorException(UNAUTHORIZED_EDIT_ANSWER);
@@ -34,12 +35,23 @@ public class PermissionValidator {
         return answer;
     }
 
-    public Answer validateAnswerDeletePermission(Long answerId, Long memberId) {
-        Answer answer = answerReader.getById(answerId);
-        Room room = answer.getQuestion().getRoom();
+    public Answer validateAnswerDeletePermission(Long roomId, Long answerId, Long memberId) {
+        Answer answer = getAnswerInRoom(roomId, answerId);
         Question question = answer.getQuestion();
 
-        validatePermission(room.getId(), memberId, question, PermissionType.DELETE);
+        validatePermission(roomId, memberId, question, PermissionType.DELETE);
+
+        return answer;
+    }
+
+    // 경로의 roomId와 답변이 속한 방이 다르면 해당 방에 없는 답변으로 취급
+    private Answer getAnswerInRoom(Long roomId, Long answerId) {
+        Answer answer = answerReader.getById(answerId);
+        Room room = answer.getQuestion().getRoom();
+
+        if (!room.getId().equals(roomId)) {
+            throw new ErrorException(NOT_FOUND_ANSWER);
+        }
 
         return answer;
     }

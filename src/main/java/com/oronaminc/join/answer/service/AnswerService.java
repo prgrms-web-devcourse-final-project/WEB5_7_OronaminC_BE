@@ -94,8 +94,8 @@ public class AnswerService {
     }
 
     @Transactional
-    public Answer update(Long answerId, Long memberId, AnswerRequest request) {
-        Answer answer = permissionValidator.validateAnswerUpdatePermission(answerId, memberId);
+    public Answer update(Long roomId, Long answerId, Long memberId, AnswerRequest request) {
+        Answer answer = permissionValidator.validateAnswerUpdatePermission(roomId, answerId, memberId);
 
         answer.updataContent(request.content());
 
@@ -103,8 +103,8 @@ public class AnswerService {
     }
 
     @Transactional
-    public void delete(Long answerId, Long memberId) {
-        Answer answer = permissionValidator.validateAnswerDeletePermission(answerId, memberId);
+    public void delete(Long roomId, Long answerId, Long memberId) {
+        Answer answer = permissionValidator.validateAnswerDeletePermission(roomId, answerId, memberId);
         answerRepository.delete(answer);
     }
 

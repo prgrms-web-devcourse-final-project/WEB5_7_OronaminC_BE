@@ -59,9 +59,10 @@ public class AnswerWebsocketController {
         return AnswerMapper.toAnswerCreateResponse(answer);
     }
 
-    @MessageMapping("/answers/{answerId}/update")
+    @MessageMapping("/rooms/{roomId}/answers/{answerId}/update")
     @SendTo("/topic/rooms/{roomId}/answers")
     public AnswerUpdateResponse update(
+        @DestinationVariable Long roomId,
         @DestinationVariable Long answerId,
         @Payload @Valid AnswerRequest request,
         Principal principal
@@ -69,22 +70,23 @@ public class AnswerWebsocketController {
 
         Long memberId = StompPrincipalUtil.getMemberId(principal);
 
-        Answer answer = answerService.update(answerId, memberId, request);
+        Answer answer = answerService.update(roomId, answerId, memberId, request);
 
         log.info("수정 메세지 = {}", answer.getContent());
 
         return AnswerMapper.toAnswerUpdateResponse(answer);
     }
 
-    @MessageMapping("/answers/{answerId}/delete")
+    @MessageMapping("/rooms/{roomId}/answers/{answerId}/delete")
     @SendTo("/topic/rooms/{roomId}/answers")
     public AnswerDeleteResponse delete(
+        @DestinationVariable Long roomId,
         @DestinationVariable Long answerId,
         Principal principal
     ) {
         Long memberId = StompPrincipalUtil.getMemberId(principal);
 
-        answerService.delete(answerId, memberId);
+        answerService.delete(roomId, answerId, memberId);
 
         log.info("삭제되었습니다.");
 

@@ -250,13 +250,13 @@ public class AnswerServiceTests {
             .content("기존 내용")
             .build();
 
-        given(permissionValidator.validateAnswerUpdatePermission(1L, 1L))
+        given(permissionValidator.validateAnswerUpdatePermission(1L, 1L, 1L))
             .willReturn(answer);
 
         AnswerRequest request = new AnswerRequest("수정된 내용");
 
         // when
-        Answer result = answerService.update(answer.getId(), answer.getMember().getId(), request);
+        Answer result = answerService.update(1L, answer.getId(), answer.getMember().getId(), request);
 
         // then
         assertThat(result.getContent()).isEqualTo("수정된 내용");
