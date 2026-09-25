@@ -5,9 +5,10 @@ import java.net.SocketException;
 
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
+import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
 import com.oronaminc.join.global.exception.ErrorCode;
@@ -64,10 +65,15 @@ public class WebSocketExceptionHandler {
     @MessageExceptionHandler
     @SendToUser("/queue/errors")
     public ErrorResponse handleValidationException(MethodArgumentNotValidException ex) {
-        return new ErrorResponse(
-            ErrorCode.SOCKET_VALIDATION_ERROR.getCode(),
-            ex.getMessage()
-        );
+        // @Payload @Valid 검증 실패 (STOMP에서는 web.bind가 아닌 messaging 패키지의 예외가 발생)
+        // ex.getMessage()는 원본 메시지 전체를 포함하므로 첫 번째 검증 오류 메시지만 내려준다
+
+        BindingResult bindingResult = ex.getBindingResult();
+        String message = (bindingResult != null && bindingResult.hasErrors())
+            ? bindingResult.getAllErrors().get(0).getDefaultMessage()
+            : ErrorCode.SOCKET_VALIDATION_ERROR.getMessage();
+
+        return new ErrorResponse(ErrorCode.SOCKET_VALIDATION_ERROR.getCode(), message);
     }
 
     private void removeSession(Message<?> message) throws IOException {

@@ -280,6 +280,26 @@ class AnswerWebsocketIntegrationTest {
     }
 
     @Test
+    @DisplayName("빈 content로 답변을 생성하면 /user/queue/errors 로 SOCKET_VALIDATION_ERROR를 받고 브로드캐스트되지 않는다")
+    void create_withBlankContent_sendsValidationErrorAndDoesNotBroadcast() throws Exception {
+        // given
+        Inbox roomTopic = subscribe(connect(subscriber), answersTopic(roomA));
+        StompSession presenterSession = connect(presenter);
+        Inbox errors = subscribeErrors(presenterSession, presenter);
+
+        // when
+        presenterSession.send(createPath(roomA, questionA), Map.of("content", ""));
+
+        // then
+        JsonNode error = errors.next();
+        assertThat(error.get("code").asText()).isEqualTo(ErrorCode.SOCKET_VALIDATION_ERROR.getCode());
+        assertThat(error.get("message").asText()).isEqualTo("답변 내용을 입력해주시기 바랍니다.");
+
+        presenterSession.send(createPath(roomA, questionA), Map.of("content", "sentinel"));
+        assertThat(roomTopic.messagesBefore("sentinel")).isEmpty();
+    }
+
+    @Test
     @DisplayName("Authorization 헤더 없이 CONNECT하면 ERROR 프레임(UNAUTHORIZED_MEMBER)과 함께 연결이 거부된다")
     void connect_withoutJwt_isRejected() {
         // given
