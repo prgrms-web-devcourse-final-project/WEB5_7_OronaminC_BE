@@ -15,6 +15,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -155,12 +156,13 @@ class AnswerWebsocketIntegrationTest {
         // given
         Inbox roomTopic = subscribe(connect(subscriber), answersTopic(roomA));
         StompSession presenterSession = connect(presenter);
+        Inbox errors = subscribeErrors(presenterSession, presenter);
 
         // when
         presenterSession.send(createPath(roomA, questionA), Map.of("content", "첫 답변"));
 
         // then
-        JsonNode message = roomTopic.next();
+        JsonNode message = roomTopic.next(errors);
         assertThat(message.get("event").asText()).isEqualTo("CREATE");
         assertThat(message.get("questionId").asLong()).isEqualTo(questionA.getId());
         assertThat(message.get("content").asText()).isEqualTo("첫 답변");
@@ -177,12 +179,13 @@ class AnswerWebsocketIntegrationTest {
         Answer answer = saveAnswer(questionA, presenter, "수정 전");
         Inbox roomTopic = subscribe(connect(subscriber), answersTopic(roomA));
         StompSession presenterSession = connect(presenter);
+        Inbox errors = subscribeErrors(presenterSession, presenter);
 
         // when
         presenterSession.send(updatePath(roomA, answer), Map.of("content", "수정 후"));
 
         // then
-        JsonNode message = roomTopic.next();
+        JsonNode message = roomTopic.next(errors);
         assertThat(message.get("event").asText()).isEqualTo("UPDATE");
         assertThat(message.get("answerId").asLong()).isEqualTo(answer.getId());
         assertThat(message.get("content").asText()).isEqualTo("수정 후");
@@ -198,12 +201,13 @@ class AnswerWebsocketIntegrationTest {
         Answer answer = saveAnswer(questionA, presenter, "삭제될 답변");
         Inbox roomTopic = subscribe(connect(subscriber), answersTopic(roomA));
         StompSession presenterSession = connect(presenter);
+        Inbox errors = subscribeErrors(presenterSession, presenter);
 
         // when
         presenterSession.send(deletePath(roomA, answer), Map.of());
 
         // then
-        JsonNode message = roomTopic.next();
+        JsonNode message = roomTopic.next(errors);
         assertThat(message.get("event").asText()).isEqualTo("DELETE");
         assertThat(message.get("answerId").asLong()).isEqualTo(answer.getId());
 
@@ -216,19 +220,23 @@ class AnswerWebsocketIntegrationTest {
         // given
         Inbox roomTopic = subscribe(connect(subscriber), answersTopic(roomA));
         StompSession presenterSession = connect(presenter);
+        Inbox errors = subscribeErrors(presenterSession, presenter);
 
-        // when: 발표자의 JWT로 연결한 세션에서 payload에 구독자의 memberId를 끼워 넣는다
+        // when: 발표자의 JWT로 연결한 세션에서 payload에 팀원의 memberId를 끼워 넣는다
+        // (위조 대상이 답변 권한이 없으면 권한 검증에서 먼저 거절되어 작성자 검증까지 도달하지 못하므로 TEAM 멤버를 사용)
         presenterSession.send(createPath(roomA, questionA),
-            Map.of("content", "위조 시도", "memberId", subscriber.getId()));
+            Map.of("content", "위조 시도", "memberId", teamMember.getId()));
 
         // then
-        JsonNode message = roomTopic.next();
-        assertThat(message.get("writer").get("memberId").asLong()).isEqualTo(presenter.getId());
+        JsonNode message = roomTopic.next(errors);
+        assertThat(message.get("writer").get("memberId").asLong())
+            .as("작성자는 JWT의 memberId여야 함")
+            .isEqualTo(presenter.getId());
 
         Long answerId = message.get("answerId").asLong();
         Long savedWriterId = transactionTemplate.execute(status ->
             answerRepository.findById(answerId).orElseThrow().getMember().getId());
-        assertThat(savedWriterId).isEqualTo(presenter.getId());
+        assertThat(savedWriterId).as("작성자는 JWT의 memberId여야 함").isEqualTo(presenter.getId());
     }
 
     @Test
@@ -454,11 +462,31 @@ class AnswerWebsocketIntegrationTest {
         }
 
         JsonNode next() throws InterruptedException {
+            return next(null);
+        }
+
+        // 요청자의 에러 큐를 함께 넘기면, 제한 시간 내에 수신하지 못했을 때 그동안 받은 에러를 실패 메시지에 담는다
+        JsonNode next(Inbox requesterErrors) throws InterruptedException {
             JsonNode message = messages.poll(TIMEOUT_SECONDS, TimeUnit.SECONDS);
             if (message == null) {
-                throw new AssertionError(TIMEOUT_SECONDS + "초 내에 메시지를 수신하지 못했습니다.");
+                throw new AssertionError(TIMEOUT_SECONDS + "초 내에 메시지를 수신하지 못했습니다."
+                    + describeErrors(requesterErrors));
             }
             return message;
+        }
+
+        private static String describeErrors(Inbox errors) {
+            if (errors == null) {
+                return "";
+            }
+            List<JsonNode> received = new ArrayList<>();
+            errors.messages.drainTo(received);
+            if (received.isEmpty()) {
+                return " (요청자 /user/queue/errors: 수신 없음)";
+            }
+            return " (요청자 /user/queue/errors: " + received.stream()
+                .map(e -> e.path("code").asText() + " " + e.path("message").asText())
+                .collect(Collectors.joining(", ")) + ")";
         }
 
         // content가 sentinelContent인 메시지가 올 때까지 기다리며, 그 전에 도착한 메시지들을 반환한다
