@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
@@ -56,6 +57,8 @@ import com.oronaminc.join.room.dao.RoomRepository;
 import com.oronaminc.join.room.domain.Room;
 import com.oronaminc.join.room.domain.RoomStatus;
 import com.oronaminc.join.room.domain.RoomType;
+import com.oronaminc.join.websocket.support.StompProbeController;
+import com.oronaminc.join.websocket.support.StompProbeController.ProbeRequest;
 
 /**
  * AnswerWebsocketController를 실제 서버(RANDOM_PORT)에 SockJS + STOMP로 연결해
@@ -63,7 +66,8 @@ import com.oronaminc.join.room.domain.RoomType;
  *
  * simple broker는 SUBSCRIBE에 RECEIPT를 보내지 않고 inbound 채널도 비동기라,
  * 구독 직후 바로 SEND하면 구독 등록보다 메시지 처리가 먼저 끝날 수 있다.
- * 그래서 구독한 목적지로 probe 메시지를 보내 실제로 수신될 때까지 기다린 뒤 시나리오를 진행한다.
+ * 그래서 /app/test/probe(StompProbeController)를 통해 서버가 구독한 목적지로 probe를 보내게 하고,
+ * 실제로 수신될 때까지 기다린 뒤 시나리오를 진행한다. (클라이언트는 브로커 목적지로 직접 SEND할 수 없다)
  */
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -76,11 +80,12 @@ import com.oronaminc.join.room.domain.RoomType;
     }
 )
 @ActiveProfiles("test")
+@Import(StompProbeController.class)
 @DisplayName("AnswerWebsocketController STOMP 통합 검증")
 class AnswerWebsocketIntegrationTest {
 
     private static final long TIMEOUT_SECONDS = 10;
-    private static final String PROBE_FIELD = "__probe";
+    private static final String PROBE_FIELD = StompProbeController.PROBE_FIELD;
     private static final String ERROR_QUEUE = "/user/queue/errors";
     private static final AtomicInteger SEQ = new AtomicInteger();
 
@@ -396,7 +401,7 @@ class AnswerWebsocketIntegrationTest {
         String probeId = UUID.randomUUID().toString();
         long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(TIMEOUT_SECONDS);
         while (true) {
-            session.send(probeDestination, Map.of(PROBE_FIELD, probeId));
+            session.send(StompProbeController.PROBE_PATH, new ProbeRequest(probeDestination, probeId));
             if (inbox.awaitProbe(probeId, 200)) {
                 return inbox;
             }

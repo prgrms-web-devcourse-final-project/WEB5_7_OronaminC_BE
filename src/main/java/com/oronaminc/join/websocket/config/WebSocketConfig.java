@@ -22,6 +22,11 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    // StompAuthChannelInterceptor의 목적지 검증도 이 값을 기준으로 한다
+    public static final String APPLICATION_DESTINATION_PREFIX = "/app";
+    public static final String USER_DESTINATION_PREFIX = "/user";
+    public static final String[] BROKER_DESTINATION_PREFIXES = {"/topic", "/queue"};
+
     private final StompErrorHandler stompErrorHandler;
     private final WebsocketSessionManager sessionManager;
     private final ApplicationEventPublisher publisher;
@@ -37,9 +42,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic", "/queue");
-        config.setApplicationDestinationPrefixes("/app");
-        config.setUserDestinationPrefix("/user");
+        config.enableSimpleBroker(BROKER_DESTINATION_PREFIXES);
+        config.setApplicationDestinationPrefixes(APPLICATION_DESTINATION_PREFIX);
+        config.setUserDestinationPrefix(USER_DESTINATION_PREFIX);
     }
 
     @Override
