@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -53,6 +54,7 @@ class EmojiFacadeTests {
 
 
     @Test
+    @Tag("flaky")
     @DisplayName("동시에 50개의 공감 생성 요청")
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     void createEmoji_success_test() throws InterruptedException {
@@ -109,6 +111,7 @@ class EmojiFacadeTests {
     }
 
     @Test
+    @Tag("flaky")
     @DisplayName("동시에 50개의 공감 삭제 요청")
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     void deleteEmoji_success_test() throws InterruptedException {

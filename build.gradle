@@ -75,8 +75,20 @@ dependencies {
 }
 
 tasks.named('test') {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        excludeTags 'flaky'
+    }
     finalizedBy jacocoTestReport
+}
+
+tasks.register('testFlaky', Test) {
+    description = 'Runs only tests tagged with "flaky".'
+    group = 'verification'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform {
+        includeTags 'flaky'
+    }
 }
 
 jacocoTestReport {
