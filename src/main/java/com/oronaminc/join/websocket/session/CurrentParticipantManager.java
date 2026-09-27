@@ -38,7 +38,11 @@ public class CurrentParticipantManager {
 
     public void addParticipant(Long roomId, Long memberId, int limit) {
         roomParticipants.compute(roomId, (id, participants) -> {
-            participants = getRoomParticipants(roomId);
+            // compute 안에서 같은 맵을 다시 수정(getRoomParticipants -> computeIfAbsent)하면
+            // ConcurrentHashMap이 IllegalStateException(Recursive update)을 던지므로 여기서 직접 생성한다
+            if (participants == null) {
+                participants = ConcurrentHashMap.newKeySet();
+            }
 
             // 중복 참가자일 경우 그대로 반환 (변화 없음)
             if (participants.contains(memberId)) {
