@@ -7,12 +7,14 @@ import com.oronaminc.join.document.service.DocumentService;
 import com.oronaminc.join.member.security.MemberDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "발표자료")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/documents")
@@ -37,6 +39,6 @@ public class DocumentController {
             @AuthenticationPrincipal MemberDetails memberDetails
     ) {
         String memberRole = memberDetails.getRole();
-        return documentService.generatePresignedUrl(documentRequest, memberRole);
+        return documentService.generateUploadPresignedUrl(documentRequest, memberRole);
     }
 }

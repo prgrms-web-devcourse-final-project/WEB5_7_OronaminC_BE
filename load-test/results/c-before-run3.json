@@ -1,0 +1,1330 @@
+{
+  "scenario": "C-broadcast",
+  "version": "before",
+  "run": "3",
+  "finished_at": "2026-09-25T14:19:50.653Z",
+  "conditions": {
+    "rooms": 5,
+    "writers_per_room": 2,
+    "subscribers_per_room": 20,
+    "questions_per_writer": 10,
+    "warmup_s": 10,
+    "measure_s": 60,
+    "grace_s": 5,
+    "cycle_ms": 1000,
+    "outcome_timeout_ms": 3000,
+    "subscribers_ready": 100
+  },
+  "summary": {
+    "broadcast_receipt_rate": 0,
+    "broadcast_expected": 24000,
+    "broadcast_received": 0,
+    "applied_update_delete": 1200,
+    "silent_failure": 1200
+  },
+  "by_op": {
+    "create": {
+      "sent": 600,
+      "applied": null,
+      "broadcast_seen_by_requester": 600,
+      "timeout": 0,
+      "silent_failure": 0,
+      "broadcast_expected": 0,
+      "broadcast_received": 0,
+      "broadcast_receipt_rate": null,
+      "requester_errors": {}
+    },
+    "update": {
+      "sent": 600,
+      "applied": 600,
+      "broadcast_seen_by_requester": 0,
+      "timeout": 0,
+      "silent_failure": 600,
+      "broadcast_expected": 12000,
+      "broadcast_received": 0,
+      "broadcast_receipt_rate": 0,
+      "requester_errors": {
+        "SOCKET-2000": 600
+      }
+    },
+    "delete": {
+      "sent": 600,
+      "applied": 600,
+      "broadcast_seen_by_requester": 0,
+      "timeout": 0,
+      "silent_failure": 600,
+      "broadcast_expected": 12000,
+      "broadcast_received": 0,
+      "broadcast_receipt_rate": 0,
+      "requester_errors": {
+        "SOCKET-2000": 600
+      }
+    }
+  },
+  "http_req_failed_rate": 0,
+  "ws_sessions": 110,
+  "k6_metrics": {
+    "requester_error{op:delete,code:ANSWER-005}": {
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      }
+    },
+    "requester_error{op:create,code:ANSWER-002}": {
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "requester_error{op:create,code:ANSWER-003}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "requester_error{op:delete,code:ANSWER-002}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "broadcast_received{op:delete}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "requester_error{op:delete,code:AUTH-002}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "op_sent{op:update}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 600,
+        "rate": 7.999421620485048
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "op_broadcast_seen": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 600,
+        "rate": 7.999421620485048
+      }
+    },
+    "requester_error{op:create,code:SOCKET-2000}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "requester_error{op:delete,code:ANSWER-004}": {
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter"
+    },
+    "broadcast_received": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      }
+    },
+    "broadcast_received{op:create}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "requester_error{op:create,code:AUTH-001}": {
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter"
+    },
+    "broadcast_expected": {
+      "contains": "default",
+      "values": {
+        "rate": 319.97686481940195,
+        "count": 24000
+      },
+      "type": "counter"
+    },
+    "requester_error{op:update,code:SOCKET-1003}": {
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter"
+    },
+    "requester_error{op:update,code:ANSWER-002}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "requester_error{op:update,code:ANSWER-003}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "op_timeout{op:delete}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "requester_error{op:delete,code:QUESTION-001}": {
+      "values": {
+        "rate": 0,
+        "count": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "requester_error{op:create,code:SOCKET-1002}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "requester_error{op:delete,code:ANSWER-001}": {
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter"
+    },
+    "requester_error{op:create,code:PARTICIPANT-001}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "requester_error{op:update,code:QUESTION-001}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "rate": 0,
+        "count": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "requester_error{op:update,code:PARTICIPANT-001}": {
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "broadcast_expected{op:create}": {
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "http_req_duration": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "min": 1.9355,
+        "med": 5.7241,
+        "max": 101.3124,
+        "p(90)": 11.952890000000014,
+        "p(95)": 14.3827,
+        "avg": 7.58730141666667
+      }
+    },
+    "requester_error{op:update,code:SOCKET-2000}": {
+      "contains": "default",
+      "values": {
+        "count": 600,
+        "rate": 7.999421620485048
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter"
+    },
+    "http_reqs": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 1200,
+        "rate": 15.998843240970096
+      }
+    },
+    "vus_max": {
+      "type": "gauge",
+      "contains": "default",
+      "values": {
+        "max": 110,
+        "value": 110,
+        "min": 110
+      }
+    },
+    "requester_error{op:update,code:OTHER}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "op_timeout": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      }
+    },
+    "requester_error{op:delete,code:SOCKET-3000}": {
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "silent_failure{op:delete}": {
+      "values": {
+        "count": 600,
+        "rate": 7.999421620485048
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "requester_error{op:delete,code:ANSWER-006}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "broadcast_expected{op:delete}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "rate": 159.98843240970098,
+        "count": 12000
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "requester_error{op:delete,code:AUTH-001}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "requester_error{op:create,code:QUESTION-001}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "requester_error{op:update,code:ANSWER-004}": {
+      "values": {
+        "rate": 0,
+        "count": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "requester_error{op:create,code:ANSWER-007}": {
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter"
+    },
+    "silent_failure{op:update}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "rate": 7.999421620485048,
+        "count": 600
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "requester_error{op:create,code:ANSWER-001}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "op_timeout{op:update}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "requester_error{op:update,code:ANSWER-005}": {
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      }
+    },
+    "ws_sessions": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 110,
+        "rate": 1.466560630422259
+      }
+    },
+    "requester_error{op:create,code:SOCKET-3000}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "op_sent": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 1800,
+        "rate": 23.998264861455144
+      }
+    },
+    "http_req_duration{expected_response:true}": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "med": 5.7241,
+        "max": 101.3124,
+        "p(90)": 11.952890000000014,
+        "p(95)": 14.3827,
+        "avg": 7.58730141666667,
+        "min": 1.9355
+      }
+    },
+    "requester_error{op:create,code:ANSWER-006}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "op_applied{op:delete}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 600,
+        "rate": 7.999421620485048
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "http_req_failed": {
+      "contains": "default",
+      "values": {
+        "rate": 0,
+        "passes": 0,
+        "fails": 1200
+      },
+      "type": "rate"
+    },
+    "requester_error{op:delete,code:ANSWER-007}": {
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      }
+    },
+    "http_req_waiting": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "med": 5.486750000000001,
+        "max": 99.598,
+        "p(90)": 11.704590000000003,
+        "p(95)": 13.872834999999997,
+        "avg": 7.264386416666669,
+        "min": 1.6678
+      }
+    },
+    "requester_error{op:update,code:SOCKET-1001}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "data_sent": {
+      "type": "counter",
+      "contains": "data",
+      "values": {
+        "count": 707672,
+        "rate": 9434.944495019825
+      }
+    },
+    "requester_error{op:update,code:AUTH-002}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "rate": 0,
+        "count": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "ws_msgs_received": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 15896,
+        "rate": 211.9313434653839
+      }
+    },
+    "requester_error{op:delete,code:SOCKET-1002}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "requester_error{op:delete,code:OTHER}": {
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      }
+    },
+    "op_broadcast_seen{op:create}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 600,
+        "rate": 7.999421620485048
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "iterations": {
+      "contains": "default",
+      "values": {
+        "count": 110,
+        "rate": 1.466560630422259
+      },
+      "type": "counter"
+    },
+    "op_broadcast_seen{op:delete}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "silent_failure{op:create}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "op_sent{op:delete}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "rate": 7.999421620485048,
+        "count": 600
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "requester_error{op:delete,code:PARTICIPANT-001}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "op_sent{op:create}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 600,
+        "rate": 7.999421620485048
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "ws_connecting": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "min": 4.8782,
+        "med": 240.60545000000002,
+        "max": 248.6045,
+        "p(90)": 247.10904,
+        "p(95)": 248.342165,
+        "avg": 220.0627881818182
+      }
+    },
+    "requester_error{op:update,code:ANSWER-006}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "requester_error{op:update,code:QUESTION-002}": {
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      }
+    },
+    "requester_error{op:delete,code:SOCKET-2000}": {
+      "contains": "default",
+      "values": {
+        "count": 600,
+        "rate": 7.999421620485048
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter"
+    },
+    "http_req_blocked": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "p(90)": 0,
+        "p(95)": 0,
+        "avg": 0.022804666666666654,
+        "min": 0,
+        "med": 0,
+        "max": 5.9516
+      }
+    },
+    "requester_error{op:update,code:SOCKET-3000}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "requester_error{op:delete,code:QUESTION-002}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "rate": 0,
+        "count": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "op_broadcast_seen{op:update}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "http_req_tls_handshaking": {
+      "contains": "time",
+      "values": {
+        "avg": 0,
+        "min": 0,
+        "med": 0,
+        "max": 0,
+        "p(90)": 0,
+        "p(95)": 0
+      },
+      "type": "trend"
+    },
+    "requester_error{op:delete,code:SOCKET-1003}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "data_received": {
+      "values": {
+        "count": 6218188,
+        "rate": 82903.17921240114
+      },
+      "type": "counter",
+      "contains": "data"
+    },
+    "requester_error{op:create,code:ANSWER-004}": {
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      }
+    },
+    "http_req_receiving": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "p(90)": 0.9243100000000006,
+        "p(95)": 1.0353,
+        "avg": 0.28765083333333324,
+        "min": 0,
+        "med": 0,
+        "max": 2.7557
+      }
+    },
+    "requester_error{op:create,code:SOCKET-1001}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "requester_error{op:update,code:ANSWER-001}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "ws_msgs_sent": {
+      "contains": "default",
+      "values": {
+        "count": 2262,
+        "rate": 30.15781950922863
+      },
+      "type": "counter"
+    },
+    "requester_error{op:create,code:AUTH-002}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "requester_error{op:delete,code:ANSWER-003}": {
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      }
+    },
+    "silent_failure": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 1200,
+        "rate": 15.998843240970096
+      }
+    },
+    "op_applied{op:create}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "iteration_duration": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "p(90)": 75004.9196,
+        "p(95)": 75005.4227,
+        "avg": 73678.51880909097,
+        "min": 60421.8224,
+        "med": 75003.7863,
+        "max": 75005.4227
+      }
+    },
+    "subscriber_ready": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 100,
+        "rate": 1.333236936747508
+      }
+    },
+    "vus": {
+      "type": "gauge",
+      "contains": "default",
+      "values": {
+        "value": 100,
+        "min": 100,
+        "max": 110
+      }
+    },
+    "requester_error{op:create,code:ANSWER-005}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "broadcast_expected{op:update}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 12000,
+        "rate": 159.98843240970098
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "requester_error{op:create,code:QUESTION-002}": {
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "broadcast_received{op:update}": {
+      "values": {
+        "rate": 0,
+        "count": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "requester_error{op:create,code:SOCKET-1003}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "rate": 0,
+        "count": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "ws_session_duration": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "min": 60421.8224,
+        "med": 75002.71745,
+        "max": 75004.9088,
+        "p(90)": 75004.3539,
+        "p(95)": 75004.4057,
+        "avg": 73677.45600454554
+      }
+    },
+    "requester_error": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 1200,
+        "rate": 15.998843240970096
+      }
+    },
+    "requester_error{op:delete,code:SOCKET-1001}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "op_applied{op:update}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 600,
+        "rate": 7.999421620485048
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "requester_error{op:update,code:ANSWER-007}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "requester_error{op:update,code:SOCKET-1002}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "requester_error{op:update,code:AUTH-001}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "op_timeout{op:create}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "http_req_sending": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "p(90)": 0,
+        "p(95)": 0,
+        "avg": 0.03526416666666665,
+        "min": 0,
+        "med": 0,
+        "max": 7.8954
+      }
+    },
+    "http_req_connecting": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "p(90)": 0,
+        "p(95)": 0,
+        "avg": 0.011397250000000003,
+        "min": 0,
+        "med": 0,
+        "max": 2.0586
+      }
+    },
+    "requester_error{op:create,code:OTHER}": {
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter"
+    },
+    "op_applied": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 1200,
+        "rate": 15.998843240970096
+      }
+    }
+  }
+}

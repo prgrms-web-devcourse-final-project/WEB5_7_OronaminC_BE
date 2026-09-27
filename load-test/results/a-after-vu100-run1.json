@@ -1,0 +1,1535 @@
+{
+  "scenario": "A-conflict",
+  "version": "after",
+  "emoji_vus": 100,
+  "run": "1",
+  "finished_at": "2026-09-25T14:50:05.159Z",
+  "conditions": {
+    "connect_s": 8,
+    "pre_s": 10,
+    "measure_s": 60,
+    "grace_s": 3,
+    "emoji_interval_ms": 450,
+    "probe_interval_ms": 500,
+    "update_timeout_ms": 5000,
+    "update_min_interval_ms": 200
+  },
+  "update": {
+    "sent": 292,
+    "applied": 291,
+    "success_rate": 0.9965753424657534,
+    "outcomes": {
+      "broadcast": 291,
+      "ANSWER-007": 1
+    },
+    "latency_ms": {
+      "count": 292,
+      "avg": 48.39041095890411,
+      "p50": 13,
+      "p95": 194.89999999999998,
+      "p99": 386.3199999999988,
+      "max": 621
+    },
+    "latency_applied_ms": {
+      "count": 291,
+      "avg": 46.422680412371136,
+      "p50": 13,
+      "p95": 194,
+      "p99": 265.00000000000296,
+      "max": 433
+    }
+  },
+  "emoji_storm": {
+    "sent": 15548,
+    "applied_broadcast": 9795,
+    "applied_rate": 0.6299845639310522,
+    "applied_per_s": 139.92857142857142,
+    "by_op": {
+      "create": {
+        "sent": 7199,
+        "applied_broadcast": 4922,
+        "applied_rate": 0.6837060702875399,
+        "errors": {
+          "EMOJI-001": 248,
+          "EMOJI-003": 12,
+          "EMOJI-004": 750
+        }
+      },
+      "delete": {
+        "sent": 8349,
+        "applied_broadcast": 4873,
+        "applied_rate": 0.5836627140974967,
+        "errors": {
+          "EMOJI-001": 1456,
+          "EMOJI-002": 3268,
+          "EMOJI-003": 19
+        }
+      }
+    }
+  },
+  "emoji_probe": {
+    "sent": 134,
+    "timeout": 0,
+    "errors": {},
+    "latency_ms": {
+        "count": 134,
+        "avg": 73.86567164179104,
+        "p50": 8,
+        "p95": 595.1499999999992,
+        "p99": 1082.1199999999994,
+        "max": 1131
+      }
+  },
+  "http_req_failed_rate": 0,
+  "ws_sessions": 102,
+  "k6_metrics": {
+    "emoji_error{op:delete,code:ANSWER-001}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "update_outcome{outcome:SOCKET-1001}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "update_outcome{outcome:EMOJI-001}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_probe_error": {
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "update_outcome{outcome:ANSWER-001}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "rate": 0,
+        "count": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_error{op:delete,code:ANSWER-002}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "update_outcome{outcome:EMOJI-004}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_probe_error{code:SOCKET-2000}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_error{op:create,code:AUTH-002}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_error{op:delete,code:SOCKET-1002}": {
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "emoji_error{op:create,code:ANSWER-005}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_probe_error{code:EMOJI-001}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "rate": 0,
+        "count": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_error{op:create,code:EMOJI-001}": {
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 248,
+        "rate": 3.0451186001680166
+      }
+    },
+    "emoji_error{op:delete,code:AUTH-002}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "rate": 0,
+        "count": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "update_outcome{outcome:ANSWER-003}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_probe_error{code:SOCKET-1001}": {
+      "values": {
+        "rate": 0,
+        "count": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "emoji_storm_applied{op:delete}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 4873,
+        "rate": 59.834124752494944
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "update_sent": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 292,
+        "rate": 3.585381577617181
+      }
+    },
+    "emoji_error{op:delete,code:ANSWER-003}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "rate": 0,
+        "count": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "update_outcome{outcome:EMOJI-003}": {
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter"
+    },
+    "emoji_probe_error{code:OTHER}": {
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter"
+    },
+    "emoji_error{op:create,code:EMOJI-002}": {
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "update_outcome{outcome:EMOJI-002}": {
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter"
+    },
+    "emoji_probe_error{code:AUTH-002}": {
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "emoji_probe_error{code:SOCKET-1003}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "update_outcome": {
+      "contains": "default",
+      "values": {
+        "count": 292,
+        "rate": 3.585381577617181
+      },
+      "type": "counter"
+    },
+    "emoji_error{op:delete,code:SOCKET-1003}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_error{op:delete,code:EMOJI-003}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 19,
+        "rate": 0.23329537662577549
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_error{op:delete,code:AUTH-001}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_error{op:delete,code:SOCKET-3000}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_sent{op:create}": {
+      "contains": "default",
+      "values": {
+        "count": 7199,
+        "rate": 88.39439033310303
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter"
+    },
+    "update_outcome{outcome:ANSWER-006}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "update_outcome{outcome:AUTH-002}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_error{op:delete,code:EMOJI-001}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 1456,
+        "rate": 17.877793071954162
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "data_sent": {
+      "type": "counter",
+      "contains": "data",
+      "values": {
+        "count": 2177533,
+        "rate": 26737.28322895025
+      }
+    },
+    "update_latency_applied": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "count": 291,
+        "avg": 46.422680412371136,
+        "min": 4,
+        "med": 13,
+        "p(95)": 194,
+        "p(99)": 265.00000000000296,
+        "max": 433
+      }
+    },
+    "http_req_waiting": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 4.800059246575344,
+        "min": 2.3378,
+        "med": 4.1682500000000005,
+        "p(95)": 6.385949999999997,
+        "p(99)": 11.229113999999988,
+        "max": 102.6625,
+        "count": 292
+      }
+    },
+    "emoji_error{op:delete,code:EMOJI-002}": {
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 3268,
+        "rate": 40.12680477963338
+      }
+    },
+    "emoji_probe_error{code:ANSWER-001}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "rate": 0,
+        "count": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_error{op:create,code:SOCKET-2000}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "update_outcome{outcome:AUTH-001}": {
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "emoji_error{op:create,code:EMOJI-003}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 12,
+        "rate": 0.14734444839522662
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_error{op:create,code:SOCKET-1001}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_error{op:create,code:ANSWER-003}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_storm_applied": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 9795,
+        "rate": 120.26990600260373
+      }
+    },
+    "http_req_receiving": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "count": 292,
+        "avg": 0.3625294520547944,
+        "min": 0,
+        "med": 0.314,
+        "p(95)": 1.004805,
+        "p(99)": 1.503663,
+        "max": 2.0699
+      }
+    },
+    "emoji_probe_error{code:ANSWER-006}": {
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "update_outcome{outcome:SOCKET-3000}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_error{op:create,code:SOCKET-1002}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "data_received": {
+      "type": "counter",
+      "contains": "data",
+      "values": {
+        "count": 4190109,
+        "rate": 51449.10827673955
+      }
+    },
+    "emoji_error{op:delete,code:EMOJI-004}": {
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      }
+    },
+    "emoji_probe_error{code:EMOJI-003}": {
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter"
+    },
+    "update_outcome{outcome:ANSWER-002}": {
+      "values": {
+        "rate": 0,
+        "count": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "emoji_probe_error{code:SOCKET-3000}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "iterations": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 102,
+        "rate": 1.2524278113594263
+      }
+    },
+    "emoji_probe_error{code:ANSWER-007}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "rate": 0,
+        "count": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "update_outcome{outcome:OTHER}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "ws_sessions": {
+      "values": {
+        "count": 102,
+        "rate": 1.2524278113594263
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "http_req_sending": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "p(95)": 0,
+        "p(99)": 0.5046989999999998,
+        "max": 0.8885,
+        "count": 292,
+        "avg": 0.012043493150684932,
+        "min": 0,
+        "med": 0
+      }
+    },
+    "ws_connecting": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 227.37953921568635,
+        "min": 221.5324,
+        "med": 227.3325,
+        "p(95)": 233.14408,
+        "p(99)": 236.846573,
+        "max": 236.8616,
+        "count": 102
+      }
+    },
+    "update_outcome{outcome:timeout}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_error{op:create,code:EMOJI-004}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "rate": 9.209028024701663,
+        "count": 750
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "update_latency": {
+      "contains": "time",
+      "values": {
+        "count": 292,
+        "avg": 48.39041095890411,
+        "min": 4,
+        "med": 13,
+        "p(95)": 194.89999999999998,
+        "p(99)": 386.3199999999988,
+        "max": 621
+      },
+      "type": "trend"
+    },
+    "emoji_error{op:create,code:PARTICIPANT-001}": {
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "http_req_duration{expected_response:true}": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "p(99)": 11.692002999999985,
+        "max": 104.7324,
+        "count": 292,
+        "avg": 5.174632191780823,
+        "min": 2.5054,
+        "med": 4.6141000000000005,
+        "p(95)": 6.862809999999997
+      }
+    },
+    "emoji_sent": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 15548,
+        "rate": 190.90929030408196
+      }
+    },
+    "emoji_probe_error{code:AUTH-001}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "ws_msgs_sent": {
+      "values": {
+        "count": 16386,
+        "rate": 201.19884428368195
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "update_success_rate": {
+      "type": "rate",
+      "contains": "default",
+      "values": {
+        "rate": 0.9965753424657534,
+        "passes": 291,
+        "fails": 1
+      }
+    },
+    "ws_session_duration": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "count": 102,
+        "avg": 81187.35865882352,
+        "min": 78147.1625,
+        "med": 81182.6868,
+        "p(95)": 81428.922435,
+        "p(99)": 81436.56961800001,
+        "max": 81441.8197
+      }
+    },
+    "iteration_duration": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 81187.53633137254,
+        "min": 78147.1625,
+        "med": 81182.6868,
+        "p(95)": 81428.922435,
+        "p(99)": 81437.77761599999,
+        "max": 81441.8197,
+        "count": 102
+      }
+    },
+    "emoji_probe_error{code:PARTICIPANT-001}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_error{op:delete,code:OTHER}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_probe_latency": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "med": 8,
+        "p(95)": 595.1499999999992,
+        "p(99)": 1082.1199999999994,
+        "max": 1131,
+        "count": 134,
+        "avg": 73.86567164179104,
+        "min": 4
+      }
+    },
+    "emoji_error{op:delete,code:ANSWER-006}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "vus_max": {
+      "type": "gauge",
+      "contains": "default",
+      "values": {
+        "min": 102,
+        "max": 102,
+        "value": 102
+      }
+    },
+    "http_req_tls_handshaking": {
+      "contains": "time",
+      "values": {
+        "med": 0,
+        "p(95)": 0,
+        "p(99)": 0,
+        "max": 0,
+        "count": 292,
+        "avg": 0,
+        "min": 0
+      },
+      "type": "trend"
+    },
+    "emoji_error{op:delete,code:SOCKET-1001}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_probe_error{code:EMOJI-004}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "rate": 0,
+        "count": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "http_req_duration": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "max": 104.7324,
+        "count": 292,
+        "avg": 5.174632191780823,
+        "min": 2.5054,
+        "med": 4.6141000000000005,
+        "p(95)": 6.862809999999997,
+        "p(99)": 11.692002999999985
+      }
+    },
+    "emoji_error{op:delete,code:SOCKET-2000}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_probe_error{code:ANSWER-005}": {
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "http_req_failed": {
+      "type": "rate",
+      "contains": "default",
+      "values": {
+        "rate": 0,
+        "passes": 0,
+        "fails": 292
+      }
+    },
+    "emoji_error{op:delete,code:ANSWER-004}": {
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      }
+    },
+    "emoji_probe_error{code:SOCKET-1002}": {
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter"
+    },
+    "emoji_error": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 5753,
+        "rate": 70.63938430147823
+      }
+    },
+    "update_outcome{outcome:ANSWER-004}": {
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      }
+    },
+    "emoji_error{op:create,code:SOCKET-3000}": {
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "emoji_error{op:create,code:OTHER}": {
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      }
+    },
+    "emoji_error{op:create,code:SOCKET-1003}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_error{op:create,code:ANSWER-004}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_probe_sent": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 134,
+        "rate": 1.645346340413364
+      }
+    },
+    "emoji_probe_error{code:ANSWER-002}": {
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "rate": 0,
+        "count": 0
+      }
+    },
+    "emoji_error{op:delete,code:PARTICIPANT-001}": {
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "emoji_probe_error{code:ANSWER-004}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_error{op:create,code:ANSWER-006}": {
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter"
+    },
+    "http_reqs": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 292,
+        "rate": 3.585381577617181
+      }
+    },
+    "emoji_error{op:delete,code:ANSWER-005}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_error{op:create,code:ANSWER-002}": {
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter"
+    },
+    "emoji_error{op:create,code:ANSWER-001}": {
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      }
+    },
+    "vus": {
+      "type": "gauge",
+      "contains": "default",
+      "values": {
+        "value": 101,
+        "min": 101,
+        "max": 102
+      }
+    },
+    "emoji_probe_error{code:EMOJI-002}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "update_outcome{outcome:PARTICIPANT-001}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "rate": 0,
+        "count": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "http_req_blocked": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 0.006891780821917808,
+        "min": 0,
+        "med": 0,
+        "p(95)": 0,
+        "p(99)": 0.502818,
+        "max": 0.5035,
+        "count": 292
+      }
+    },
+    "emoji_error{op:delete,code:ANSWER-007}": {
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter"
+    },
+    "emoji_storm_applied{op:create}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 4922,
+        "rate": 60.43578125010878
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "update_outcome{outcome:ANSWER-005}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "update_outcome{outcome:broadcast}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 291,
+        "rate": 3.5731028735842454
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_sent{op:delete}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 8349,
+        "rate": 102.51489997097892
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_probe_error{code:ANSWER-003}": {
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "update_outcome{outcome:SOCKET-1003}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "update_outcome{outcome:SOCKET-2000}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "emoji_error{op:create,code:ANSWER-007}": {
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      },
+      "type": "counter"
+    },
+    "emoji_error{op:create,code:AUTH-001}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "rate": 0,
+        "count": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "update_outcome{outcome:SOCKET-1002}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    },
+    "http_req_connecting": {
+      "values": {
+        "avg": 0.00516917808219178,
+        "min": 0,
+        "med": 0,
+        "p(95)": 0,
+        "p(99)": 0.04525199999998743,
+        "max": 0.5035,
+        "count": 292
+      },
+      "type": "trend",
+      "contains": "time"
+    },
+    "ws_msgs_received": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 16180,
+        "rate": 198.66943125289723
+      }
+    },
+    "update_outcome{outcome:ANSWER-007}": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 1,
+        "rate": 0.012278704032935552
+      },
+      "thresholds": {
+        "count>=0": {
+          "ok": true
+        }
+      }
+    }
+  }
+}

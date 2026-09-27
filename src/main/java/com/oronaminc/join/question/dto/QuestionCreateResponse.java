@@ -2,6 +2,7 @@ package com.oronaminc.join.question.dto;
 
 
 import com.oronaminc.join.global.dto.WriterDto;
+import com.oronaminc.join.websocket.common.EventType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.Builder;
@@ -10,7 +11,7 @@ import lombok.Builder;
 @Schema(description = "질문 생성 응답 DTO")
 public record QuestionCreateResponse(
     @Schema(description = "", example = "CREATE")
-    String event,
+    EventType event,
     @Schema(description = "질문 ID", example = "11")
     Long questionId,
     @Schema(description = "질문 내용", example = "질문있습니다. 질문생성DTO가 맞나요?")

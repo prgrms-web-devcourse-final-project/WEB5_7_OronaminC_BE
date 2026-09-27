@@ -2,6 +2,8 @@ package com.oronaminc.join.question.dao;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
+import com.oronaminc.join.config.TestQueryDslConfig;
+import com.oronaminc.join.question.domain.QuestionSort;
 import com.oronaminc.join.question.dto.QuestionFlatResponse;
 import java.util.Comparator;
 import java.util.List;
@@ -9,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
@@ -16,6 +19,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 @DataJpaTest
 @ActiveProfiles("test")
+@Import(TestQueryDslConfig.class)
 @Sql(scripts = "/question-test-data.sql")
 class QuestionRepositoryTests {
 
@@ -31,9 +35,8 @@ class QuestionRepositoryTests {
         Long roomId = 1L;
 
         // when
-        List<QuestionFlatResponse> result = questionRepository.findByCreatedAt(
-            null, memberId, roomId, pageable
-        );
+        List<QuestionFlatResponse> result = questionRepository.findQuestionsOrderBy(
+            null, null, memberId, roomId, QuestionSort.CREATEDAT, pageable);
 
         // then
         assertThat(result).hasSize(5);
@@ -50,9 +53,8 @@ class QuestionRepositoryTests {
         Long roomId = 1L;
 
         // when
-        List<QuestionFlatResponse> result = questionRepository.findByEmojiCount(
-            null, null, memberId, roomId, pageable
-        );
+        List<QuestionFlatResponse> result = questionRepository.findQuestionsOrderBy(
+            null, null, memberId, roomId, QuestionSort.EMOJI, pageable);
 
         // then
         assertThat(result).hasSize(5);
@@ -70,9 +72,8 @@ class QuestionRepositoryTests {
         Long roomId = 1L;
 
         // when
-        List<QuestionFlatResponse> result = questionRepository.findByMyQuestion(
-            null, memberId, roomId, pageable
-        );
+        List<QuestionFlatResponse> result = questionRepository.findQuestionsOrderBy(
+            null, null, memberId, roomId, QuestionSort.MYQUESTION, pageable);
 
         // then
         assertThat(result).hasSize(5);
